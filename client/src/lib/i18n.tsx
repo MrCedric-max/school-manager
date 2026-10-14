@@ -1,0 +1,26 @@
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import type { Lang } from './types';
+
+interface LangContextValue {
+  lang: Lang;
+  setLang: (lang: Lang) => void;
+}
+
+const LangContext = createContext<LangContextValue>({ lang: 'en', setLang: () => {} });
+
+export function LangProvider({ children }: { children: ReactNode }) {
+  const [lang, setLang] = useState<Lang>(() => (localStorage.getItem('sm.lang') === 'fr' ? 'fr' : 'en'));
+  useEffect(() => {
+    localStorage.setItem('sm.lang', lang);
+    document.documentElement.lang = lang;
+  }, [lang]);
+  const value = useMemo(() => ({ lang, setLang }), [lang]);
+  return <LangContext.Provider value={value}>{children}</LangContext.Provider>;
+}
+
+/** `tr('English', 'Français')` picks the text for the current interface language. */
+export function useLang() {
+  const { lang, setLang } = useContext(LangContext);
+  const tr = useCallback((en: string, fr: string) => (lang === 'fr' ? fr : en), [lang]);
+  return { lang, setLang, tr };
+}
