@@ -4,6 +4,11 @@ import { HttpError } from './http.js';
 const SCRYPT = { N: 16384, r: 8, p: 1, keylen: 64 };
 export const SESSION_COOKIE = 'sm_session';
 export const CSRF_HEADER = 'x-requested-with';
+/** Header and query parameter the app uses to carry the session token where cookies are refused. */
+export const SESSION_HEADER = 'x-session-token';
+export const SESSION_QUERY = 'sm_session';
+/** A session token: 32 random bytes as base64url (43 characters). */
+const TOKEN_PATTERN = /^[A-Za-z0-9_-]{20,200}$/;
 
 export function hashPassword(password) {
   const salt = crypto.randomBytes(16);
@@ -65,11 +70,57 @@ export function deleteSession(db, token) {
 
 /**
  * Session token sent by the app in an `Authorization: Bearer …` header. Browsers often refuse
- * cookies when the app is shown inside another site (e.g. a preview panel); the header always works.
+ * cookies when the app is shown inside another site (e.g. a preview panel); a header always works —
+ * but only when the proxy in front of the app passes it through, which is why the app also has
+ * `x-session-token` and, as a last resort, the `?sm_session=` query parameter (see readSessionToken).
  */
 export function readBearer(req) {
   const match = /^Bearer\s+([A-Za-z0-9_-]{20,200})$/.exec(req.headers.authorization ?? '');
   return match ? match[1] : null;
+}
+
+/** Session token in the app's own header — no proxy gives `Authorization` a special meaning. */
+export function readSessionHeader(req) {
+  const value = req.headers[SESSION_HEADER];
+  return typeof value === 'string' && TOKEN_PATTERN.test(value) ? value : null;
+}
+
+/** Session token in the query string — the only channel left when a proxy drops our headers. */
+export function readSessionQuery(req) {
+  const value = req.query?.[SESSION_QUERY];
+  return typeof value === 'string' && TOKEN_PATTERN.test(value) ? value : null;
+}
+
+/**
+ * Where a request carries its session token, in order of preference:
+ *
+ * 1. `x-session-token` header — the app's own header;
+ * 2. `authorization: Bearer …` — kept for older clients;
+ * 3. `?sm_session=…` — only used when the app found that headers do not reach the server
+ *    (some proxies strip `Authorization`; the app checks with GET /api/auth/transport);
+ * 4. the `sm_session` cookie — the normal case in a browser tab.
+ *
+ * Returns `{ token, via }`, `via` being the channel that supplied the token (null when there is none).
+ */
+export function readSessionToken(req) {
+  const header = readSessionHeader(req);
+  if (header) return { token: header, via: 'x-session-token' };
+  const bearer = readBearer(req);
+  if (bearer) return { token: bearer, via: 'authorization' };
+  const query = readSessionQuery(req);
+  if (query) return { token: query, via: 'query' };
+  const cookie = readCookie(req, SESSION_COOKIE);
+  return cookie ? { token: cookie, via: 'cookie' } : { token: null, via: null };
+}
+
+/** Which credential channels the request carried (used for the app's diagnostics). */
+export function sessionChannels(req) {
+  const channels = [];
+  if (readSessionHeader(req)) channels.push('x-session-token');
+  if (readBearer(req)) channels.push('authorization');
+  if (readSessionQuery(req)) channels.push('query');
+  if (readCookie(req, SESSION_COOKIE)) channels.push('cookie');
+  return channels;
 }
 
 export function readCookie(req, name) {
@@ -84,12 +135,26 @@ export function readCookie(req, name) {
 }
 
 /**
- * Cookie options. COOKIE_SAMESITE=none is only needed when the app is shown
- * inside an iframe on another site (e.g. a preview panel); it forces Secure.
+ * True when the app is shown inside another site — the browser blocks its cookies there.
+ * The app says so itself (`x-sm-embedded`, or `?embedded=1` where a proxy drops headers);
+ * operators can also force it either way with COOKIE_SAMESITE.
+ */
+export function isEmbeddedRequest(req) {
+  const forced = (process.env.COOKIE_SAMESITE ?? '').trim().toLowerCase();
+  if (forced === 'none') return true;
+  if (forced === 'lax' || forced === 'strict') return false;
+  return req.get('x-sm-embedded') === '1' || req.query?.embedded === '1';
+}
+
+/**
+ * Cookie options. A plain `SameSite=none` cookie is refused by browsers that block third-party
+ * cookies (Chrome 120+, and all of Chrome 155); a **partitioned** one (CHIPS) is kept, which is why
+ * the embedded cookie is `sameSite: none; secure; partitioned`. `Secure` is required by both — the
+ * preview is served over HTTPS, so it works; over plain HTTP the browser drops the cookie and the
+ * app falls back to sending the session token in a header.
  */
 function cookieOptions(req) {
-  const embedded = process.env.COOKIE_SAMESITE === 'none';
-  return embedded
+  return isEmbeddedRequest(req)
     ? { httpOnly: true, sameSite: 'none', secure: true, partitioned: true, path: '/' }
     : { httpOnly: true, sameSite: 'lax', secure: req.secure, path: '/' };
 }

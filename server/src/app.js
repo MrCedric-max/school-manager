@@ -12,8 +12,15 @@ import { metaRouter, sendLogo } from './routes/meta.js';
 import { pupilsRouter } from './routes/pupils.js';
 import { reportsRouter } from './routes/reports.js';
 
+/**
+ * Origins allowed to frame the app by default: the school's own pages, plus the sandbox preview
+ * hosts used to show the app while it is being worked on (the preview panel embeds it in an iframe,
+ * and without this the browser would refuse to display it). Override with FRAME_ANCESTORS.
+ */
+const PREVIEW_ANCESTORS = 'https://*.e2b.app https://*.arena.ai https://arena.ai';
+
 function securityHeaders(req, res, next) {
-  const frameAncestors = process.env.FRAME_ANCESTORS || "'self'";
+  const frameAncestors = process.env.FRAME_ANCESTORS || `'self' ${PREVIEW_ANCESTORS}`;
   res.set({
     'X-Content-Type-Options': 'nosniff',
     'Referrer-Policy': 'same-origin',
@@ -33,6 +40,15 @@ function securityHeaders(req, res, next) {
   next();
 }
 
+/**
+ * API answers are never cached: a stale `/api/auth/status` (or a proxy cache) would send a signed-in
+ * user back to the sign-in page.
+ */
+function noStore(req, res, next) {
+  res.set('Cache-Control', 'no-store');
+  next();
+}
+
 /** State-changing API calls must carry a custom header (blocks cross-site form posts). */
 function csrfGuard(req, _res, next) {
   if (['GET', 'HEAD', 'OPTIONS'].includes(req.method)) return next();
@@ -46,6 +62,7 @@ export function createApp({ clientDist = config.clientDist } = {}) {
   app.set('trust proxy', config.trustProxy);
   app.use(securityHeaders);
 
+  app.use('/api', noStore);
   app.get('/api/health', (req, res) => res.json({ ok: true }));
   app.use('/api', express.json({ limit: '2mb' }));
   app.use('/api', sessionMiddleware);

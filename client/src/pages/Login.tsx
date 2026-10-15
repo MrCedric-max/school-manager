@@ -2,7 +2,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { GraduationCap, KeyRound, ShieldCheck, Sparkles } from 'lucide-react';
 import { useState, type FormEvent } from 'react';
 import { Button, Field, Input, cx } from '../components/ui';
-import { api } from '../lib/api';
+import { api, isEmbedded } from '../lib/api';
 import type { AuthStatus } from '../lib/hooks';
 import { useLang } from '../lib/i18n';
 
@@ -10,6 +10,7 @@ export default function LoginPage({ status }: { status: AuthStatus }) {
   const { lang, setLang, tr } = useLang();
   const qc = useQueryClient();
   const setup = status.setupRequired;
+  const embedded = isEmbedded();
   const [username, setUsername] = useState(setup ? 'admin' : '');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
@@ -22,6 +23,18 @@ export default function LoginPage({ status }: { status: AuthStatus }) {
     try {
       await api.post(path, credentials);
       await qc.invalidateQueries();
+      // Signing in worked, but the browser may still have refused the session (it drops the cookie in
+      // an iframe and the proxy in front of us may drop our headers). Say so rather than showing the
+      // form again with no explanation.
+      const after = qc.getQueryData<AuthStatus>(['auth']);
+      if (after && !after.user) {
+        setError(
+          tr(
+            'Signed in, but this browser kept no session (it refuses cookies and the session header). Open the app in its own tab to continue.',
+            'Connexion réussie, mais ce navigateur n’a gardé aucune session (il refuse les cookies et l’en-tête de session). Ouvrez l’application dans son propre onglet.',
+          ),
+        );
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
     } finally {
@@ -128,6 +141,14 @@ export default function LoginPage({ status }: { status: AuthStatus }) {
                 {tr('Sign in with the demo account', 'Se connecter avec le compte de démo')}
               </Button>
             </div>
+          )}
+          {embedded && (
+            <p className="mt-4 text-center text-xs leading-relaxed text-emerald-100/75" data-testid="embedded-note">
+              {tr(
+                'Preview: this page is shown inside another site, where the browser refuses the app’s cookie — your sign-in is kept with a token for this tab.',
+                'Aperçu : cette page est affichée dans un autre site, où le navigateur refuse le cookie de l’application — votre connexion est conservée par un jeton propre à cet onglet.',
+              )}
+            </p>
           )}
         </div>
       </div>

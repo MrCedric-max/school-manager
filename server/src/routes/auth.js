@@ -8,8 +8,12 @@ import {
   createSession,
   deleteSession,
   hashPassword,
+  isEmbeddedRequest,
   readBearer,
   readCookie,
+  readSessionHeader,
+  readSessionToken,
+  sessionChannels,
   sessionUser,
   setSessionCookie,
   validatePassword,
@@ -26,10 +30,21 @@ export function userCount(db) {
   return db.prepare('SELECT COUNT(*) AS n FROM users WHERE is_demo = 0').get().n;
 }
 
-/** Attach req.user from the session token: the Authorization header first, then the cookie. */
+/**
+ * Attach req.user from the session token: the app's own header first, then `Authorization: Bearer`,
+ * the query parameter and finally the cookie (see readSessionToken).
+ */
 export function sessionMiddleware(req, _res, next) {
   const db = getDb();
-  req.user = sessionUser(db, readBearer(req)) ?? sessionUser(db, readCookie(req, SESSION_COOKIE));
+  const session = readSessionToken(req);
+  req.session = session;
+  req.user = sessionUser(db, session.token);
+  if (process.env.DEBUG_SESSIONS) {
+    // Handy in an embedded preview: shows which channels actually reached the server.
+    console.log(
+      `[session] ${req.method} ${req.path} channels=[${sessionChannels(req).join(', ') || 'none'}] via=${session.via ?? 'none'} user=${req.user?.username ?? 'anonymous'}`,
+    );
+  }
   next();
 }
 
@@ -49,6 +64,35 @@ authRouter.get('/status', (req, res) => {
     school: { name: setting('school_name'), subtitle: setting('school_subtitle'), academicYear: setting('academic_year') },
     // Public demo account (DEMO_LOGIN=1 and invented data only), shown on the sign-in page.
     demo: demoCredentials(db),
+    // How this request proved who it is — the app shows it and uses it to pick a transport that works.
+    session: {
+      via: req.session?.via ?? null,
+      channels: sessionChannels(req),
+      cookie: Boolean(readCookie(req, SESSION_COOKIE)),
+      embedded: isEmbeddedRequest(req),
+    },
+  });
+});
+
+/**
+ * Capability probe for embedded pages (preview panels, iframes on another site). The app sends the
+ * same random value in every channel it can use; the answer says which of them arrived here, so the
+ * app can carry the session token in a way the proxy in front of it does not drop.
+ * No session data is read or returned — it is only an echo of the probe.
+ */
+authRouter.get('/transport', (req, res) => {
+  const probe = typeof req.query?.probe === 'string' && /^[A-Za-z0-9_-]{20,200}$/.test(req.query.probe) ? req.query.probe : null;
+  res.json({
+    probe: Boolean(probe),
+    channels: probe
+      ? {
+          sessionHeader: readSessionHeader(req) === probe,
+          authorization: readBearer(req) === probe,
+          // The probe itself arrived in the address, so the app can always fall back to carrying the
+          // token there — that is the one channel a proxy does not normally strip.
+          query: true,
+        }
+      : null,
   });
 });
 
@@ -91,6 +135,8 @@ authRouter.post('/login', (req, res) => {
 
 authRouter.post('/logout', (req, res) => {
   const db = getDb();
+  // The token may arrive in any channel (header, query parameter or cookie): end it wherever it is.
+  deleteSession(db, req.session?.token);
   deleteSession(db, readBearer(req));
   deleteSession(db, readCookie(req, SESSION_COOKIE));
   clearSessionCookie(req, res);

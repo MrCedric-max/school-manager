@@ -1,8 +1,8 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { AlertTriangle, Database, Download, FileSpreadsheet, ImagePlus, KeyRound, Plus, Save, School, Sparkles, Trash2, Upload } from 'lucide-react';
+import { AlertTriangle, Database, Download, FileSpreadsheet, ImagePlus, KeyRound, Plus, Save, School, ShieldCheck, Sparkles, Trash2, Upload } from 'lucide-react';
 import { Fragment, useEffect, useRef, useState, type FormEvent } from 'react';
 import { Badge, Button, Card, CardHeader, Field, Input, Select, cx, useToast } from '../components/ui';
-import { api, downloadFile } from '../lib/api';
+import { api, downloadFile, isEmbedded, sessionTransport } from '../lib/api';
 import { fmtDate } from '../lib/format';
 import { useAuthStatus, useMetaData } from '../lib/hooks';
 import { useLang } from '../lib/i18n';
@@ -573,6 +573,58 @@ function DemoAccountCard() {
   );
 }
 
+/**
+ * How this browser and the network in front of the app carry the session. In an embedded preview the
+ * cookie is refused, so the app proves who it is with the token (header, or the address — see
+ * lib/api.ts): this card shows which one the server actually receives.
+ */
+function SessionCard() {
+  const { tr } = useLang();
+  const session = useAuthStatus().data?.session;
+  const channels = session?.channels ?? [];
+  const label = (channel: string) =>
+    ({
+      cookie: tr('the sm_session cookie', 'le cookie sm_session'),
+      'x-session-token': tr('the X-Session-Token header', 'l’en-tête X-Session-Token'),
+      authorization: tr('the Authorization: Bearer header', 'l’en-tête Authorization: Bearer'),
+      query: tr('the session token in the address', 'le jeton de session dans l’adresse'),
+    })[channel] ?? channel;
+  return (
+    <Card>
+      <CardHeader
+        icon={<ShieldCheck className="h-5 w-5" />}
+        title={tr('Session & sign-in', 'Session & connexion')}
+        subtitle={tr('How this browser keeps you signed in.', 'Comment ce navigateur garde votre connexion.')}
+      />
+      <div className="space-y-3 p-5 text-sm text-slate-600">
+        <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5">
+          <dt className="text-slate-500">{tr('Page inside another site', 'Page dans un autre site')}</dt>
+          <dd className="font-medium text-slate-900">{isEmbedded() ? tr('yes (preview)', 'oui (aperçu)') : tr('no', 'non')}</dd>
+          <dt className="text-slate-500">{tr('Session carried by', 'Session transmise par')}</dt>
+          <dd className="font-medium text-slate-900">{session?.via ? label(session.via) : tr('nothing — not signed in', 'rien — non connecté')}</dd>
+          <dt className="text-slate-500">{tr('Browser keeps the sm_session cookie', 'Le navigateur garde le cookie sm_session')}</dt>
+          <dd className="font-medium text-slate-900">{session?.cookie ? tr('yes', 'oui') : tr('no', 'non')}</dd>
+          <dt className="text-slate-500">{tr('Token received by the server in', 'Jeton reçu par le serveur par')}</dt>
+          <dd className="font-medium text-slate-900">{channels.length ? channels.map(label).join(', ') : '—'}</dd>
+        </dl>
+        {session && !session.cookie && (
+          <p className="rounded-lg bg-amber-50 p-3 text-amber-950">
+            {sessionTransport() === 'query'
+              ? tr(
+                  'This browser refuses cookies and the page’s proxy drops the session header, so the token travels in the address of every API call. Sign-in still works.',
+                  'Ce navigateur refuse les cookies et le proxy de la page supprime l’en-tête de session : le jeton voyage donc dans l’adresse de chaque appel. La connexion fonctionne quand même.',
+                )
+              : tr(
+                  'This browser refuses the app’s cookie (the page is inside another site), so the session travels in a header. Sign-in still works.',
+                  'Ce navigateur refuse le cookie de l’application (la page est dans un autre site) : la session voyage donc dans un en-tête. La connexion fonctionne quand même.',
+                )}
+          </p>
+        )}
+      </div>
+    </Card>
+  );
+}
+
 export default function SettingsPage() {
   const { tr } = useLang();
   const demoUser = useAuthStatus().data?.user?.demo === true;
@@ -589,6 +641,7 @@ export default function SettingsPage() {
         <ClassesCard />
         {!demoUser && <AccountCard />}
         <FrameworkCard />
+        <SessionCard />
         {!demoUser && <DangerCard />}
       </div>
     </>

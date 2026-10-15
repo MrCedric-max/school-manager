@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { api, setSessionToken } from './api';
+import { api, ensureSessionTransport, setSessionToken } from './api';
 import type { Meta } from './types';
 
 export interface AuthStatus {
@@ -10,12 +10,26 @@ export interface AuthStatus {
   school: { name: string; subtitle: string; academicYear: string };
   /** Public demo account shown on the sign-in page (only while the data is invented). */
   demo: { username: string; password: string } | null;
+  /** How this request proved who it is — diagnostics for embedded previews (see Settings). */
+  session?: {
+    /** Channel that carried the session token: `cookie`, `x-session-token`, `authorization` or `query`. */
+    via: string | null;
+    /** Every channel the request carried a session token in. */
+    channels: string[];
+    /** True when the request came with an `sm_session` cookie (browsers refuse it in an iframe). */
+    cookie: boolean;
+    /** True when the app asked for the embedded (partitioned) cookie. */
+    embedded: boolean;
+  };
 }
 
 export function useAuthStatus() {
   return useQuery({
     queryKey: ['auth'],
     queryFn: async () => {
+      // Before anything authenticated: check which channel reaches the server (only does work when
+      // the app is embedded, e.g. in a preview panel).
+      await ensureSessionTransport();
       const status = await api.get<AuthStatus>('/auth/status');
       if (!status.user) setSessionToken(null); // expired, signed out elsewhere, or replaced by a restore
       return status;

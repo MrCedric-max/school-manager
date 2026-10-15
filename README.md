@@ -142,6 +142,28 @@ host needs a **persistent disk** (Netlify, used for the old frontend, cannot run
 - **Render / Railway / Fly.io / a VPS**: build with `npm ci && npm run build`, start with `npm start`,
   mount a disk and set `DATA_DIR` to it. Put it behind HTTPS.
 
+### Signing in inside another site (preview panels, iframes)
+
+The app is often looked at inside someone else's page (an editor's *preview panel*, a portal, a wiki).
+Browsers treat that as **another site** and are strict there: Chrome — 155 and every recent
+version — **drops the `sm_session` cookie** of a page shown in such an iframe, so the cookie alone
+cannot keep a sign-in. The app therefore proves who it is on every call with the session token, and
+picks the channel that actually arrives:
+
+1. **`X-Session-Token` header** (and `Authorization: Bearer`, kept for older clients) — the normal
+   path, and what a plain browser tab uses as well;
+2. **`?sm_session=…` in the address** — used only when the app finds out that headers do not reach the
+   server: before the first call it *asks* (`GET /api/auth/transport?probe=…` sends the same random
+   value in both headers and in the address, and the answer says which arrived). Proxies in front of a
+   preview rewrite or drop `Authorization`, which is exactly why the token has another way through;
+3. **cookie** — a *partitioned* one (`SameSite=None; Secure; Partitioned`) as long as the app is
+   embedded, which Chrome keeps even with third-party cookies blocked, next to a normal `SameSite=Lax`
+   one in a browser tab.
+
+Nothing to configure: the app detects the situation itself, and *Settings → Session & sign-in* shows
+which channel the server received, whether the browser kept the cookie, and whether the page is
+embedded. Start the server with `DEBUG_SESSIONS=1` to see the same for every request in the log.
+
 | Variable | Default | Purpose |
 | --- | --- | --- |
 | `PORT` / `HOST` | `4000` / `0.0.0.0` | Where the server listens |
@@ -149,8 +171,9 @@ host needs a **persistent disk** (Netlify, used for the old frontend, cannot run
 | `DB_FILE` | – | Full path of the database file (overrides `DATA_DIR`) |
 | `SESSION_DAYS` | `14` | How long a sign-in lasts |
 | `TRUST_PROXY` | private networks | Express "trust proxy" (for HTTPS behind a proxy) |
-| `FRAME_ANCESTORS` | `'self'` | Who may embed the app in an iframe |
-| `COOKIE_SAMESITE` | `lax` | Set to `none` only when the app is embedded in another site (sign-in also works there when the browser refuses the cookie) |
+| `FRAME_ANCESTORS` | the app itself + the preview hosts (`https://*.e2b.app`, `https://*.arena.ai`) | Who may embed the app in an iframe |
+| `COOKIE_SAMESITE` | automatic | `lax` in a normal tab, `none` (partitioned) when the app is embedded — force either one with `lax` / `none` |
+| `DEBUG_SESSIONS` | off | `1` logs, for every API call, which channel the session token arrived in — the quickest way to see what a proxy forwards |
 | `MAX_UPLOAD_MB` | `25` | Largest workbook / backup accepted |
 | `DEMO_LOGIN` | off | `1` shows a demo account on the sign-in page — only while the data is invented (see §1) |
 | `DEMO_USERNAME` / `DEMO_PASSWORD` | `demo` / `demo2026` | Demo account credentials |
@@ -162,7 +185,8 @@ host needs a **persistent disk** (Netlify, used for the old frontend, cannot run
 ```bash
 npm install
 npm run dev        # API on :4000 (auto-restart) + Vite on :5173 with hot reload
-npm test           # 38 server tests: calendar, grading rules, reports & cards, importer, API & security
+npm test           # 51 tests: 46 server (calendar, grading, reports, importer, API & security, sessions)
+                   #          5 client (which channel carries the session out of an iframe)
 npm run typecheck  # TypeScript check of the interface
 npm run seed:demo  # fill an empty database with invented pupils (+ demo account with DEMO_LOGIN=1)
 ```
@@ -176,10 +200,12 @@ school-manager/
 │   ├── src/routes/        REST API (all under /api; admin session required except sign-in and the school logo)
 │   └── test/              node:test suites (+ a fixture workbook with the School_Manager layout)
 └── client/                React 19 + TypeScript + Vite + Tailwind CSS 4 + TanStack Query + Recharts
-    └── src/pages/         one page per workbook sheet
+    ├── src/pages/         one page per workbook sheet
+    └── test/              node:test suites that load src/lib/api.ts directly
 ```
 
 Security: passwords hashed with scrypt, server-side sessions in an httpOnly cookie, CSRF header check on
 every change, login rate limiting, strict Content-Security-Policy, input validation on every endpoint.
-The session token is also sent in an `Authorization` header (kept for the current browser tab only), so
-signing in works where browsers block cookies — for example when the app is shown inside another site.
+The session token is kept for the current browser tab only and sent on every call — in the
+`X-Session-Token` header, or, where a proxy drops it, in the address (see §6) — so signing in works in
+browsers that refuse cookies, for example when the app is shown inside another site.
