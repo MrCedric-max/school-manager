@@ -4,7 +4,7 @@ import { Fragment, useEffect, useRef, useState, type FormEvent } from 'react';
 import { Badge, Button, Card, CardHeader, Field, Input, Select, cx, useToast } from '../components/ui';
 import { api, downloadFile } from '../lib/api';
 import { fmtDate } from '../lib/format';
-import { useMetaData } from '../lib/hooks';
+import { useAuthStatus, useMetaData } from '../lib/hooks';
 import { useLang } from '../lib/i18n';
 import type { ImportSummary } from '../lib/types';
 
@@ -545,8 +545,37 @@ function DangerCard() {
   );
 }
 
+/** Shown instead of import, backups, password and "delete everything" to the public demo account. */
+function DemoAccountCard() {
+  const { tr } = useLang();
+  return (
+    <Card>
+      <CardHeader
+        icon={<Sparkles className="h-5 w-5" />}
+        title={tr('Demo account', 'Compte de démonstration')}
+        subtitle={tr('Some settings need your own account.', 'Certains réglages demandent votre propre compte.')}
+      />
+      <div className="space-y-2 p-5 text-sm text-slate-600">
+        <p>
+          {tr(
+            'With the demo account you can try every page with invented pupils and marks. To protect real data, these actions are kept for the school’s own account:',
+            'Avec le compte de démo, vous pouvez essayer toutes les pages avec des élèves et des notes fictifs. Pour protéger les vraies données, ces actions sont réservées au compte de l’école :',
+          )}
+        </p>
+        <ul className="list-disc space-y-1 pl-5">
+          <li>{tr('importing the School_Manager workbook', 'l’import du classeur School_Manager')}</li>
+          <li>{tr('downloading or restoring backups', 'le téléchargement et la restauration des sauvegardes')}</li>
+          <li>{tr('changing the password', 'le changement de mot de passe')}</li>
+          <li>{tr('deleting all data', 'la suppression de toutes les données')}</li>
+        </ul>
+      </div>
+    </Card>
+  );
+}
+
 export default function SettingsPage() {
   const { tr } = useLang();
+  const demoUser = useAuthStatus().data?.user?.demo === true;
   return (
     <>
       <div className="mb-5">
@@ -554,13 +583,13 @@ export default function SettingsPage() {
         <p className="mt-1 text-sm text-slate-500">{tr('Import the workbook, protect your data and adjust the school details.', 'Importez le classeur, protégez vos données et ajustez les informations de l’école.')}</p>
       </div>
       <div className={cx('grid gap-5 xl:grid-cols-2')}>
-        <ImportCard />
+        {demoUser ? <DemoAccountCard /> : <ImportCard />}
         <SchoolCard />
-        <BackupCard />
+        {!demoUser && <BackupCard />}
         <ClassesCard />
-        <AccountCard />
+        {!demoUser && <AccountCard />}
         <FrameworkCard />
-        <DangerCard />
+        {!demoUser && <DangerCard />}
       </div>
     </>
   );

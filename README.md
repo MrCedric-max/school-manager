@@ -43,6 +43,23 @@ npm run create-admin -- admin "a-new-password"
 Want to look around first? *Settings → Load demo data* (only when no pupils exist) creates **invented**
 pupils and marks. Importing the workbook later replaces them automatically.
 
+### Demo sign-in (to show the app to others)
+
+Start the server with `DEMO_LOGIN=1` and the sign-in page shows a ready-made **demo account**
+(`demo` / `demo2026`, change them with `DEMO_USERNAME` / `DEMO_PASSWORD`) with a one-click button:
+
+```bash
+npm run seed:demo                 # invented pupils and marks (empty database only)
+DEMO_LOGIN=1 npm start            # Windows (cmd): set "DEMO_LOGIN=1" && npm start
+```
+
+It is safe by design:
+
+- it only exists while the database holds **demo data** — importing the workbook, *Delete all data*
+  or restoring a real backup deletes it and ends its sessions, so real pupils are never shown to it;
+- it cannot import, download or restore backups, delete all data or change its password;
+- it is not the administrator: on a new install you can still create your own account next to it.
+
 ---
 
 ## 2. Workbook → app
@@ -135,6 +152,8 @@ host needs a **persistent disk** (Netlify, used for the old frontend, cannot run
 | `FRAME_ANCESTORS` | `'self'` | Who may embed the app in an iframe |
 | `COOKIE_SAMESITE` | `lax` | Set to `none` only when the app is embedded in another site (sign-in also works there when the browser refuses the cookie) |
 | `MAX_UPLOAD_MB` | `25` | Largest workbook / backup accepted |
+| `DEMO_LOGIN` | off | `1` shows a demo account on the sign-in page — only while the data is invented (see §1) |
+| `DEMO_USERNAME` / `DEMO_PASSWORD` | `demo` / `demo2026` | Demo account credentials |
 
 ---
 
@@ -143,9 +162,9 @@ host needs a **persistent disk** (Netlify, used for the old frontend, cannot run
 ```bash
 npm install
 npm run dev        # API on :4000 (auto-restart) + Vite on :5173 with hot reload
-npm test           # 32 server tests: calendar, grading rules, reports & cards, importer, API & security
+npm test           # 38 server tests: calendar, grading rules, reports & cards, importer, API & security
 npm run typecheck  # TypeScript check of the interface
-npm run seed:demo  # fill an empty database with invented pupils
+npm run seed:demo  # fill an empty database with invented pupils (+ demo account with DEMO_LOGIN=1)
 ```
 
 ```

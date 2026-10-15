@@ -218,12 +218,17 @@ export function Layout({ children }: { children: ReactNode }) {
           <div className="no-print flex flex-wrap items-center gap-2 border-b border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-900 sm:px-6">
             <Sparkles className="h-4 w-4 shrink-0" />
             <span>
-              {tr(
-                'Demo data: these pupils and marks are invented so you can explore the app.',
-                'Données de démonstration : ces élèves et ces notes sont fictifs.',
-              )}
+              {auth?.user?.demo
+                ? tr(
+                    'Demo account: these pupils and marks are invented. Importing the workbook, backups and passwords need your own account.',
+                    'Compte de démo : ces élèves et ces notes sont fictifs. L’import du classeur, les sauvegardes et les mots de passe demandent votre propre compte.',
+                  )
+                : tr(
+                    'Demo data: these pupils and marks are invented so you can explore the app.',
+                    'Données de démonstration : ces élèves et ces notes sont fictifs.',
+                  )}
             </span>
-            {location.pathname !== '/settings' && (
+            {!auth?.user?.demo && location.pathname !== '/settings' && (
               <Link to="/settings" className="font-semibold underline">
                 {tr('Import your School_Manager workbook', 'Importer votre classeur School_Manager')}
               </Link>

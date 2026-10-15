@@ -8,6 +8,7 @@ import { HttpError, badRequest } from '../lib/http.js';
 import { backupToFile, restoreFromBuffer } from '../services/backup.js';
 import { loadContext } from '../services/context.js';
 import { generateDemoData } from '../services/demo.js';
+import { refuseDemoAccount, syncDemoAccount } from '../services/demo-login.js';
 import { commitImport, parseWorkbook, summarize } from '../services/importer.js';
 
 export const adminRouter = Router();
@@ -24,7 +25,8 @@ function cleanupImports() {
   for (const [id, entry] of pendingImports) if (entry.createdAt < limit) pendingImports.delete(id);
 }
 
-adminRouter.post('/import/preview', upload.single('file'), async (req, res) => {
+// Importing, backups, restoring and deleting everything need a real account (never the public demo one).
+adminRouter.post('/import/preview', refuseDemoAccount, upload.single('file'), async (req, res) => {
   if (!req.file) throw badRequest('Choose the School_Manager .xlsx file to import');
   if (!/\.xlsx$/i.test(req.file.originalname)) throw badRequest('Only .xlsx workbooks can be imported');
   let parsed;
@@ -45,7 +47,7 @@ adminRouter.post('/import/preview', upload.single('file'), async (req, res) => {
   res.json({ importId: id, fileName: req.file.originalname, summary: summarize(parsed), demoMode, existingPupils });
 });
 
-adminRouter.post('/import/commit', (req, res) => {
+adminRouter.post('/import/commit', refuseDemoAccount, (req, res) => {
   const entry = pendingImports.get(String(req.body?.importId ?? ''));
   if (!entry) throw new HttpError(410, 'This import has expired — please upload the file again');
   const db = getDb();
@@ -54,37 +56,43 @@ adminRouter.post('/import/commit', (req, res) => {
   const mode = demoMode ? 'replace' : req.body?.mode === 'merge' ? 'merge' : 'replace';
   const result = commitImport(db, entry.parsed, { mode });
   pendingImports.delete(String(req.body.importId));
+  syncDemoAccount(db); // real pupils now: the public demo account is removed
   res.json({ mode, result });
 });
 
-adminRouter.get('/backup', async (req, res) => {
+adminRouter.get('/backup', refuseDemoAccount, async (req, res) => {
   const file = await backupToFile();
   const name = `school-manager-backup-${new Date().toISOString().slice(0, 10)}.db`;
   res.download(file, name, () => fs.rm(file, { force: true }, () => {}));
 });
 
-adminRouter.post('/restore', upload.single('file'), async (req, res) => {
+adminRouter.post('/restore', refuseDemoAccount, upload.single('file'), async (req, res) => {
   if (!req.file) throw badRequest('Choose a backup file (.db)');
   const result = await restoreFromBuffer(req.file.buffer);
+  syncDemoAccount(getDb());
   res.json({ ok: true, ...result });
 });
 
 adminRouter.post('/demo', (req, res) => {
   const db = getDb();
+  let result;
   try {
-    res.json(generateDemoData(db, loadContext(db)));
+    result = generateDemoData(db, loadContext(db));
   } catch (e) {
     throw new HttpError(409, e.message);
   }
+  syncDemoAccount(db);
+  res.json(result);
 });
 
 /** Delete every pupil and all their records (calendar, classes and settings are kept). */
-adminRouter.post('/data/reset', (req, res) => {
+adminRouter.post('/data/reset', refuseDemoAccount, (req, res) => {
   if (req.body?.confirm !== 'DELETE') throw badRequest('Type DELETE to confirm');
   const db = getDb();
   db.transaction(() => {
     db.prepare('DELETE FROM pupils').run();
     db.prepare("UPDATE settings SET value = '0' WHERE key = 'demo_mode'").run();
   })();
+  syncDemoAccount(db);
   res.json({ ok: true });
 });

@@ -5,8 +5,11 @@ import type { Meta } from './types';
 
 export interface AuthStatus {
   setupRequired: boolean;
-  user: { id: number; username: string } | null;
+  /** `demo` is true for the public demo account (limited: no import, backups or password change). */
+  user: { id: number; username: string; demo: boolean } | null;
   school: { name: string; subtitle: string; academicYear: string };
+  /** Public demo account shown on the sign-in page (only while the data is invented). */
+  demo: { username: string; password: string } | null;
 }
 
 export function useAuthStatus() {

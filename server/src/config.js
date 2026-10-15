@@ -19,6 +19,15 @@ export const config = {
   maxUploadMb: Number(process.env.MAX_UPLOAD_MB || 25),
 };
 
+/**
+ * Optional public demo account (DEMO_LOGIN=1), shown on the sign-in page. It only exists while the
+ * database holds generated demo data — see services/demo-login.js. Read on every call (tests toggle it).
+ */
+export function demoLoginConfig() {
+  if (!/^(1|true|yes|on)$/i.test((process.env.DEMO_LOGIN ?? '').trim())) return null;
+  return { username: process.env.DEMO_USERNAME?.trim() || 'demo', password: process.env.DEMO_PASSWORD?.trim() || 'demo2026' };
+}
+
 export function databasePath() {
   return config.dbFile || path.join(config.dataDir, 'school.db');
 }

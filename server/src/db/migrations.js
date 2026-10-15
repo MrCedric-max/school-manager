@@ -176,6 +176,11 @@ export const migrations = [
     PRIMARY KEY (pupil_id, period)
   ) WITHOUT ROWID;
   `,
+
+  // v2 — optional public demo account (DEMO_LOGIN), deleted automatically when real data arrives.
+  `
+  ALTER TABLE users ADD COLUMN is_demo INTEGER NOT NULL DEFAULT 0;
+  `,
 ];
 
 export function migrate(db) {

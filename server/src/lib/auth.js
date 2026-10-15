@@ -50,14 +50,13 @@ export function createSession(db, userId, days) {
 
 export function sessionUser(db, token) {
   if (!token) return null;
-  return (
-    db
-      .prepare(
-        `SELECT u.id, u.username FROM sessions s JOIN users u ON u.id = s.user_id
-          WHERE s.token_hash = ? AND s.expires_at > ?`,
-      )
-      .get(sha256(token), new Date().toISOString()) ?? null
-  );
+  const row = db
+    .prepare(
+      `SELECT u.id, u.username, u.is_demo FROM sessions s JOIN users u ON u.id = s.user_id
+        WHERE s.token_hash = ? AND s.expires_at > ?`,
+    )
+    .get(sha256(token), new Date().toISOString());
+  return row ? { id: row.id, username: row.username, demo: row.is_demo === 1 } : null;
 }
 
 export function deleteSession(db, token) {

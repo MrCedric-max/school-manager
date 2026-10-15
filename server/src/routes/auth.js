@@ -17,11 +17,13 @@ import {
   verifyPassword,
 } from '../lib/auth.js';
 import { HttpError, badRequest } from '../lib/http.js';
+import { demoCredentials, refuseDemoAccount } from '../services/demo-login.js';
 
 const limiter = createRateLimiter();
 
+/** Real accounts (the optional public demo account does not count as an administrator). */
 export function userCount(db) {
-  return db.prepare('SELECT COUNT(*) AS n FROM users').get().n;
+  return db.prepare('SELECT COUNT(*) AS n FROM users WHERE is_demo = 0').get().n;
 }
 
 /** Attach req.user from the session token: the Authorization header first, then the cookie. */
@@ -45,6 +47,8 @@ authRouter.get('/status', (req, res) => {
     setupRequired: userCount(db) === 0,
     user: req.user,
     school: { name: setting('school_name'), subtitle: setting('school_subtitle'), academicYear: setting('academic_year') },
+    // Public demo account (DEMO_LOGIN=1 and invented data only), shown on the sign-in page.
+    demo: demoCredentials(db),
   });
 });
 
@@ -55,6 +59,9 @@ authRouter.post('/setup', (req, res) => {
   validatePassword(req.body?.password);
   const created = db.transaction(() => {
     if (userCount(db) > 0) return null;
+    if (db.prepare('SELECT 1 FROM users WHERE username = ?').get(username)) {
+      throw new HttpError(409, 'This username is used by the demo account — choose another one');
+    }
     return db.prepare('INSERT INTO users (username, password_hash) VALUES (?, ?)').run(username, hashPassword(req.body.password));
   })();
   if (!created) throw new HttpError(409, 'An administrator account already exists');
@@ -71,8 +78,9 @@ authRouter.post('/login', (req, res) => {
   const username = typeof req.body?.username === 'string' ? req.body.username.trim() : '';
   const password = typeof req.body?.password === 'string' ? req.body.password : '';
   if (!username || !password) throw badRequest('Username and password are required');
-  const user = db.prepare('SELECT id, username, password_hash FROM users WHERE username = ?').get(username);
-  if (!user || !verifyPassword(password, user.password_hash)) {
+  const user = db.prepare('SELECT id, username, password_hash, is_demo FROM users WHERE username = ?').get(username);
+  const demoClosed = user?.is_demo === 1 && !demoCredentials(db);
+  if (!user || demoClosed || !verifyPassword(password, user.password_hash)) {
     throw new HttpError(401, 'Incorrect username or password');
   }
   limiter.reset(ip);
@@ -89,7 +97,7 @@ authRouter.post('/logout', (req, res) => {
   res.json({ ok: true });
 });
 
-authRouter.post('/password', requireAuth, (req, res) => {
+authRouter.post('/password', requireAuth, refuseDemoAccount, (req, res) => {
   const db = getDb();
   const { currentPassword, newPassword } = req.body ?? {};
   const user = db.prepare('SELECT id, password_hash FROM users WHERE id = ?').get(req.user.id);

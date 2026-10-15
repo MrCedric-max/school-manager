@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { GraduationCap, KeyRound, ShieldCheck } from 'lucide-react';
+import { GraduationCap, KeyRound, ShieldCheck, Sparkles } from 'lucide-react';
 import { useState, type FormEvent } from 'react';
 import { Button, Field, Input, cx } from '../components/ui';
 import { api } from '../lib/api';
@@ -16,16 +16,11 @@ export default function LoginPage({ status }: { status: AuthStatus }) {
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
-  const submit = async (e: FormEvent) => {
-    e.preventDefault();
+  const send = async (path: string, credentials: { username: string; password: string }) => {
     setError(null);
-    if (setup && password !== confirm) {
-      setError(tr('The two passwords are different', 'Les deux mots de passe sont différents'));
-      return;
-    }
     setBusy(true);
     try {
-      await api.post(setup ? '/auth/setup' : '/auth/login', { username, password });
+      await api.post(path, credentials);
       await qc.invalidateQueries();
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
@@ -33,6 +28,17 @@ export default function LoginPage({ status }: { status: AuthStatus }) {
       setBusy(false);
     }
   };
+
+  const submit = (e: FormEvent) => {
+    e.preventDefault();
+    if (setup && password !== confirm) {
+      setError(tr('The two passwords are different', 'Les deux mots de passe sont différents'));
+      return;
+    }
+    void send(setup ? '/auth/setup' : '/auth/login', { username, password });
+  };
+
+  const demo = status.demo;
 
   return (
     <div className="flex min-h-screen flex-col bg-gradient-to-br from-emerald-900 via-emerald-800 to-emerald-950">
@@ -101,6 +107,28 @@ export default function LoginPage({ status }: { status: AuthStatus }) {
               </Button>
             </div>
           </form>
+          {demo && (
+            <div className="mt-4 rounded-2xl bg-amber-50 p-5 text-sm text-amber-950 shadow-xl" data-testid="demo-account">
+              <div className="mb-1 flex items-center gap-2 font-semibold">
+                <Sparkles className="h-4 w-4 text-amber-600" />
+                {tr('Demo account', 'Compte de démonstration')}
+              </div>
+              <p className="mb-3 text-amber-900/80">
+                {setup
+                  ? tr('Just looking? Explore the app with invented pupils and marks.', 'Simple visite ? Découvrez l’application avec des élèves et des notes fictifs.')
+                  : tr('Explore the app with invented pupils and marks.', 'Découvrez l’application avec des élèves et des notes fictifs.')}
+              </p>
+              <dl className="mb-4 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1">
+                <dt className="text-amber-900/70">{tr('Username', 'Identifiant')}</dt>
+                <dd className="font-mono font-semibold select-all">{demo.username}</dd>
+                <dt className="text-amber-900/70">{tr('Password', 'Mot de passe')}</dt>
+                <dd className="font-mono font-semibold select-all">{demo.password}</dd>
+              </dl>
+              <Button type="button" variant="secondary" className="w-full" loading={busy} onClick={() => void send('/auth/login', demo)}>
+                {tr('Sign in with the demo account', 'Se connecter avec le compte de démo')}
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </div>
