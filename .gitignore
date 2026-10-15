@@ -1,0 +1,20 @@
+# Dependencies & builds
+node_modules/
+client/dist/
+
+# Runtime data — the SQLite database holds pupils' personal data.
+# Never commit it (this repository is public).
+server/data/
+*.db
+*.db-shm
+*.db-wal
+
+# Local environment
+.env
+.env.*
+!.env.example
+
+# Workbooks dropped here for local testing (personal data)
+*.xlsx
+*.xlsm
+!server/test/fixtures/*.xlsx
