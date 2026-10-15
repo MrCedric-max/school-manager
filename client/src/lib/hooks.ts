@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { api, ensureSessionTransport, setSessionToken } from './api';
+import { api, ensureSessionTransport, hasSessionToken, isEmbedded, preferQueryTransport, sessionTransport, setSessionToken } from './api';
 import type { Meta } from './types';
 
 export interface AuthStatus {
@@ -30,7 +30,15 @@ export function useAuthStatus() {
       // Before anything authenticated: check which channel reaches the server (only does work when
       // the app is embedded, e.g. in a preview panel).
       await ensureSessionTransport();
-      const status = await api.get<AuthStatus>('/auth/status');
+      let status = await api.get<AuthStatus>('/auth/status');
+      // We hold a token but the server does not recognise it. If the check claimed our headers arrive,
+      // it was wrong (proxies can drop them only sometimes): try again over the address channel, and
+      // keep it if that works — so signing in still holds where a header quietly disappears.
+      if (!status.user && hasSessionToken() && isEmbedded() && sessionTransport() === 'header') {
+        preferQueryTransport();
+        const retry = await api.get<AuthStatus>('/auth/status');
+        if (retry.user) status = retry;
+      }
       if (!status.user) setSessionToken(null); // expired, signed out elsewhere, or replaced by a restore
       return status;
     },

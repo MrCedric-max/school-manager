@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import express from 'express';
 import { config } from './config.js';
-import { CSRF_HEADER } from './lib/auth.js';
+import { CSRF_HEADER, sessionChannels } from './lib/auth.js';
 import { HttpError, errorHandler } from './lib/http.js';
 import { adminRouter } from './routes/admin.js';
 import { authRouter, requireAuth, sessionMiddleware } from './routes/auth.js';
@@ -49,6 +49,38 @@ function noStore(req, res, next) {
   next();
 }
 
+/**
+ * DEBUG_REQUESTS=1 logs every request the app receives — path, answer, and what the browser (or the
+ * proxy in front of it) really sent: user agent, referrer, whether it is a document or a fetch, and
+ * which session channels arrived. It is the quickest way to see what a preview panel forwards.
+ */
+function requestLogger(req, res, next) {
+  if (!process.env.DEBUG_REQUESTS) return next();
+  const started = Date.now();
+  let error = null;
+  const json = res.json.bind(res);
+  res.json = (body) => {
+    if (res.statusCode >= 400) error = body?.error ?? null;
+    return json(body);
+  };
+  res.on('finish', () => {
+    const credentials = sessionChannels(req).join(' + ') || 'none';
+    const lines = [
+      `[request] ${req.method} ${req.path} -> ${res.statusCode} (${Date.now() - started}ms)`,
+      `credentials=${credentials}`,
+      `sec-fetch-site=${req.get('sec-fetch-site') ?? '-'}`,
+      `sec-fetch-dest=${req.get('sec-fetch-dest') ?? '-'}`,
+      `referer=${req.get('referer') ?? '-'}`,
+      `ua=${(req.get('user-agent') ?? '-').slice(0, 60)}`,
+      res.getHeader('set-cookie') ? 'set-cookie=yes' : 'set-cookie=no',
+      req.path.startsWith('/api/auth/') && req.body?.username ? `user=${req.body.username}` : '',
+      error ? `error="${error}"` : '',
+    ];
+    console.log(lines.filter(Boolean).join(' '));
+  });
+  next();
+}
+
 /** State-changing API calls must carry a custom header (blocks cross-site form posts). */
 function csrfGuard(req, _res, next) {
   if (['GET', 'HEAD', 'OPTIONS'].includes(req.method)) return next();
@@ -61,6 +93,7 @@ export function createApp({ clientDist = config.clientDist } = {}) {
   app.disable('x-powered-by');
   app.set('trust proxy', config.trustProxy);
   app.use(securityHeaders);
+  app.use(requestLogger);
 
   app.use('/api', noStore);
   app.get('/api/health', (req, res) => res.json({ ok: true }));
@@ -84,7 +117,9 @@ export function createApp({ clientDist = config.clientDist } = {}) {
     app.use('/assets', express.static(path.join(clientDist, 'assets'), { immutable: true, maxAge: '365d' }));
     app.use(express.static(clientDist, { index: false, maxAge: '1h' }));
     app.get(/^(?!\/api(\/|$)).*/, (req, res) => {
-      res.set('Cache-Control', 'no-cache');
+      // No cache at all on the page itself: a cached copy would keep loading an older interface
+      // (the bundle names change on every build) — the trap in a proxied preview.
+      res.set('Cache-Control', 'no-store');
       res.sendFile(path.join(clientDist, 'index.html'));
     });
   } else {

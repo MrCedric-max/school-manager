@@ -32,7 +32,8 @@ export type SessionTransport = 'header' | 'query';
  * Kept for this tab only, or in memory when storage is blocked.
  */
 let sessionToken: string | null = sessionStore.get(TOKEN_KEY);
-let transport: SessionTransport = 'header';
+/** True only once the probe below has *proved* that one of our headers reaches the server. */
+let headerProven = false;
 let transportChecked = false;
 let transportCheck: Promise<SessionTransport> | null = null;
 
@@ -40,6 +41,10 @@ export function setSessionToken(token: string | null) {
   sessionToken = token;
   if (token) sessionStore.set(TOKEN_KEY, token);
   else sessionStore.remove(TOKEN_KEY);
+}
+
+export function hasSessionToken() {
+  return sessionToken !== null;
 }
 
 /** True when the app is displayed inside another page (preview panel, iframe on another site). */
@@ -51,9 +56,20 @@ export function isEmbedded() {
   }
 }
 
-/** Where the session token travels right now — shown in Settings next to the other diagnostics. */
+/**
+ * Where the session token travels right now — shown in Settings next to the other diagnostics.
+ *
+ * In a plain tab: the cookie plus our headers, never the address. Embedded in another site (where
+ * browsers drop the cookie) the address is the safe default — a proxy forwards it whatever it does
+ * with headers — and the app moves to the header as soon as the probe below proves it arrives.
+ */
 export function sessionTransport(): SessionTransport {
-  return transport;
+  return isEmbedded() && !headerProven ? 'query' : 'header';
+}
+
+/** Give up on the header channel (the server did not recognise the token we sent in it). */
+export function preferQueryTransport() {
+  headerProven = false;
 }
 
 /**
@@ -62,12 +78,12 @@ export function sessionTransport(): SessionTransport {
  * A preview panel serves the app through a proxy, and such a proxy may rewrite or drop the headers
  * we set (a common one is `Authorization`, which proxies like to use for themselves). So the app asks
  * the server: it sends the same random value in the `X-Session-Token` header, in `Authorization` and
- * in the query string, and the server answers which of them arrived. If neither header did, every
- * API call carries the session token in the query string instead. Inside a normal tab there is
- * nothing to check, so no request is made.
+ * in the query string, and the server answers which of them arrived. Any answer but "a header
+ * arrived" — including no answer at all — leaves the session token in the address, so a sign-in can
+ * never depend on this check succeeding. Inside a normal tab nothing is sent.
  */
 export function ensureSessionTransport(): Promise<SessionTransport> {
-  if (transportChecked) return Promise.resolve(transport);
+  if (transportChecked) return Promise.resolve(sessionTransport());
   transportCheck ??= (async () => {
     try {
       if (isEmbedded()) {
@@ -80,16 +96,13 @@ export function ensureSessionTransport(): Promise<SessionTransport> {
         const data = (await readJson(res)) as {
           channels?: { sessionHeader?: boolean; authorization?: boolean } | null;
         } | null;
-        // No answer at all (the probe never arrived): keep the header, it is what a plain tab uses.
-        if (data?.channels) {
-          transport = data.channels.sessionHeader || data.channels.authorization ? 'header' : 'query';
-        }
+        headerProven = Boolean(data?.channels?.sessionHeader || data?.channels?.authorization);
       }
     } catch {
-      transport = 'header'; // the probe failed: keep the normal header unless a request says otherwise
+      headerProven = false; // no answer: keep carrying the token in the address
     }
     transportChecked = true;
-    return transport;
+    return sessionTransport();
   })();
   return transportCheck;
 }
@@ -101,7 +114,7 @@ async function readJson(res: Response) {
 /** URL of an API call: the session token is added to the query only where headers do not arrive. */
 function apiUrl(path: string) {
   const url = `/api${path}`;
-  if (!sessionToken || transport !== 'query') return url;
+  if (!sessionToken || sessionTransport() !== 'query') return url;
   return `${url}${url.includes('?') ? '&' : '?'}${TOKEN_QUERY}=${encodeURIComponent(sessionToken)}`;
 }
 

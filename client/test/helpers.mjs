@@ -25,13 +25,17 @@ export function installFetch(base) {
  * Stub of the app behind the preview proxy. `drop` lists the headers the proxy removes on the way in
  * (a real proxy keeps the address and the CSRF header, but may rewrite or drop the rest).
  */
-export function startPreviewProxy({ drop = [] } = {}) {
+export function startPreviewProxy({ drop = [], failProbe = false } = {}) {
   const requests = [];
   const server = http.createServer((req, res) => {
     const url = new URL(req.url, 'http://app');
     const headers = { ...req.headers };
     for (const name of drop) delete headers[name];
     requests.push({ path: url.pathname, search: url.search, headers });
+    if (failProbe && url.pathname === '/api/auth/transport') {
+      req.destroy(); // the probe never gets an answer: the app must not depend on it
+      return;
+    }
     const send = (body) => {
       res.setHeader('content-type', 'application/json');
       res.end(JSON.stringify(body));

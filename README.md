@@ -150,12 +150,15 @@ version — **drops the `sm_session` cookie** of a page shown in such an iframe,
 cannot keep a sign-in. The app therefore proves who it is on every call with the session token, and
 picks the channel that actually arrives:
 
-1. **`X-Session-Token` header** (and `Authorization: Bearer`, kept for older clients) — the normal
-   path, and what a plain browser tab uses as well;
-2. **`?sm_session=…` in the address** — used only when the app finds out that headers do not reach the
-   server: before the first call it *asks* (`GET /api/auth/transport?probe=…` sends the same random
-   value in both headers and in the address, and the answer says which arrived). Proxies in front of a
-   preview rewrite or drop `Authorization`, which is exactly why the token has another way through;
+1. **`?sm_session=…` in the address** — what an embedded app uses by default, because no proxy drops
+   it. As soon as the app has *proved* that a header arrives it stops putting the token in the URL:
+   before the first call it asks (`GET /api/auth/transport?probe=…` sends the same random value in the
+   headers and in the address, and the answer says which arrived). If that check fails, or the token
+   in a header is not recognised, the app goes back to the address — signing in never depends on it;
+2. **`X-Session-Token` header** (and `Authorization: Bearer`, kept for older clients) — the normal
+   path in a browser tab, and what an embedded app switches to once the check above confirms it
+   arrives. Proxies in front of a preview rewrite or drop `Authorization`, which is why the app has
+   another way through;
 3. **cookie** — a *partitioned* one (`SameSite=None; Secure; Partitioned`) as long as the app is
    embedded, which Chrome keeps even with third-party cookies blocked, next to a normal `SameSite=Lax`
    one in a browser tab.
@@ -174,6 +177,7 @@ embedded. Start the server with `DEBUG_SESSIONS=1` to see the same for every req
 | `FRAME_ANCESTORS` | the app itself + the preview hosts (`https://*.e2b.app`, `https://*.arena.ai`) | Who may embed the app in an iframe |
 | `COOKIE_SAMESITE` | automatic | `lax` in a normal tab, `none` (partitioned) when the app is embedded — force either one with `lax` / `none` |
 | `DEBUG_SESSIONS` | off | `1` logs, for every API call, which channel the session token arrived in — the quickest way to see what a proxy forwards |
+| `DEBUG_REQUESTS` | off | `1` logs every request (path, answer, user agent, referrer, `Sec-Fetch-*`, credentials) — for diagnosing what a preview panel really sends |
 | `MAX_UPLOAD_MB` | `25` | Largest workbook / backup accepted |
 | `DEMO_LOGIN` | off | `1` shows a demo account on the sign-in page — only while the data is invented (see §1) |
 | `DEMO_USERNAME` / `DEMO_PASSWORD` | `demo` / `demo2026` | Demo account credentials |
@@ -185,8 +189,8 @@ embedded. Start the server with `DEBUG_SESSIONS=1` to see the same for every req
 ```bash
 npm install
 npm run dev        # API on :4000 (auto-restart) + Vite on :5173 with hot reload
-npm test           # 51 tests: 46 server (calendar, grading, reports, importer, API & security, sessions)
-                   #          5 client (which channel carries the session out of an iframe)
+npm test           # 52 tests: 46 server (calendar, grading, reports, importer, API & security, sessions)
+                   #          6 client (which channel carries the session out of an iframe)
 npm run typecheck  # TypeScript check of the interface
 npm run seed:demo  # fill an empty database with invented pupils (+ demo account with DEMO_LOGIN=1)
 ```
