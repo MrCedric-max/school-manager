@@ -2,7 +2,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { GraduationCap, KeyRound, ShieldCheck, Sparkles } from 'lucide-react';
 import { useState, type FormEvent } from 'react';
 import { Button, Field, Input, cx } from '../components/ui';
-import { api, isEmbedded } from '../lib/api';
+import { api, isEmbedded, sessionTransport } from '../lib/api';
 import type { AuthStatus } from '../lib/hooks';
 import { useLang } from '../lib/i18n';
 
@@ -147,7 +147,10 @@ export default function LoginPage({ status }: { status: AuthStatus }) {
               {tr(
                 'Preview: this page is shown inside another site, where the browser refuses the app’s cookie — your sign-in is kept with a token for this tab.',
                 'Aperçu : cette page est affichée dans un autre site, où le navigateur refuse le cookie de l’application — votre connexion est conservée par un jeton propre à cet onglet.',
-              )}
+              )}{' '}
+              <span className="font-mono text-emerald-100/90" data-testid="session-channel">
+                {sessionTransport() === 'query' ? tr('token in the address', 'jeton dans l’adresse') : 'X-Session-Token'}
+              </span>
             </p>
           )}
         </div>

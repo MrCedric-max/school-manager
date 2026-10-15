@@ -1,4 +1,6 @@
-import { sessionStore } from './storage';
+import { clearStoredToken, isEmbedded, readStoredToken, storeToken } from './session';
+
+export { isEmbedded } from './session';
 
 export class ApiError extends Error {
   status: number;
@@ -17,7 +19,6 @@ interface RequestOptions {
   form?: FormData;
 }
 
-const TOKEN_KEY = 'sm.session';
 /** Our own header: proxies give `Authorization` a meaning of their own, this one they pass through. */
 const TOKEN_HEADER = 'X-Session-Token';
 /** Last resort, used only when the probe below shows that headers do not reach the server. */
@@ -28,10 +29,10 @@ export type SessionTransport = 'header' | 'query';
 /**
  * Session token handed out at sign-in. The server also sets a cookie, but browsers refuse third-party
  * cookies when the app is shown inside another site (e.g. a preview panel), so every request also
- * carries the token in a header — and, if even that does not arrive, in the query string.
- * Kept for this tab only, or in memory when storage is blocked.
+ * carries the token in the query string — and in a header once the transport check proves one arrives
+ * (see ensureSessionTransport). Where it is kept between loads: lib/session.ts.
  */
-let sessionToken: string | null = sessionStore.get(TOKEN_KEY);
+let sessionToken: string | null = readStoredToken();
 /** True only once the probe below has *proved* that one of our headers reaches the server. */
 let headerProven = false;
 let transportChecked = false;
@@ -39,21 +40,12 @@ let transportCheck: Promise<SessionTransport> | null = null;
 
 export function setSessionToken(token: string | null) {
   sessionToken = token;
-  if (token) sessionStore.set(TOKEN_KEY, token);
-  else sessionStore.remove(TOKEN_KEY);
+  if (token) storeToken(token);
+  else clearStoredToken();
 }
 
 export function hasSessionToken() {
   return sessionToken !== null;
-}
-
-/** True when the app is displayed inside another page (preview panel, iframe on another site). */
-export function isEmbedded() {
-  try {
-    return window.self !== window.top;
-  } catch {
-    return true; // cross-origin parent: we cannot look, so assume the app is embedded
-  }
 }
 
 /**

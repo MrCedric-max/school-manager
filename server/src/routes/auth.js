@@ -3,6 +3,7 @@ import { config } from '../config.js';
 import { getDb } from '../db/index.js';
 import {
   SESSION_COOKIE,
+  SESSION_COOKIE_CLIENT,
   clearSessionCookie,
   createRateLimiter,
   createSession,
@@ -68,7 +69,7 @@ authRouter.get('/status', (req, res) => {
     session: {
       via: req.session?.via ?? null,
       channels: sessionChannels(req),
-      cookie: Boolean(readCookie(req, SESSION_COOKIE)),
+      cookie: Boolean(readCookie(req, SESSION_COOKIE) || readCookie(req, SESSION_COOKIE_CLIENT)),
       embedded: isEmbeddedRequest(req),
     },
   });
@@ -139,6 +140,7 @@ authRouter.post('/logout', (req, res) => {
   deleteSession(db, req.session?.token);
   deleteSession(db, readBearer(req));
   deleteSession(db, readCookie(req, SESSION_COOKIE));
+  deleteSession(db, readCookie(req, SESSION_COOKIE_CLIENT));
   clearSessionCookie(req, res);
   res.json({ ok: true });
 });

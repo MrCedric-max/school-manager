@@ -81,11 +81,29 @@ function requestLogger(req, res, next) {
   next();
 }
 
-/** State-changing API calls must carry a custom header (blocks cross-site form posts). */
+/**
+ * State-changing API calls must be provably same-origin (this blocks cross-site form posts).
+ *
+ * The app stamps `X-Requested-With: SchoolManager` on every change, but a proxy in front of an
+ * embedded page may drop headers it does not know — that would turn sign-in into a silent 403. So the
+ * check also accepts the signals the *browser* adds and another site cannot forge: `Sec-Fetch-Site:
+ * same-origin`, or an `Origin` header naming this very host.
+ */
+function sameOriginRequest(req) {
+  if (req.get('sec-fetch-site') === 'same-origin') return true;
+  const origin = req.get('origin');
+  if (!origin) return false;
+  try {
+    return new URL(origin).host === req.get('host');
+  } catch {
+    return false;
+  }
+}
+
 function csrfGuard(req, _res, next) {
   if (['GET', 'HEAD', 'OPTIONS'].includes(req.method)) return next();
-  if (req.get(CSRF_HEADER) !== 'SchoolManager') return next(new HttpError(403, 'Missing request header'));
-  next();
+  if (req.get(CSRF_HEADER) === 'SchoolManager' || sameOriginRequest(req)) return next();
+  return next(new HttpError(403, 'Missing request header'));
 }
 
 export function createApp({ clientDist = config.clientDist } = {}) {

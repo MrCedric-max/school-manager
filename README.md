@@ -163,6 +163,12 @@ picks the channel that actually arrives:
    embedded, which Chrome keeps even with third-party cookies blocked, next to a normal `SameSite=Lax`
    one in a browser tab.
 
+A reload must not lose the sign-in either, so in an embedded page the token is also kept where the
+next load can read it: this tab's storage (as in a normal tab), a partitioned cookie the page sets
+itself, and — when a preview takes both away — the address of the page (`?sm_session=…`, rewritten
+without a history entry). Playwright isn't used; sign-in is exercised in tests instead, including a
+simulated preview proxy that drops headers, and the page shows which channel it ended up using.
+
 Nothing to configure: the app detects the situation itself, and *Settings → Session & sign-in* shows
 which channel the server received, whether the browser kept the cookie, and whether the page is
 embedded. Start the server with `DEBUG_SESSIONS=1` to see the same for every request in the log.
@@ -189,8 +195,9 @@ embedded. Start the server with `DEBUG_SESSIONS=1` to see the same for every req
 ```bash
 npm install
 npm run dev        # API on :4000 (auto-restart) + Vite on :5173 with hot reload
-npm test           # 52 tests: 46 server (calendar, grading, reports, importer, API & security, sessions)
-                   #          6 client (which channel carries the session out of an iframe)
+npm test           # 56 tests: 47 server (calendar, grading, reports, importer, API & security, sessions)
+                   #          9 client (which channel carries the session out of an iframe, and how
+                   #                    the sign-in survives a reload without storage or cookies)
 npm run typecheck  # TypeScript check of the interface
 npm run seed:demo  # fill an empty database with invented pupils (+ demo account with DEMO_LOGIN=1)
 ```

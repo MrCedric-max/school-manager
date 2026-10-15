@@ -3,6 +3,8 @@ import { HttpError } from './http.js';
 
 const SCRYPT = { N: 16384, r: 8, p: 1, keylen: 64 };
 export const SESSION_COOKIE = 'sm_session';
+/** Cookie the app sets itself (a partitioned one, in an embedded page) when the browser refuses the httpOnly cookie. */
+export const SESSION_COOKIE_CLIENT = 'sm_token';
 export const CSRF_HEADER = 'x-requested-with';
 /** Header and query parameter the app uses to carry the session token where cookies are refused. */
 export const SESSION_HEADER = 'x-session-token';
@@ -96,9 +98,11 @@ export function readSessionQuery(req) {
  *
  * 1. `x-session-token` header — the app's own header;
  * 2. `authorization: Bearer …` — kept for older clients;
- * 3. `?sm_session=…` — only used when the app found that headers do not reach the server
- *    (some proxies strip `Authorization`; the app checks with GET /api/auth/transport);
- * 4. the `sm_session` cookie — the normal case in a browser tab.
+ * 3. `?sm_session=…` — used while the app cannot prove that a header arrives (some proxies strip
+ *    `Authorization`; the app checks with GET /api/auth/transport);
+ * 4. the `sm_session` cookie — the normal case in a browser tab;
+ * 5. the `sm_token` cookie — the partitioned cookie the page sets itself in an embedded page, so a
+ *    proxy that mangles headers and addresses still cannot end the sign-in.
  *
  * Returns `{ token, via }`, `via` being the channel that supplied the token (null when there is none).
  */
@@ -109,7 +113,7 @@ export function readSessionToken(req) {
   if (bearer) return { token: bearer, via: 'authorization' };
   const query = readSessionQuery(req);
   if (query) return { token: query, via: 'query' };
-  const cookie = readCookie(req, SESSION_COOKIE);
+  const cookie = readCookie(req, SESSION_COOKIE) ?? readCookie(req, SESSION_COOKIE_CLIENT);
   return cookie ? { token: cookie, via: 'cookie' } : { token: null, via: null };
 }
 
@@ -119,7 +123,7 @@ export function sessionChannels(req) {
   if (readSessionHeader(req)) channels.push('x-session-token');
   if (readBearer(req)) channels.push('authorization');
   if (readSessionQuery(req)) channels.push('query');
-  if (readCookie(req, SESSION_COOKIE)) channels.push('cookie');
+  if (readCookie(req, SESSION_COOKIE) || readCookie(req, SESSION_COOKIE_CLIENT)) channels.push('cookie');
   return channels;
 }
 

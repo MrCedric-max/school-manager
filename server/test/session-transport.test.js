@@ -103,6 +103,12 @@ test('the session token is accepted from every channel the app can use', async (
   assert.equal(withCookie.data.user?.username, 'demo');
   assert.equal(withCookie.data.session.via, 'cookie');
 
+  // The partitioned cookie the page sets itself, for when a proxy drops headers *and* mangles the address.
+  const withPageCookie = await call('/api/auth/status', { headers: { cookie: `sm_token=${token}` } });
+  assert.equal(withPageCookie.data.user?.username, 'demo');
+  assert.equal(withPageCookie.data.session.via, 'cookie');
+  assert.equal(withPageCookie.data.session.cookie, true);
+
   // The app's own header wins over the others (a stale cookie must not override a fresh token).
   const mixed = await call(`/api/auth/status?sm_session=${'x'.repeat(43)}`, {
     headers: { 'x-session-token': token, cookie: `sm_session=${'y'.repeat(43)}` },
@@ -240,4 +246,35 @@ test('preview proxy that drops every header: the token travels in the address', 
   } finally {
     proxy.close();
   }
+});
+
+// A proxy that drops `X-Requested-With` must not turn sign-in into a silent 403: the check also
+// accepts the browser's own same-origin signals, which another site cannot forge.
+test('a change is accepted when the browser proves the request is same-origin', async () => {
+  const post = (headers) =>
+    fetch(`${base}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', ...headers },
+      body: JSON.stringify(DEMO),
+    });
+
+  const noHeader = await post({});
+  assert.equal(noHeader.status, 403, 'without any proof a change is refused');
+  await noHeader.text();
+
+  const secFetch = await post({ 'sec-fetch-site': 'same-origin' });
+  assert.equal(secFetch.status, 200);
+  await secFetch.text();
+
+  const ownOrigin = await post({ origin: base });
+  assert.equal(ownOrigin.status, 200);
+  await ownOrigin.text();
+
+  const foreignOrigin = await post({ origin: 'https://elsewhere.example' });
+  assert.equal(foreignOrigin.status, 403, 'another site cannot borrow ours');
+  await foreignOrigin.text();
+
+  const crossSite = await post({ 'sec-fetch-site': 'cross-site', origin: 'https://elsewhere.example' });
+  assert.equal(crossSite.status, 403);
+  await crossSite.text();
 });
