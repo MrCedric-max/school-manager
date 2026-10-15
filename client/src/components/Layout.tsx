@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 import { useState, type ReactNode } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
-import { api } from '../lib/api';
+import { api, setSessionToken } from '../lib/api';
 import { fmtDate } from '../lib/format';
 import { useAuthStatus, useMetaData } from '../lib/hooks';
 import { useLang } from '../lib/i18n';
@@ -102,6 +102,7 @@ export function Layout({ children }: { children: ReactNode }) {
 
   const logout = async () => {
     await api.post('/auth/logout').catch(() => {});
+    setSessionToken(null);
     qc.clear();
     window.location.assign('/');
   };

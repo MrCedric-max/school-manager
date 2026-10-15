@@ -8,6 +8,7 @@ import {
   createSession,
   deleteSession,
   hashPassword,
+  readBearer,
   readCookie,
   sessionUser,
   setSessionCookie,
@@ -23,9 +24,10 @@ export function userCount(db) {
   return db.prepare('SELECT COUNT(*) AS n FROM users').get().n;
 }
 
-/** Attach req.user when a valid session cookie is present. */
+/** Attach req.user from the session token: the Authorization header first, then the cookie. */
 export function sessionMiddleware(req, _res, next) {
-  req.user = sessionUser(getDb(), readCookie(req, SESSION_COOKIE));
+  const db = getDb();
+  req.user = sessionUser(db, readBearer(req)) ?? sessionUser(db, readCookie(req, SESSION_COOKIE));
   next();
 }
 
@@ -58,7 +60,8 @@ authRouter.post('/setup', (req, res) => {
   if (!created) throw new HttpError(409, 'An administrator account already exists');
   const { token, expires } = createSession(db, Number(created.lastInsertRowid), config.sessionDays);
   setSessionCookie(req, res, token, expires);
-  res.status(201).json({ user: { id: Number(created.lastInsertRowid), username } });
+  // The token is also returned so the app can send it in a header where cookies are blocked.
+  res.status(201).json({ user: { id: Number(created.lastInsertRowid), username }, token });
 });
 
 authRouter.post('/login', (req, res) => {
@@ -75,11 +78,13 @@ authRouter.post('/login', (req, res) => {
   limiter.reset(ip);
   const { token, expires } = createSession(db, user.id, config.sessionDays);
   setSessionCookie(req, res, token, expires);
-  res.json({ user: { id: user.id, username: user.username } });
+  res.json({ user: { id: user.id, username: user.username }, token });
 });
 
 authRouter.post('/logout', (req, res) => {
-  deleteSession(getDb(), readCookie(req, SESSION_COOKIE));
+  const db = getDb();
+  deleteSession(db, readBearer(req));
+  deleteSession(db, readCookie(req, SESSION_COOKIE));
   clearSessionCookie(req, res);
   res.json({ ok: true });
 });
@@ -102,5 +107,5 @@ authRouter.post('/password', requireAuth, (req, res) => {
   })();
   const { token, expires } = createSession(db, user.id, config.sessionDays);
   setSessionCookie(req, res, token, expires);
-  res.json({ ok: true });
+  res.json({ ok: true, token });
 });

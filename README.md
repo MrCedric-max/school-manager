@@ -133,7 +133,7 @@ host needs a **persistent disk** (Netlify, used for the old frontend, cannot run
 | `SESSION_DAYS` | `14` | How long a sign-in lasts |
 | `TRUST_PROXY` | private networks | Express "trust proxy" (for HTTPS behind a proxy) |
 | `FRAME_ANCESTORS` | `'self'` | Who may embed the app in an iframe |
-| `COOKIE_SAMESITE` | `lax` | Set to `none` only when the app is embedded in another site |
+| `COOKIE_SAMESITE` | `lax` | Set to `none` only when the app is embedded in another site (sign-in also works there when the browser refuses the cookie) |
 | `MAX_UPLOAD_MB` | `25` | Largest workbook / backup accepted |
 
 ---
@@ -143,7 +143,7 @@ host needs a **persistent disk** (Netlify, used for the old frontend, cannot run
 ```bash
 npm install
 npm run dev        # API on :4000 (auto-restart) + Vite on :5173 with hot reload
-npm test           # 31 server tests: calendar, grading rules, reports & cards, importer, API & security
+npm test           # 32 server tests: calendar, grading rules, reports & cards, importer, API & security
 npm run typecheck  # TypeScript check of the interface
 npm run seed:demo  # fill an empty database with invented pupils
 ```
@@ -154,7 +154,7 @@ school-manager/
 │   ├── src/db/            schema, default reference data (from the workbook)
 │   ├── src/lib/           calendar, grading rules, auth, validation
 │   ├── src/services/      reports & report cards, dashboard & statistics, workbook importer, backups, demo data
-│   ├── src/routes/        REST API (all under /api, admin session required)
+│   ├── src/routes/        REST API (all under /api; admin session required except sign-in and the school logo)
 │   └── test/              node:test suites (+ a fixture workbook with the School_Manager layout)
 └── client/                React 19 + TypeScript + Vite + Tailwind CSS 4 + TanStack Query + Recharts
     └── src/pages/         one page per workbook sheet
@@ -162,3 +162,5 @@ school-manager/
 
 Security: passwords hashed with scrypt, server-side sessions in an httpOnly cookie, CSRF header check on
 every change, login rate limiting, strict Content-Security-Policy, input validation on every endpoint.
+The session token is also sent in an `Authorization` header (kept for the current browser tab only), so
+signing in works where browsers block cookies — for example when the app is shown inside another site.

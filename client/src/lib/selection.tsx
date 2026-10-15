@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { sessionStore } from './storage';
 import type { Meta } from './types';
 
 export interface Selection {
@@ -35,7 +36,7 @@ export function SelectionProvider({ meta, children }: { meta: Meta; children: Re
   const [sel, setSel] = useState<Selection>(() => {
     let stored: Partial<Selection> = {};
     try {
-      stored = JSON.parse(sessionStorage.getItem(STORAGE_KEY) || '{}');
+      stored = JSON.parse(sessionStore.get(STORAGE_KEY) || '{}');
     } catch {
       stored = {};
     }
@@ -47,7 +48,7 @@ export function SelectionProvider({ meta, children }: { meta: Meta; children: Re
   }, [meta]);
 
   useEffect(() => {
-    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(sel));
+    sessionStore.set(STORAGE_KEY, JSON.stringify(sel));
   }, [sel]);
 
   const update = useCallback((patch: Partial<Selection>) => setSel((s) => ({ ...s, ...patch })), []);

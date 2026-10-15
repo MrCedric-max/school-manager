@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { api } from './api';
+import { api, setSessionToken } from './api';
 import type { Meta } from './types';
 
 export interface AuthStatus {
@@ -10,7 +10,15 @@ export interface AuthStatus {
 }
 
 export function useAuthStatus() {
-  return useQuery({ queryKey: ['auth'], queryFn: () => api.get<AuthStatus>('/auth/status'), staleTime: Infinity });
+  return useQuery({
+    queryKey: ['auth'],
+    queryFn: async () => {
+      const status = await api.get<AuthStatus>('/auth/status');
+      if (!status.user) setSessionToken(null); // expired, signed out elsewhere, or replaced by a restore
+      return status;
+    },
+    staleTime: Infinity,
+  });
 }
 
 export function useMeta() {

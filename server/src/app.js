@@ -8,7 +8,7 @@ import { adminRouter } from './routes/admin.js';
 import { authRouter, requireAuth, sessionMiddleware } from './routes/auth.js';
 import { calendarRouter } from './routes/calendar.js';
 import { entriesRouter } from './routes/entries.js';
-import { metaRouter } from './routes/meta.js';
+import { metaRouter, sendLogo } from './routes/meta.js';
 import { pupilsRouter } from './routes/pupils.js';
 import { reportsRouter } from './routes/reports.js';
 
@@ -51,6 +51,8 @@ export function createApp({ clientDist = config.clientDist } = {}) {
   app.use('/api', sessionMiddleware);
   app.use('/api', csrfGuard);
   app.use('/api/auth', authRouter);
+  // The school logo is not secret (it is printed on every report card) and is loaded by <img> tags.
+  app.get('/api/logo', sendLogo);
 
   app.use('/api', requireAuth);
   app.use('/api', metaRouter);

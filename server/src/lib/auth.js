@@ -64,6 +64,15 @@ export function deleteSession(db, token) {
   if (token) db.prepare('DELETE FROM sessions WHERE token_hash = ?').run(sha256(token));
 }
 
+/**
+ * Session token sent by the app in an `Authorization: Bearer …` header. Browsers often refuse
+ * cookies when the app is shown inside another site (e.g. a preview panel); the header always works.
+ */
+export function readBearer(req) {
+  const match = /^Bearer\s+([A-Za-z0-9_-]{20,200})$/.exec(req.headers.authorization ?? '');
+  return match ? match[1] : null;
+}
+
 export function readCookie(req, name) {
   const header = req.headers.cookie;
   if (!header) return null;

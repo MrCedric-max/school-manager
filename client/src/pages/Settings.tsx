@@ -2,7 +2,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { AlertTriangle, Database, Download, FileSpreadsheet, ImagePlus, KeyRound, Plus, Save, School, Sparkles, Trash2, Upload } from 'lucide-react';
 import { Fragment, useEffect, useRef, useState, type FormEvent } from 'react';
 import { Badge, Button, Card, CardHeader, Field, Input, Select, cx, useToast } from '../components/ui';
-import { api } from '../lib/api';
+import { api, downloadFile } from '../lib/api';
 import { fmtDate } from '../lib/format';
 import { useMetaData } from '../lib/hooks';
 import { useLang } from '../lib/i18n';
@@ -281,6 +281,18 @@ function BackupCard() {
     }
   };
 
+  // Fetched with the session header (a plain link would only work where the browser keeps cookies).
+  const downloadBackup = async () => {
+    setBusy('backup');
+    try {
+      await downloadFile('/backup', 'school-manager-backup.db');
+    } catch (e) {
+      toast.error(e);
+    } finally {
+      setBusy(null);
+    }
+  };
+
   const loadDemo = async () => {
     setBusy('demo');
     try {
@@ -298,9 +310,9 @@ function BackupCard() {
     <Card>
       <CardHeader icon={<Database className="h-5 w-5" />} title={tr('Backup & restore', 'Sauvegarde & restauration')} subtitle={tr('Download a copy of all school data regularly.', 'Téléchargez régulièrement une copie de toutes les données.')} />
       <div className="space-y-3 p-5">
-        <a href="/api/backup" className="inline-flex h-10 items-center gap-2 rounded-lg bg-emerald-700 px-4 text-sm font-medium text-white shadow-sm hover:bg-emerald-800">
-          <Download className="h-4 w-4" /> {tr('Download backup (.db)', 'Télécharger la sauvegarde (.db)')}
-        </a>
+        <Button icon={<Download className="h-4 w-4" />} onClick={downloadBackup} loading={busy === 'backup'}>
+          {tr('Download backup (.db)', 'Télécharger la sauvegarde (.db)')}
+        </Button>
         <div>
           <input ref={input} type="file" accept=".db,.sqlite" className="hidden" onChange={(e) => e.target.files?.[0] && restore(e.target.files[0])} />
           <Button variant="secondary" icon={<Upload className="h-4 w-4" />} onClick={() => input.current?.click()} loading={busy === 'restore'}>

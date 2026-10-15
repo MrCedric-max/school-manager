@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { localStore } from './storage';
 import type { Lang } from './types';
 
 interface LangContextValue {
@@ -9,9 +10,9 @@ interface LangContextValue {
 const LangContext = createContext<LangContextValue>({ lang: 'en', setLang: () => {} });
 
 export function LangProvider({ children }: { children: ReactNode }) {
-  const [lang, setLang] = useState<Lang>(() => (localStorage.getItem('sm.lang') === 'fr' ? 'fr' : 'en'));
+  const [lang, setLang] = useState<Lang>(() => (localStore.get('sm.lang') === 'fr' ? 'fr' : 'en'));
   useEffect(() => {
-    localStorage.setItem('sm.lang', lang);
+    localStore.set('sm.lang', lang);
     document.documentElement.lang = lang;
   }, [lang]);
   const value = useMemo(() => ({ lang, setLang }), [lang]);

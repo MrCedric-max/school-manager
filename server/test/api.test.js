@@ -174,3 +174,47 @@ test('password change and logout', async () => {
   r = await api('/api/auth/login', { method: 'POST', body: { username: 'ADMIN', password: 'new-password-1' } });
   assert.equal(r.status, 200);
 });
+
+// Inside a preview panel (another site), browsers often refuse the session cookie.
+// The app then sends the token returned at sign-in in an Authorization header instead.
+test('sign-in also works without cookies (Authorization header)', async () => {
+  const call = async (path, { token, method = 'GET', body } = {}) => {
+    const headers = {};
+    if (token) headers.authorization = `Bearer ${token}`;
+    if (method !== 'GET') headers['x-requested-with'] = 'SchoolManager';
+    if (body !== undefined) headers['content-type'] = 'application/json';
+    const res = await fetch(base + path, { method, headers, body: body === undefined ? undefined : JSON.stringify(body) });
+    const data = res.headers.get('content-type')?.includes('json') ? await res.json() : null;
+    return { status: res.status, data, res };
+  };
+
+  let r = await call('/api/auth/login', { method: 'POST', body: { username: 'admin', password: 'new-password-1' } });
+  assert.equal(r.status, 200);
+  const token = r.data.token;
+  assert.match(token, /^[\w-]{40,}$/);
+  assert.equal((await call('/api/auth/status', { token })).data.user.username, 'admin');
+  assert.equal((await call('/api/meta', { token })).status, 200);
+  assert.equal((await call('/api/meta')).status, 401);
+  assert.equal((await call('/api/meta', { token: 'x'.repeat(43) })).status, 401);
+
+  // The logo is public: <img> tags cannot send the header.
+  assert.equal((await call('/api/logo')).status, 404);
+  const png = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
+  r = await call('/api/settings/logo', { token, method: 'PUT', body: { dataUrl: `data:image/png;base64,${png}` } });
+  assert.equal(r.status, 200);
+  r = await call('/api/logo');
+  assert.equal(r.status, 200);
+  assert.equal(r.res.headers.get('content-type'), 'image/png');
+  assert.equal((await call('/api/settings/logo', { method: 'DELETE' })).status, 401, 'changing the logo still needs a session');
+
+  // Password change returns a fresh token and ends the old sessions.
+  r = await call('/api/auth/password', { token, method: 'POST', body: { currentPassword: 'new-password-1', newPassword: 'new-password-2' } });
+  assert.equal(r.status, 200);
+  assert.equal((await call('/api/meta', { token })).status, 401);
+  const fresh = r.data.token;
+  assert.equal((await call('/api/meta', { token: fresh })).status, 200);
+
+  // Sign-out ends the header session.
+  assert.equal((await call('/api/auth/logout', { token: fresh, method: 'POST' })).status, 200);
+  assert.equal((await call('/api/meta', { token: fresh })).status, 401);
+});

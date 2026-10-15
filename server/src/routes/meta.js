@@ -75,13 +75,14 @@ metaRouter.delete('/settings/logo', (req, res) => {
   res.json({ ok: true });
 });
 
-metaRouter.get('/logo', (req, res) => {
+/** GET /api/logo — public (mounted before the sign-in check in app.js): <img> tags cannot send the session header. */
+export function sendLogo(req, res) {
   const row = getDb().prepare("SELECT value FROM settings WHERE key = 'logo'").get();
   const m = row?.value?.match(/^data:(image\/(?:png|jpeg|webp));base64,(.+)$/);
   if (!m) throw notFound('No logo');
   res.set('Cache-Control', 'private, max-age=300');
   res.type(m[1]).send(Buffer.from(m[2], 'base64'));
-});
+}
 
 // ---- Classes ---------------------------------------------------------------
 
