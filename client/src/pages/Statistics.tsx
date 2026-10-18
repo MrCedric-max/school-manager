@@ -216,6 +216,17 @@ export default function Statistics() {
         'aucune matière sur la carte mensuelle, donc pas de taux pour elles',
       )}`
     : undefined;
+  const controlsIncludedNote = su
+    ? [
+        tr(
+          'The grey bar is the monthly card on its own; the coloured one folds the weekly controls in.',
+          'La barre grise est la carte mensuelle seule ; la barre colorée y ajoute les contrôles hebdomadaires.',
+        ),
+        notEvaluatedNote,
+      ]
+        .filter(Boolean)
+        .join(' ')
+    : undefined;
 
   return (
     <>
@@ -371,10 +382,7 @@ export default function Statistics() {
                   'carte mensuelle',
                 )} / ${fmtPct(su.controlWeight, lang, 0)} ${tr('controls', 'contrôles')}`}
                 empty={withControls.every((r) => r.rate === null)}
-                note={`${tr(
-                  'The grey bar is the monthly card on its own; the coloured one folds the weekly controls in.',
-                  'La barre grise est la carte mensuelle seule ; la barre colorée y ajoute les contrôles hebdomadaires.',
-                )} ${notEvaluatedNote ?? ''}`}
+                note={controlsIncludedNote}
               >
                 <RateChart rows={withControls} lang={lang} tr={tr} compare />
               </ChartCard>
