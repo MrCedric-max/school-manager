@@ -62,9 +62,11 @@ export function seedDefaults(db) {
 
     if (isEmpty(db, 'control_subjects')) {
       const stmt = db.prepare(
-        'INSERT INTO control_subjects (code, label_fr, label_en, short_fr, short_en, max, sort_order) VALUES (?, ?, ?, ?, ?, 20, ?)',
+        'INSERT INTO control_subjects (code, label_fr, label_en, short_fr, short_en, max, competence, sort_order) VALUES (?, ?, ?, ?, ?, 20, ?, ?)',
       );
-      DEFAULT_CONTROL_SUBJECTS.forEach((s, i) => stmt.run(...s, i + 1));
+      DEFAULT_CONTROL_SUBJECTS.forEach(([code, labelFr, labelEn, shortFr, shortEn, competence], i) =>
+        stmt.run(code, labelFr, labelEn, shortFr, shortEn, competence, i + 1),
+      );
     }
 
     if (isEmpty(db, 'performance_areas')) {

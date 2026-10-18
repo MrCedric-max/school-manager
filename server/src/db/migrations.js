@@ -181,6 +181,14 @@ export const migrations = [
   `
   ALTER TABLE users ADD COLUMN is_demo INTEGER NOT NULL DEFAULT 0;
   `,
+
+  // v3 — which competence a weekly control subject counts towards (used by the monthly
+  // success rates: English and French feed competence 1, Maths and Science & Technology feed 2).
+  `
+  ALTER TABLE control_subjects ADD COLUMN competence INTEGER REFERENCES competences(number);
+  UPDATE control_subjects SET competence = 1 WHERE code IN ('english', 'french');
+  UPDATE control_subjects SET competence = 2 WHERE code IN ('maths', 'scitech');
+  `,
 ];
 
 export function migrate(db) {

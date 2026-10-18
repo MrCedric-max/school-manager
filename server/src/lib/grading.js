@@ -47,6 +47,31 @@ export function coteFor(pct, cotes) {
 }
 
 /**
+ * The pass mark of a cote scale: the lowest threshold that is not a failure.
+ *
+ * With the workbook's scale (A+ ≥ 90% · A ≥ 75% · ECA/B ≥ 50% · NA < 50%) that is 50% — a pupil
+ * passes from "En cours d'acquisition" (ECA/B) upwards. Editing the scale in Settings moves the pass
+ * mark with it, so a success rate always means "the share of pupils the school itself counts as
+ * passing".
+ */
+export function passMark(cotes) {
+  const thresholds = (cotes ?? []).map((c) => c.min).filter((m) => isNum(m) && m > 0);
+  return thresholds.length ? Math.min(...thresholds) : 0.5;
+}
+
+/** The cote a pupil sits at on the pass mark itself (ECA/B with the default scale). */
+export function passCote(cotes) {
+  const threshold = passMark(cotes);
+  return (cotes ?? []).find((c) => isNum(c.min) && c.min === threshold)?.code ?? null;
+}
+
+/** Does this share of the maximum count as a success? (Same tolerance as coteFor.) */
+export function isPass(pct, cotes) {
+  if (!isNum(pct)) return false;
+  return pct >= passMark(cotes) - 1e-9;
+}
+
+/**
  * Overall score /20 = academic% × academic average + (1 − academic%) × daily
  * performance average rescaled to /20. Without performance data the academic
  * average is used on its own.

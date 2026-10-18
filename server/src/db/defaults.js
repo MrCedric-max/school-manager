@@ -140,12 +140,13 @@ export const DEFAULT_ATTITUDES = [
 
 export const ATTITUDE_GRADES = ['A+', 'A', 'B', 'C'];
 
-// Weekly_Controls subjects (/20): code, label FR, label EN, short FR, short EN
+// Weekly_Controls subjects (/20): code, label FR, label EN, short FR, short EN, competence
+// (the competence a control of this subject counts towards in the monthly success rates)
 export const DEFAULT_CONTROL_SUBJECTS = [
-  ['english', 'Anglais', 'English Language', 'Ang.', 'Eng.'],
-  ['maths', 'Mathématiques', 'Mathematics', 'Maths', 'Maths'],
-  ['french', 'Français', 'French Language', 'Fran.', 'Fren.'],
-  ['scitech', 'Sciences & Technologies', 'Science & Technology', 'Sci&T', 'Sci&T'],
+  ['english', 'Anglais', 'English Language', 'Ang.', 'Eng.', 1],
+  ['maths', 'Mathématiques', 'Mathematics', 'Maths', 'Maths', 2],
+  ['french', 'Français', 'French Language', 'Fran.', 'Fren.', 1],
+  ['scitech', 'Sciences & Technologies', 'Science & Technology', 'Sci&T', 'Sci&T', 2],
 ];
 
 // Daily_Performance areas (/10): code, label FR, label EN

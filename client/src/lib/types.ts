@@ -400,10 +400,55 @@ export interface Dashboard {
   rollMarks: Record<RollMark, number>;
 }
 
+/**
+ * One line of a success-rate chart: how many pupils reached the pass mark out of those judged.
+ * `evaluated` only counts pupils whose every subject for the line was entered.
+ */
+export interface SuccessRow {
+  key: string;
+  /** Competence number (competence lines) or discipline code (subject lines). */
+  number?: number;
+  code?: string;
+  short_en: string;
+  short_fr: string;
+  label_en?: string;
+  label_fr?: string;
+  title_en?: string;
+  title_fr?: string;
+  /** Points a pupil could score for this line — 0 when the monthly card has no subject for it. */
+  max: number;
+  evaluated: number;
+  skipped: number;
+  passed: number;
+  /** Share of the pupils judged who reached the pass mark (0–1), null when nobody could be judged. */
+  rate: number | null;
+  averagePct: number | null;
+  /** How many of the pupils judged had weekly controls folded in (competences with controls). */
+  controlsIncluded?: number;
+}
+
+export interface SuccessScope {
+  competences: SuccessRow[];
+  competencesWithControls: SuccessRow[];
+  subjects: SuccessRow[];
+}
+
+export interface MonthlySuccess {
+  month: MonthInfo;
+  passMark: number;
+  passCote: string | null;
+  controlWeight: number;
+  /** Competences that have no subject on the monthly card, so they can never have a rate. */
+  notEvaluated: number[];
+  class: SuccessScope;
+  school: SuccessScope;
+}
+
 export interface Statistics {
   class: ClassInfo;
   week: WeekInfo;
   month: MonthInfo;
+  success: MonthlySuccess;
   performanceByArea: Array<{ code: string; label_en: string; label_fr: string; average: number | null }>;
   controlsBySubject: Array<{ code: string; label_en: string; label_fr: string; average: number | null }>;
   disciplines: Array<{ code: string; short_en: string; short_fr: string; max: number; average: number | null; pct: number | null }>;

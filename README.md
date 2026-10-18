@@ -67,7 +67,7 @@ It is safe by design:
 | Workbook sheet | In the app | Notes |
 | --- | --- | --- |
 | Dashboard | **Dashboard** | KPIs, per-class statistics, subject/area averages, cote distribution, roll marks — plus *today's roll call* progress per class |
-| Statistics | **Statistics** | The 5 charts (per area, per subject, per discipline %, per competence %, attendance + year trend) |
+| Statistics | **Statistics** | The 5 charts (per area, per subject, per discipline %, per competence %, attendance + year trend) and the 4 monthly success rates (per competence, per subject, per competence with controls, whole school) |
 | Lists | Built in (*Settings*, *Calendar*) | Classes & codes, months, terms & UA months, cote scale, competence framework |
 | Registration | **Pupils** | Automatic IDs (`CE2-28`), status, gender, birth date/place, parent, phone, quarter; CSV export |
 | Calendar | **Calendar** | Terms, UA months, public holidays, colour-coded months, week numbers from W1 |
@@ -107,6 +107,32 @@ These follow the workbook; the few places where the workbook was ambiguous are m
   rank = overall score. *(choice)* The term card shows the **term** rank (the workbook showed the rank of the
   last month of the term).
 - Totals add the marks entered; the grids flag pupils whose marks are incomplete.
+
+### Monthly success rates (Statistics, charts 6–9)
+
+A **success rate** is the share of pupils who reached the **pass mark** — not an average of marks. The pass
+mark is the school's own lowest passing cote: **50% of the maximum (ECA/B or better)**. Change the cote
+scale in *Settings* and the pass mark moves with it.
+
+| Chart | Scope | Reads |
+| --- | --- | --- |
+| 6 — per competence | one class | the monthly card only |
+| 7 — per subject | one class | the monthly card only (French, English, Maths, Sci & Tech, ICT, Autonomy) |
+| 8 — per competence | one class | 70% monthly card + 30% weekly controls |
+| 9 — per competence **and** per subject | **whole school** | the monthly card only |
+
+Two rules keep the rates honest:
+
+- **A pupil is judged only when every subject behind a line was entered.** A competence scored on half its
+  subjects would read as a failure. Pupils with a partial evaluation are left out (the tooltip and the
+  `skipped` count say how many).
+- **Weekly controls are averaged over the weeks of the month** (October = W4–W8) and each control counts
+  towards one competence: English and French towards C1 *Languages*, Maths and Science & Technology towards
+  C2 *Maths & Sciences*. A competence with no control subject (C4, C5) keeps its monthly card score.
+  The 70/30 split lives in `CONTROL_WEIGHT` in `server/src/services/insights.js`.
+
+Competences **C3 *Values*** and **C6 *Sport & Arts*** have no subject on the monthly card, so they get no
+rate — the charts say so instead of showing an empty bar.
 
 ---
 
@@ -195,7 +221,8 @@ embedded. Start the server with `DEBUG_SESSIONS=1` to see the same for every req
 ```bash
 npm install
 npm run dev        # API on :4000 (auto-restart) + Vite on :5173 with hot reload
-npm test           # 56 tests: 47 server (calendar, grading, reports, importer, API & security, sessions)
+npm test           # 61 tests: 52 server (calendar, grading, reports, importer, API & security,
+                   #                     sessions, monthly success rates)
                    #          9 client (which channel carries the session out of an iframe, and how
                    #                    the sign-in survives a reload without storage or cookies)
 npm run typecheck  # TypeScript check of the interface

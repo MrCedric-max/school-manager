@@ -1,10 +1,16 @@
 // Dashboard and Statistics sheets.
-import { attendanceRate, coteFor, isNum, mean } from '../lib/grading.js';
+import { attendanceRate, coteFor, isNum, isPass, mean, passCote, passMark } from '../lib/grading.js';
 import { notFound } from '../lib/http.js';
 import { readClasses, findMonth, findWeek } from './context.js';
-import { getClass, loadDisciplineMarks } from './records.js';
+import { classPupils, getClass, loadDisciplineMarks } from './records.js';
 
 const placeholders = (list) => list.map(() => '?').join(',') || "''";
+
+/**
+ * Share of a competence score that comes from the weekly controls when they are folded in
+ * (statistics chart 8): 70% monthly evaluation, 30% weekly controls.
+ */
+export const CONTROL_WEIGHT = 0.3;
 
 export function dashboard(db, ctx) {
   const { framework, settings, calendar, today } = ctx;
@@ -210,6 +216,8 @@ export function statistics(db, ctx, classId, weekNo, monthKey) {
     class: cls,
     week,
     month,
+    /** Success rates: share of pupils who reached the pass mark (charts 6–9). */
+    success: monthlySuccess(db, ctx, classId, month.key),
     performanceByArea: framework.areas.map((a) => ({
       code: a.code,
       label_en: a.label_en,
@@ -225,5 +233,200 @@ export function statistics(db, ctx, classId, weekNo, monthKey) {
     disciplines,
     competences,
     attendance: { counts: monthCounts, rate: attendanceRate(monthCounts), trend },
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Monthly success rates: the share of pupils who reached the pass mark, per
+// competence and per subject of the monthly card (charts 6–9 of the sheet).
+
+/** `AND p.class_id = ?` when a class is asked for, nothing for the whole school. */
+function classClause(classId) {
+  return classId === null || classId === undefined ? '' : ' AND p.class_id = ?';
+}
+
+function classParams(classId) {
+  return classId === null || classId === undefined ? [] : [classId];
+}
+
+/** Pupil → { code: mark }, for every pupil of the class (or of the school) that has marks. */
+function marksByPupil(db, sql, params) {
+  const map = new Map();
+  for (const r of db.prepare(sql).all(...params)) {
+    if (!map.has(r.pupil_id)) map.set(r.pupil_id, {});
+    map.get(r.pupil_id)[r.code] = r.value;
+  }
+  return map;
+}
+
+/**
+ * Pupil → { subject: share of the maximum }, averaged over the weeks of the month: a control week is
+ * a sample of the month, not a separate result.
+ */
+function controlsByPupil(db, classId, weekFrom, weekTo) {
+  const rows = db
+    .prepare(
+      `SELECT c.pupil_id, c.subject AS code, s.max AS max, AVG(c.value) AS avg
+         FROM control_marks c
+         JOIN pupils p ON p.id = c.pupil_id
+         JOIN control_subjects s ON s.code = c.subject
+        WHERE c.week BETWEEN ? AND ?${classClause(classId)}
+        GROUP BY c.pupil_id, c.subject`,
+    )
+    .all(weekFrom, weekTo, ...classParams(classId));
+  const map = new Map();
+  for (const r of rows) {
+    if (!map.has(r.pupil_id)) map.set(r.pupil_id, {});
+    map.get(r.pupil_id)[r.code] = r.max ? r.avg / r.max : null;
+  }
+  return map;
+}
+
+/**
+ * Share of a pupil's marks for one row, as a fraction of the maximum.
+ *
+ * A row is judged only when every subject behind it was entered: a competence scored on half its
+ * subjects would otherwise read as a failure. Pupils with a partial evaluation are left out and
+ * counted in `skipped`, so the sheet can say how many results the rate rests on.
+ */
+function monthlyShare(marks, codes, max) {
+  if (!max || !codes.length) return null;
+  const values = codes.map((code) => marks?.[code]);
+  if (values.some((v) => !isNum(v))) return null;
+  return values.reduce((a, b) => a + b, 0) / max;
+}
+
+/** Average share of the weekly controls of a competence (null when the pupil has none of them). */
+function controlShare(controls, codes) {
+  const values = codes.map((code) => controls?.[code]).filter(isNum);
+  if (!values.length) return null;
+  return values.reduce((a, b) => a + b, 0) / values.length;
+}
+
+/**
+ * Success rates for one scope (a class, or the whole school when `classId` is null).
+ *
+ * `competences` and `subjects` look at the monthly card only; `competencesWithControls` folds the
+ * weekly controls into them (70/30 — see CONTROL_WEIGHT).
+ */
+function successScope(db, ctx, classId, month) {
+  const { framework, settings } = ctx;
+  const threshold = passMark(settings.cotes);
+  const pupils = classId === null || classId === undefined
+    ? db.prepare('SELECT id FROM pupils').all().map((r) => r.id)
+    : classPupils(db, classId).map((p) => p.id);
+
+  const marks = marksByPupil(
+    db,
+    `SELECT m.pupil_id, m.discipline AS code, m.value FROM discipline_marks m
+       JOIN pupils p ON p.id = m.pupil_id
+      WHERE m.month = ?${classClause(classId)}`,
+    [month.key, ...classParams(classId)],
+  );
+  const controls = controlsByPupil(db, classId, month.weekFrom, month.weekTo);
+
+  /** Turn one share per pupil into "how many pupils passed, out of how many judged". */
+  const row = (base, shares, controlsIncluded = 0) => {
+    const judged = shares.filter(isNum);
+    const passed = judged.filter((p) => isPass(p, settings.cotes)).length;
+    return {
+      ...base,
+      evaluated: judged.length,
+      skipped: shares.length - judged.length,
+      passed,
+      rate: judged.length ? passed / judged.length : null,
+      averagePct: mean(judged),
+      controlsIncluded,
+    };
+  };
+
+  const monthlyCodes = (number) =>
+    framework.monthlyDisciplines.filter((d) => d.competence === number).map((d) => d.code);
+  const controlCodes = (number) => framework.subjects.filter((s) => s.competence === number).map((s) => s.code);
+
+  const competences = framework.competences.map((c) => {
+    const codes = monthlyCodes(c.number);
+    return row(
+      {
+        key: `C${c.number}`,
+        number: c.number,
+        short_en: c.short_en,
+        short_fr: c.short_fr,
+        title_en: c.title_en,
+        title_fr: c.title_fr,
+        max: c.monthlyMax,
+        subjects: codes,
+      },
+      pupils.map((id) => monthlyShare(marks.get(id), codes, c.monthlyMax)),
+    );
+  });
+
+  const competencesWithControls = framework.competences.map((c) => {
+    const codes = monthlyCodes(c.number);
+    const cCodes = controlCodes(c.number);
+    let controlsIncluded = 0;
+    const shares = pupils.map((id) => {
+      const monthly = monthlyShare(marks.get(id), codes, c.monthlyMax);
+      const control = controlShare(controls.get(id), cCodes);
+      if (isNum(monthly) && isNum(control)) {
+        controlsIncluded += 1;
+        return (1 - CONTROL_WEIGHT) * monthly + CONTROL_WEIGHT * control;
+      }
+      // No controls for this competence (or no monthly card): judge on what exists.
+      return isNum(monthly) ? monthly : control;
+    });
+    return row(
+      {
+        key: `C${c.number}`,
+        number: c.number,
+        short_en: c.short_en,
+        short_fr: c.short_fr,
+        title_en: c.title_en,
+        title_fr: c.title_fr,
+        max: c.monthlyMax,
+        subjects: codes,
+        controlSubjects: cCodes,
+      },
+      shares,
+      controlsIncluded,
+    );
+  });
+
+  const subjects = framework.monthlyDisciplines.map((d) =>
+    row(
+      {
+        key: d.code,
+        code: d.code,
+        short_en: d.short_en,
+        short_fr: d.short_fr,
+        label_en: d.label_en,
+        label_fr: d.label_fr,
+        max: d.max,
+      },
+      pupils.map((id) => monthlyShare(marks.get(id), [d.code], d.max)),
+    ),
+  );
+
+  return { competences, competencesWithControls, subjects };
+}
+
+/**
+ * Monthly success rates — the share of pupils who reached the pass mark — for one class and for the
+ * whole school, on the monthly card and (for competences) with the weekly controls folded in.
+ */
+export function monthlySuccess(db, ctx, classId, monthKey) {
+  const month = findMonth(ctx, monthKey);
+  if (!month) throw notFound('Month not found');
+  const { settings } = ctx;
+
+  return {
+    month,
+    passMark: passMark(settings.cotes),
+    passCote: passCote(settings.cotes),
+    controlWeight: CONTROL_WEIGHT,
+    /** Rows that can never have a rate: competences with no subject on the monthly card. */
+    notEvaluated: ctx.framework.competences.filter((c) => !c.monthlyMax).map((c) => c.number),
+    class: successScope(db, ctx, classId, month),
+    school: successScope(db, ctx, null, month),
   };
 }
