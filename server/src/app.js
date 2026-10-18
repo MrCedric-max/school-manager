@@ -7,6 +7,7 @@ import { HttpError, errorHandler } from './lib/http.js';
 import { adminRouter } from './routes/admin.js';
 import { authRouter, requireAuth, sessionMiddleware } from './routes/auth.js';
 import { calendarRouter } from './routes/calendar.js';
+import { collegeRouter } from './routes/college.js';
 import { entriesRouter } from './routes/entries.js';
 import { metaRouter, sendLogo } from './routes/meta.js';
 import { pupilsRouter } from './routes/pupils.js';
@@ -127,6 +128,7 @@ export function createApp({ clientDist = config.clientDist } = {}) {
   app.use('/api', metaRouter);
   app.use('/api/pupils', pupilsRouter);
   app.use('/api/calendar', calendarRouter);
+  app.use('/api', collegeRouter);
   app.use('/api', entriesRouter);
   app.use('/api', reportsRouter);
   app.use('/api/reminders', remindersRouter);

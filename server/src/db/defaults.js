@@ -171,3 +171,61 @@ export const DEFAULT_PERFORMANCE_AREAS = [
 
 export const PUPIL_STATUSES = ['Active', 'Transferred', 'Suspended', 'Expelled', 'Graduated'];
 export const ROLL_MARKS = ['P', 'A', 'L', 'E'];
+
+// ---- The two cycles -----------------------------------------------------------
+
+/**
+ * The primary is evaluated by discipline (/280, monthly and term cards); the college by
+ * subject, coefficient and six-week séquence (bulletin de notes). A class is placed in a
+ * cycle from its level, and the school can move one over in Settings.
+ */
+export const CYCLES = ['primary', 'college'];
+
+/**
+ * Subjects a college class starts with — the three groups of the MINESEC bulletin, with
+ * the coefficients of the 6ème bulletin the school uses. Teacher names are left blank:
+ * the school fills them in Settings.
+ *
+ * Columns: code, label FR, label EN, group (1-3), coefficient.
+ */
+export const COLLEGE_SUBJECT_TEMPLATE = [
+  // Groupe 1 — languages, mathematics and science
+  ['anglais', 'Anglais', 'English', 1, 3],
+  ['expression-ecrite', 'Expression écrite', 'Written expression', 1, 2],
+  ['expression-orale', 'Expression Orale', 'Oral expression', 1, 2],
+  ['mathematiques', 'Mathématiques', 'Mathematics', 1, 4],
+  ['science', 'Science', 'Science', 1, 2],
+  ['informatique', 'Informatique', 'Computer studies', 1, 2],
+  // Groupe 2 — French, humanities and citizenship
+  ['etude-de-texte', 'Étude de texte', 'Text study', 2, 1],
+  ['correction-ortho', 'Correct. Ortho.', 'Spelling', 2, 1],
+  ['ecm', 'ECM', 'Citizenship & moral education', 2, 2],
+  ['histoire-geo', 'Histoire/Géographie', 'History/Geography', 2, 2],
+  ['lcn', 'LCN', 'LCN', 2, 1],
+  // Groupe 3 — other languages, religion and sport
+  ['espagnol', 'Espagnol', 'Spanish', 3, 1],
+  ['religion', 'Religion', 'Religious studies', 3, 1],
+  ['sport', 'Sport', 'Physical education', 3, 2],
+];
+
+/** Labels of the group rows printed under each block of subjects. */
+export const COLLEGE_GROUPS = [
+  { no: 1, fr: 'Moy. 1er Groupe', en: 'Group 1 average' },
+  { no: 2, fr: 'Moy. 2e Groupe', en: 'Group 2 average' },
+  { no: 3, fr: 'Moy. 3e Groupe', en: 'Group 3 average' },
+];
+
+/**
+ * The mention printed for a mark out of twenty, as the MINESEC bulletin words it
+ * (Insuffisant below 10, then Passable, Assez Bien, Bien, Très Bien).
+ */
+export const COLLEGE_MENTIONS = [
+  { code: 'TB', min: 16, fr: 'Très Bien', en: 'Very good' },
+  { code: 'B', min: 14, fr: 'Bien', en: 'Good' },
+  { code: 'AB', min: 12, fr: 'Assez Bien', en: 'Fairly good' },
+  { code: 'P', min: 10, fr: 'Passable', en: 'Pass' },
+  { code: 'I', min: 0, fr: 'Insuffisant', en: 'Insufficient' },
+];
+
+/** A mark the school counts as a pass: 10/20, as everywhere in the secondary system. */
+export const COLLEGE_PASS_MARK = 10;

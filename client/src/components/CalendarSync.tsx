@@ -1,10 +1,10 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { CalendarClock, CheckCircle2, FileSpreadsheet, History, RefreshCw, Sparkles, Trash2, Upload } from 'lucide-react';
+import { CalendarClock, CheckCircle2, Download, FileSpreadsheet, History, RefreshCw, Sparkles, Trash2, Upload } from 'lucide-react';
 import { useMemo, useRef, useState, type ChangeEvent } from 'react';
 import { api } from '../lib/api';
 import { fmtDate } from '../lib/format';
 import { useLang } from '../lib/i18n';
-import type { CalendarEvent, EventCategory, PlannerPreview, SchoolYearsData, YearDiff } from '../lib/types';
+import type { CalendarEvent, EventCategory, EventCycle, PlannerPreview, SchoolYearsData, YearDiff } from '../lib/types';
 import { Badge, Button, Card, CardHeader, Field, Input, Modal, Select, cx, useToast } from './ui';
 
 const CATEGORY_STYLE: Record<EventCategory, string> = {
@@ -14,6 +14,12 @@ const CATEGORY_STYLE: Record<EventCategory, string> = {
   exam: 'bg-violet-100 text-violet-800',
   deadline: 'bg-rose-100 text-rose-700',
   event: 'bg-slate-100 text-slate-700',
+};
+
+const CYCLE_LABEL: Record<'' | 'primary' | 'college', [string, string]> = {
+  '': ['Whole school', 'Toute l’école'],
+  primary: ['Primary', 'Primaire'],
+  college: ['College', 'Collège'],
 };
 
 const CATEGORY_LABEL: Record<EventCategory, [string, string]> = {
@@ -54,17 +60,23 @@ export function CalendarSync({ compact = false }: { compact?: boolean }) {
   const [confirm, setConfirm] = useState(false);
   const [planner, setPlanner] = useState<PlannerPreview | null>(null);
   const [filter, setFilter] = useState<EventCategory | 'all'>('all');
+  const [cycle, setCycle] = useState<'' | 'primary' | 'college' | 'all'>('all');
 
   const year = data?.years.find((y) => y.id === activeId) ?? null;
   const changes = preview.data?.terms.filter((t) => t.changed).length ?? 0;
   const holidayChanges =
     (preview.data?.holidays.added.length ?? 0) + (preview.data?.holidays.removed.length ?? 0) + (preview.data?.holidays.renamed.length ?? 0);
-  const outOfStep = changes > 0 || holidayChanges > 0;
+  const eventChanges = (preview.data?.events?.added.length ?? 0) + (preview.data?.events?.removed.length ?? 0);
+  const outOfStep = changes > 0 || holidayChanges > 0 || eventChanges > 0;
 
+  // The primary follows MINEDUB and the college MINESEC: keep the dates of the cycle
+  // being looked at, and the ones that concern the whole school.
   const events = useMemo(() => {
     const all = data?.events ?? [];
-    return filter === 'all' ? all : all.filter((e) => e.category === filter);
-  }, [data, filter]);
+    return all.filter(
+      (e) => (filter === 'all' || e.category === filter) && (cycle === 'all' || e.cycle === '' || e.cycle === cycle),
+    );
+  }, [data, filter, cycle]);
 
   const nextYear = useMemo(() => {
     const label = year?.label ?? '';
@@ -135,6 +147,14 @@ export function CalendarSync({ compact = false }: { compact?: boolean }) {
 
   const removeEvent = (id: number) => run(`del-${id}`, () => api.del(`/calendar/events/${id}`), tr('Date removed', 'Date supprimée'));
 
+  // The dates that ship with the app are reloaded, not applied: the school sees first.
+  const reloadOfficial = () =>
+    run(
+      'reload',
+      () => api.post(`/calendar/years/${activeId}/refresh`, {}),
+      tr('The official dates were reloaded — check what would change', 'Les dates officielles ont été rechargées — vérifiez ce qui changerait'),
+    );
+
   if (q.isPending) return <Card className="p-5 text-sm text-slate-500">{tr('Loading the national calendar…', 'Chargement du calendrier national…')}</Card>;
   if (q.error || !data) return <Card className="p-5 text-sm text-red-700">{String((q.error as Error)?.message ?? '')}</Card>;
 
@@ -200,6 +220,20 @@ export function CalendarSync({ compact = false }: { compact?: boolean }) {
                     − {preview.data.holidays.removed.length} {tr('public holidays', 'jours fériés')}
                   </li>
                 )}
+                {preview.data?.events?.added.map((e) => (
+                  <li key={`+${e.date}${e.title}`}>
+                    + {fmtDate(e.date, lang)}
+                    {e.endDate ? ` – ${fmtDate(e.endDate, lang)}` : ''} · {e.title}
+                    {e.cycle ? ` (${CYCLE_LABEL[e.cycle][lang === 'fr' ? 1 : 0]})` : ''}
+                  </li>
+                ))}
+                {preview.data?.events?.removed.map((e) => (
+                  <li key={`-${e.date}${e.title}`}>
+                    − {fmtDate(e.date, lang)}
+                    {e.endDate ? ` – ${fmtDate(e.endDate, lang)}` : ''} · {e.title}
+                    {e.cycle ? ` (${CYCLE_LABEL[e.cycle][lang === 'fr' ? 1 : 0]})` : ''}
+                  </li>
+                ))}
               </ul>
               <p className="mt-2 text-xs">
                 {tr(
@@ -225,6 +259,11 @@ export function CalendarSync({ compact = false }: { compact?: boolean }) {
                 disabled={Boolean(data.years.find((y) => y.label === nextYear.label))}
               >
                 {tr(`Prepare ${nextYear.label}`, `Préparer ${nextYear.label}`)}
+              </Button>
+            )}
+            {data.hasOfficial && (
+              <Button variant="secondary" size="sm" icon={<Download className="h-4 w-4" />} onClick={reloadOfficial} loading={busy === 'reload'}>
+                {tr('Reload the official dates', 'Recharger les dates officielles')}
               </Button>
             )}
             <Button variant="ghost" size="sm" icon={<RefreshCw className="h-4 w-4" />} onClick={() => void refresh()}>
@@ -267,18 +306,25 @@ export function CalendarSync({ compact = false }: { compact?: boolean }) {
             icon={<FileSpreadsheet className="h-5 w-5" />}
             title={tr('Dates of the school year', 'Dates de l’année scolaire')}
             subtitle={tr(
-              'The official dates and the school’s own, the ones reminders are sent for.',
-              'Les dates officielles et celles de l’école, celles pour lesquelles des rappels sont envoyés.',
+              'The official dates and the school’s own, the ones reminders are sent for. The primary follows MINEDUB, the college follows MINESEC: filter on a cycle to see its calendar.',
+              'Les dates officielles et celles de l’école, celles pour lesquelles des rappels sont envoyés. Le primaire suit le MINEDUB, le collège le MINESEC : filtrez sur un cycle pour voir son calendrier.',
             )}
             actions={
-              <Select value={filter} onChange={(e) => setFilter(e.target.value as EventCategory | 'all')} className="h-9 w-40">
-                <option value="all">{tr('Everything', 'Tout')}</option>
-                {(data.categories ?? []).map((c) => (
-                  <option key={c} value={c}>
-                    {CATEGORY_LABEL[c]?.[lang === 'fr' ? 1 : 0] ?? c}
-                  </option>
-                ))}
-              </Select>
+              <div className="flex gap-2">
+                <Select value={cycle} onChange={(e) => setCycle(e.target.value as typeof cycle)} className="h-9 w-36">
+                  <option value="all">{tr('Both cycles', 'Les deux cycles')}</option>
+                  <option value="primary">{CYCLE_LABEL.primary[lang === 'fr' ? 1 : 0]}</option>
+                  <option value="college">{CYCLE_LABEL.college[lang === 'fr' ? 1 : 0]}</option>
+                </Select>
+                <Select value={filter} onChange={(e) => setFilter(e.target.value as EventCategory | 'all')} className="h-9 w-40">
+                  <option value="all">{tr('Everything', 'Tout')}</option>
+                  {(data.categories ?? []).map((c) => (
+                    <option key={c} value={c}>
+                      {CATEGORY_LABEL[c]?.[lang === 'fr' ? 1 : 0] ?? c}
+                    </option>
+                  ))}
+                </Select>
+              </div>
             }
           />
           <ul className="max-h-96 divide-y divide-slate-100 overflow-y-auto">
@@ -377,6 +423,9 @@ function EventRow({ event, lang, onRemove, busy }: { event: CalendarEvent; lang:
     <li className="flex items-center gap-3 px-4 py-2 text-sm">
       <span className="w-24 shrink-0 tabular-nums text-slate-500">{fmtDate(event.date, lang)}</span>
       <Badge className={CATEGORY_STYLE[event.category]}>{CATEGORY_LABEL[event.category]?.[lang === 'fr' ? 1 : 0]}</Badge>
+      {event.cycle && (
+        <Badge className="shrink-0 bg-sky-50 text-sky-700">{CYCLE_LABEL[event.cycle]?.[lang === 'fr' ? 1 : 0] ?? event.cycle}</Badge>
+      )}
       <span className="min-w-0 flex-1 truncate" title={event.title}>
         {event.title}
       </span>
@@ -452,14 +501,14 @@ function DiffView({ diff, lang }: { diff?: YearDiff; lang: 'en' | 'fr' }) {
 export function AddEventForm({ onAdded }: { onAdded: () => void }) {
   const { lang, tr } = useLang();
   const toast = useToast();
-  const [form, setForm] = useState({ date: '', title: '', category: 'event' as EventCategory });
+  const [form, setForm] = useState({ date: '', title: '', category: 'event' as EventCategory, cycle: '' as EventCycle });
   const [saving, setSaving] = useState(false);
 
   const submit = async () => {
     setSaving(true);
     try {
       await api.post('/calendar/events', form);
-      setForm({ date: '', title: '', category: 'event' });
+      setForm({ date: '', title: '', category: 'event', cycle: '' });
       onAdded();
       toast.success(tr('Date added', 'Date ajoutée'));
     } catch (e) {
@@ -482,6 +531,15 @@ export function AddEventForm({ onAdded }: { onAdded: () => void }) {
           {(['event', 'exam', 'deadline', 'holiday', 'official'] as EventCategory[]).map((c) => (
             <option key={c} value={c}>
               {CATEGORY_LABEL[c][lang === 'fr' ? 1 : 0]}
+            </option>
+          ))}
+        </Select>
+      </Field>
+      <Field label={tr('Concerns', 'Concerne')}>
+        <Select value={form.cycle} onChange={(e) => setForm({ ...form, cycle: e.target.value as EventCycle })} className="w-36">
+          {(['', 'primary', 'college'] as EventCycle[]).map((c) => (
+            <option key={c} value={c}>
+              {CYCLE_LABEL[c][lang === 'fr' ? 1 : 0]}
             </option>
           ))}
         </Select>

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { AverageRow, InfoNote, NoPupils } from '../components/Common';
+import { AverageRow, InfoNote, NoPupils, CollegeNote } from '../components/Common';
 import { MarkGrid } from '../components/MarkGrid';
 import { ClassSelect, MonthSelect } from '../components/Selectors';
 import { Card, CoteBadge, ErrorBox, LoadingBlock, PageHeader, SaveIndicator, Tabs, Toolbar } from '../components/ui';
@@ -68,6 +68,7 @@ export default function TermMarks() {
           />
         </div>
       </Toolbar>
+      <CollegeNote what="discipline" />
       {tab === 'marks' && (
         <InfoNote>
           {tr('Grey columns come from', 'Les colonnes grises viennent des')}{' '}

@@ -15,6 +15,7 @@ const DailyPerformance = lazy(() => import('./pages/DailyPerformance'));
 const WeeklyControls = lazy(() => import('./pages/WeeklyControls'));
 const MonthlyMarks = lazy(() => import('./pages/MonthlyMarks'));
 const TermMarks = lazy(() => import('./pages/TermMarks'));
+const Sequences = lazy(() => import('./pages/Sequences'));
 const WeeklyReport = lazy(() => import('./pages/WeeklyReport'));
 const MonthlyReport = lazy(() => import('./pages/MonthlyReport'));
 const TermReport = lazy(() => import('./pages/TermReport'));
@@ -66,6 +67,7 @@ function MetaGate() {
             <Route path="/controls" element={<WeeklyControls />} />
             <Route path="/monthly-marks" element={<MonthlyMarks />} />
             <Route path="/term-marks" element={<TermMarks />} />
+            <Route path="/sequences" element={<Sequences />} />
             <Route path="/reports/weekly" element={<WeeklyReport />} />
             <Route path="/reports/monthly" element={<MonthlyReport />} />
             <Route path="/reports/term" element={<TermReport />} />

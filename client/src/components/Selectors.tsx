@@ -27,11 +27,28 @@ export function ClassSelect({ className }: { className?: string }) {
   return (
     <Field label={tr('Class', 'Classe')} className={className}>
       <Select value={sel.classId} onChange={(e) => update({ classId: Number(e.target.value) })} className="min-w-32">
-        {meta.classes.map((c) => (
-          <option key={c.id} value={c.id}>
-            {c.name} ({c.enrolled})
-          </option>
+        {/* The school runs two cycles: they are marked differently, so the list says which is which. */}
+        {[
+          ['primary', tr('Primary', 'Primaire')],
+          ['college', tr('College', 'Collège')],
+        ].map(([cycle, label]) => (
+          <optgroup key={cycle} label={label}>
+            {meta.classes
+              .filter((c) => c.cycle === cycle)
+              .map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name} ({c.enrolled})
+                </option>
+              ))}
+          </optgroup>
         ))}
+        {meta.classes
+          .filter((c) => c.cycle !== 'primary' && c.cycle !== 'college')
+          .map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.name} ({c.enrolled})
+            </option>
+          ))}
       </Select>
     </Field>
   );

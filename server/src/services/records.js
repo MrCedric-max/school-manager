@@ -4,7 +4,7 @@ import { attendanceRate, isNum, mean } from '../lib/grading.js';
 export const ACTIVE_STATUSES = new Set(['Active', 'Suspended']);
 
 export function getClass(db, classId) {
-  return db.prepare('SELECT id, name, code, sort_order FROM classes WHERE id = ?').get(classId) ?? null;
+  return db.prepare('SELECT id, name, code, sort_order, cycle FROM classes WHERE id = ?').get(classId) ?? null;
 }
 
 export function classPupils(db, classId) {

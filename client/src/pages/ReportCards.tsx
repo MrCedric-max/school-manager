@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { NoPupils } from '../components/Common';
 import { PrintHint } from '../components/Layout';
 import { SchoolLogo } from '../components/SchoolLogo';
+import Bulletins from './Bulletins';
 import { ClassSelect, MonthSelect, TermSelect } from '../components/Selectors';
 import { Button, Card, ErrorBox, Field, LoadingBlock, PageHeader, Select, Tabs, Toolbar, cx } from '../components/ui';
 import { api, qs } from '../lib/api';
@@ -505,21 +506,27 @@ export default function ReportCards() {
   const [kind, setKind] = useState<'monthly' | 'term'>('monthly');
   const [pupilId, setPupilId] = useState<number | 'all'>('all');
 
+  // A college class is not reported on the primary cards: it has its own bulletin, printed
+  // from the subjects, coefficients and séquences of the class.
+  const isCollege = meta.classes.find((c) => c.id === sel.classId)?.cycle === 'college';
+
   useEffect(() => setPupilId('all'), [sel.classId]);
 
   const monthly = useQuery({
     queryKey: ['cards-monthly', sel.classId, sel.month],
     queryFn: () => api.get<MonthlyCards>(`/cards/monthly?${qs({ classId: sel.classId, month: sel.month })}`),
-    enabled: kind === 'monthly',
+    enabled: kind === 'monthly' && !isCollege,
   });
   const term = useQuery({
     queryKey: ['cards-term', sel.classId, sel.term],
     queryFn: () => api.get<TermCards>(`/cards/term?${qs({ classId: sel.classId, term: sel.term })}`),
-    enabled: kind === 'term',
+    enabled: kind === 'term' && !isCollege,
   });
   const q = kind === 'monthly' ? monthly : term;
   const pupils = (kind === 'monthly' ? monthly.data?.cards : term.data?.cards)?.map((c) => c.pupil) ?? [];
   const shown = pupilId === 'all' ? pupils.length : 1;
+
+  if (isCollege) return <Bulletins />;
 
   return (
     <>

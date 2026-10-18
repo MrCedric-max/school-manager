@@ -1,6 +1,8 @@
 // Demo data so the app can be explored before importing the real workbook.
 // All names are generated — they are NOT the school's pupils.
+import { cycleOf } from '../lib/cycles.js';
 import { readClasses } from './context.js';
+import { collegeSubjects, sequenceGrid } from './college.js';
 
 function mulberry32(seed) {
   let a = seed >>> 0;
@@ -58,14 +60,20 @@ export function generateDemoData(db, ctx, { seed = 2026, until } = {}) {
   const insCtrl = db.prepare('INSERT INTO control_marks (pupil_id, week, subject, value) VALUES (?, ?, ?, ?)');
   const insMark = db.prepare('INSERT INTO discipline_marks (pupil_id, month, discipline, value) VALUES (?, ?, ?, ?)');
   const insGrade = db.prepare('INSERT INTO attitude_grades (pupil_id, month, attitude, grade) VALUES (?, ?, ?, ?)');
+  const insSeq = db.prepare('INSERT INTO sequence_marks (pupil_id, term, sequence, subject, kind, value) VALUES (?, ?, ?, ?, ?, ?)');
 
   const schoolDays = calendar.schoolDays.filter((d) => d <= end);
   const weeks = calendar.weeks.filter((w) => w.term && w.friday < end && w.schoolDays > 0);
   const months = calendar.months.filter((m) => m.uaTerm && m.firstDay <= end);
+  const sequences = sequenceGrid(ctx).filter((s) => s.end <= end);
 
   let count = 0;
   db.transaction(() => {
     readClasses(db).forEach((cls, level) => {
+    // A college class is marked on its own subjects, séquence by séquence; a primary one
+    // on the disciplines of the competence framework.
+    const college = cycleOf(cls) === 'college';
+    const subjects = college ? collegeSubjects(db, cls.id) : [];
       const size = CLASS_SIZES[cls.code] ?? 20;
       const names = [];
       for (let i = 0; i < size; i += 1) {
@@ -109,18 +117,30 @@ export function generateDemoData(db, ctx, { seed = 2026, until } = {}) {
             insPerf.run(pupilId, date, a.code, clamp(Math.round(a.max * (ability + 0.12 + noise(0.25))), 3, a.max));
           }
         }
-        for (const w of weeks) {
-          for (const s of framework.subjects) {
-            insCtrl.run(pupilId, w.number, s.code, clamp(Math.round(s.max * (ability + noise(0.3)) * 2) / 2, 4, s.max));
+        if (college) {
+          // The college is marked by subject and séquence: two tests per subject per
+          // séquence, for every séquence whose six weeks are over.
+          for (const seq of sequences) {
+            for (const subject of subjects) {
+              for (const kind of ['interro', 'devoir']) {
+                insSeq.run(pupilId, seq.term, seq.number, subject.code, kind, clamp(Math.round((ability + noise(0.3)) * 20 * 2) / 2, 2, 20));
+              }
+            }
           }
-        }
-        for (const m of months) {
-          for (const d of framework.disciplines) {
-            insMark.run(pupilId, m.key, d.code, clamp(Math.round(d.max * (ability + noise(0.28)) * 2) / 2, Math.round(d.max * 0.2), d.max));
+        } else {
+          for (const w of weeks) {
+            for (const s of framework.subjects) {
+              insCtrl.run(pupilId, w.number, s.code, clamp(Math.round(s.max * (ability + noise(0.3)) * 2) / 2, 4, s.max));
+            }
           }
-          for (const a of framework.attitudes) {
-            const g = ability + noise(0.3);
-            insGrade.run(pupilId, m.key, a.code, g > 0.85 ? 'A+' : g > 0.68 ? 'A' : g > 0.5 ? 'B' : 'C');
+          for (const m of months) {
+            for (const d of framework.disciplines) {
+              insMark.run(pupilId, m.key, d.code, clamp(Math.round(d.max * (ability + noise(0.28)) * 2) / 2, Math.round(d.max * 0.2), d.max));
+            }
+            for (const a of framework.attitudes) {
+              const g = ability + noise(0.3);
+              insGrade.run(pupilId, m.key, a.code, g > 0.85 ? 'A+' : g > 0.68 ? 'A' : g > 0.5 ? 'B' : 'C');
+            }
           }
         }
       });

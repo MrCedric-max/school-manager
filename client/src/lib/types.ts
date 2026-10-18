@@ -31,6 +31,8 @@ export interface ClassInfo {
   sort_order: number;
   enrolled: number;
   registered: number;
+  /** Which cycle the class is evaluated in: `primary` (disciplines) or `college` (subjects). */
+  cycle: Cycle;
 }
 
 export interface Competence {
@@ -505,12 +507,17 @@ export type EventCategory = 'official' | 'break' | 'holiday' | 'exam' | 'deadlin
 export type EventSource = 'national' | 'import' | 'manual';
 
 /** A date of the school year: an official one, or one of the school's own. */
+/** Which part of the school an event concerns: '' is the whole school. */
+export type EventCycle = '' | 'primary' | 'college';
+
 export interface CalendarEvent {
   id: number;
   date: string;
   endDate: string | null;
   title: string;
   category: EventCategory;
+  /** primary and college do not sit the same exams on the same days (MINEDUB vs MINESEC). */
+  cycle: EventCycle;
   source: EventSource;
   schoolYearId: number | null;
   remind: boolean;
@@ -580,7 +587,12 @@ export interface YearDiff {
     removed: Array<{ date: string; name: string }>;
     renamed: Array<{ date: string; name: string; was: string }>;
   };
-  events: number;
+  /** The official dates applying the year would add or drop — the two cycles differ here. */
+  events: {
+    added: Array<{ date: string; endDate: string | null; title: string; category: EventCategory; cycle: EventCycle }>;
+    removed: Array<{ date: string; endDate: string | null; title: string; category: EventCategory; cycle: EventCycle }>;
+    total: number;
+  };
   schoolDays: number;
 }
 
@@ -702,4 +714,115 @@ export interface RemindersData {
   outbox: OutboxMessage[];
   log: ReminderLogEntry[];
   today: string;
+}
+
+// ---- The two cycles: primary and college ---------------------------------------
+
+/** The primary is marked by discipline; the college by subject, coefficient and séquence. */
+export type Cycle = 'primary' | 'college';
+
+export interface CollegeSubject {
+  id: number;
+  classId: number;
+  code: string;
+  label: string;
+  labelEn: string;
+  groupNo: number;
+  coefficient: number;
+  teacher: string;
+}
+
+/** One of the six séquences of the year: a term's teaching weeks cut in two. */
+export interface Sequence {
+  number: number;
+  term: number;
+  part: number;
+  label: string;
+  start: string;
+  end: string;
+  weeks: number[];
+  schoolDays: number;
+}
+
+export interface SequenceSheetData {
+  class: { id: number; name: string; code: string; cycle: Cycle };
+  sequence: Sequence;
+  sequences: Sequence[];
+  subjects: CollegeSubject[];
+  kinds: string[];
+  pupils: Array<{
+    pupilId: number;
+    studentId: string;
+    classNo: number;
+    name: string;
+    status: string;
+    marks: Array<{ code: string; interro: number | null; devoir: number | null; mark: number | null }>;
+  }>;
+  entered: number;
+  expected: number;
+}
+
+export interface Mention {
+  code: string;
+  fr: string;
+  en: string;
+}
+
+/** One line of the bulletin: a subject, its two séquences, its term mark and its rank. */
+export interface BulletinSubject {
+  code: string;
+  label: string;
+  labelEn: string;
+  groupNo: number;
+  coefficient: number;
+  teacher: string;
+  seq: Record<number, number | null>;
+  trim: number | null;
+  rank: number | null;
+  classAverage?: number | null;
+}
+
+export interface BulletinGroup {
+  groupNo: number;
+  label: string;
+  labelEn: string;
+  coefficient: number;
+  classAverage: number | null;
+}
+
+export interface BulletinPupil {
+  pupilId: number;
+  studentId: string;
+  classNo: number;
+  name: string;
+  gender: string | null;
+  dateOfBirth: string | null;
+  placeOfBirth: string | null;
+  address: string | null;
+  guardian: string | null;
+  status: string;
+  subjects: BulletinSubject[];
+  groups: Array<{ groupNo: number; label: string; coefficient: number; seq: Record<number, number | null>; trim: number | null; rank: number | null }>;
+  points: number | null;
+  coefficient: number;
+  average: number | null;
+  mention: Mention | null;
+  sequenceAverages: Record<number, number | null>;
+  conduct: number | null;
+  remark: string;
+  attendance: { justified: number; unjustified: number; late: number; present: number };
+  rank: number | null;
+}
+
+export interface CollegeBulletin {
+  cycle: Cycle;
+  class: { id: number; name: string; code: string; cycle: Cycle };
+  term: { number: number; name: string; start: string; end: string };
+  sequences: number[];
+  sequenceGrid: Sequence[];
+  subjects: Array<BulletinSubject & { classAverage: number | null }>;
+  groups: BulletinGroup[];
+  pupils: BulletinPupil[];
+  classProfile: { count: number; average: number | null; best: number | null; worst: number | null; passMark: number; passing: number };
+  school: { name: string; subtitle: string; academicYear: string; cycle: Cycle };
 }

@@ -271,6 +271,64 @@ export const migrations = [
 
   ALTER TABLE users ADD COLUMN email TEXT;
   `,
+
+  // v5 — the school's two cycles. The primary is evaluated by discipline (/280, monthly
+  // and term cards); the college is evaluated by subject, coefficient and six-week
+  // séquence, and prints a bulletin de notes. Same school year, two ways of working.
+  `
+  -- Which cycle a class belongs to. Empty is "not looked at yet": the app fills it in
+  -- from the level (SIL to CM2 primary, 6ème onwards college) and the school can change
+  -- a class over in Settings.
+  ALTER TABLE classes ADD COLUMN cycle TEXT NOT NULL DEFAULT '' CHECK (cycle IN ('', 'primary', 'college'));
+
+  -- The subjects of one college class. They are per class, because 6ème and 3ème do not
+  -- weigh the same subjects: each carries a coefficient and sits in a group (Groupe 1,
+  -- Groupe 2, Groupe 3), whose averages are printed on the bulletin.
+  CREATE TABLE college_subjects (
+    id          INTEGER PRIMARY KEY,
+    class_id    INTEGER NOT NULL REFERENCES classes(id) ON DELETE CASCADE,
+    code        TEXT NOT NULL,
+    label_fr    TEXT NOT NULL,
+    label_en    TEXT NOT NULL DEFAULT '',
+    group_no    INTEGER NOT NULL DEFAULT 1 CHECK (group_no BETWEEN 1 AND 3),
+    coefficient REAL NOT NULL DEFAULT 1 CHECK (coefficient > 0),
+    teacher     TEXT NOT NULL DEFAULT '',
+    sort_order  INTEGER NOT NULL DEFAULT 0
+  );
+  CREATE UNIQUE INDEX idx_college_subjects_code ON college_subjects(class_id, code);
+  CREATE INDEX idx_college_subjects_order ON college_subjects(class_id, group_no, sort_order);
+
+  -- Marks of the six-week séquences: one row per pupil, séquence (1-6), subject and kind
+  -- of test. The mark of a séquence is the average of the tests written for it; the mark
+  -- of the term is the average of its two séquences.
+  CREATE TABLE sequence_marks (
+    pupil_id   INTEGER NOT NULL REFERENCES pupils(id) ON DELETE CASCADE,
+    term       INTEGER NOT NULL,
+    sequence   INTEGER NOT NULL CHECK (sequence BETWEEN 1 AND 6),
+    subject    TEXT NOT NULL,
+    kind       TEXT NOT NULL CHECK (kind IN ('interro', 'devoir')),
+    value      REAL NOT NULL,
+    updated_at TEXT NOT NULL DEFAULT ${NOW},
+    PRIMARY KEY (pupil_id, sequence, subject, kind)
+  ) WITHOUT ROWID;
+  CREATE INDEX idx_sequence_marks_seq ON sequence_marks(term, sequence, subject);
+
+  -- Conduite /20 for a term (period = "T:2"), printed under the pupil's results.
+  CREATE TABLE conduct_marks (
+    pupil_id   INTEGER NOT NULL REFERENCES pupils(id) ON DELETE CASCADE,
+    period     TEXT NOT NULL,
+    value      REAL NOT NULL,
+    updated_at TEXT NOT NULL DEFAULT ${NOW},
+    PRIMARY KEY (pupil_id, period)
+  ) WITHOUT ROWID;
+  `,
+
+  // v6 — an event belongs to a cycle. The primary follows MINEDUB and the college
+  // follows MINESEC: their exam periods fall on different days, so a date can concern
+  // one cycle only. An empty cycle means the whole school.
+  `
+  ALTER TABLE events ADD COLUMN cycle TEXT NOT NULL DEFAULT '';
+  `
 ];
 
 export function migrate(db) {

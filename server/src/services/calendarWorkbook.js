@@ -191,6 +191,24 @@ export function categorise(title) {
 }
 
 /**
+ * Which cycle a note from the school's planner concerns, read off its wording.
+ *
+ * The planner is one grid for the whole school, and most of its notes say who they are
+ * for ("Semaine des challenges (Primaire)", "Évaluation S1 (collège)", "BEPC BLANC"). A
+ * note that names both cycles — or neither — concerns the whole school.
+ */
+const COLLEGE_WORDS = /coll[eè]ge|second(?:ary|aire|ery)|\b(?:6|5|4|3)[eè]me\b|\b6e\b|bepc|probatoire|\bgce\b|\b3e\b|\b2nd(?:e)?\b|\b1[èe]re\b|\btle\b|terminale/i;
+const PRIMARY_WORDS = /primaire|primary|\bcep\b|\bcm[12]\b|\bsil\b|\bcp\b|\bce[12]\b|maternelle|\bcours\s*(?:moyen|pr[eé]paratoire)\b/i;
+
+export function cycleFromTitle(title) {
+  const college = COLLEGE_WORDS.test(title);
+  const primary = PRIMARY_WORDS.test(title);
+  if (college && !primary) return 'college';
+  if (primary && !college) return 'primary';
+  return '';
+}
+
+/**
  * Read one sheet: every day that carries a note becomes an event.
  * `yearOf(month)` answers the year of a block when the sheet does not say.
  */
@@ -229,7 +247,7 @@ function readSheet(ws, defaultYear) {
       }
       const title = joinNote(parts);
       if (!title) continue;
-      events.push({ date: iso, title, category: categorise(title) });
+      events.push({ date: iso, title, category: categorise(title), cycle: cycleFromTitle(title) });
     }
   }
   return events;

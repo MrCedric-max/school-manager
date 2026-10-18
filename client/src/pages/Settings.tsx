@@ -1,6 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { AlertTriangle, Database, Download, FileSpreadsheet, ImagePlus, KeyRound, Plus, Save, School, ShieldCheck, Sparkles, Trash2, Upload } from 'lucide-react';
 import { Fragment, useEffect, useRef, useState, type FormEvent } from 'react';
+import { CollegeSubjectsCard, CycleSelect } from '../components/CollegeSubjects';
 import { SchoolLogo } from '../components/SchoolLogo';
 import { Badge, Button, Card, CardHeader, Field, Input, Select, cx, useToast } from '../components/ui';
 import { api, downloadFile, isEmbedded, sessionTransport } from '../lib/api';
@@ -383,7 +384,13 @@ function ClassesCard() {
 
   return (
     <Card>
-      <CardHeader title={tr('Classes', 'Classes')} subtitle={tr('The code is used in student IDs (e.g. 6EME-04).', 'Le code sert dans les matricules (ex. 6EME-04).')} />
+      <CardHeader
+        title={tr('Classes', 'Classes')}
+        subtitle={tr(
+          'The code is used in student IDs (e.g. 6EME-04). The cycle decides how the class is marked: the primary by discipline, the college by subject and séquence.',
+          'Le code sert dans les matricules (ex. 6EME-04). Le cycle décide comment la classe est notée : le primaire par discipline, le collège par matière et séquence.',
+        )}
+      />
       <div className="max-h-96 overflow-y-auto">
         <table className="w-full text-sm">
           <tbody>
@@ -398,7 +405,16 @@ function ClassesCard() {
                   <td className="px-1 py-1.5">
                     <Input value={r.code} onChange={(e) => setRows(rows.map((x) => (x.id === r.id ? { ...x, code: e.target.value.toUpperCase() } : x)))} className="h-8 w-24" />
                   </td>
+                  <td className="px-1 py-1.5">
+                  </td>
                   <td className="px-2 text-xs text-slate-500">{r.registered}</td>
+                  <td className="px-2 py-1.5">
+                    <CycleSelect
+                      classId={r.id}
+                      cycle={meta.classes.find((c) => c.id === r.id)?.cycle ?? 'primary'}
+                      onChanged={() => void qc.invalidateQueries()}
+                    />
+                  </td>
                   <td className="px-2 py-1.5 text-right">
                     {dirty ? (
                       <Button size="sm" onClick={() => save(r.id)}>
@@ -648,6 +664,7 @@ export default function SettingsPage() {
         <SchoolCard />
         {!demoUser && <BackupCard />}
         <ClassesCard />
+        <CollegeSubjectsCard />
         {!demoUser && <AccountCard />}
         <FrameworkCard />
         <SessionCard />

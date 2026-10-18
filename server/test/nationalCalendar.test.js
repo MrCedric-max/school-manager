@@ -6,6 +6,7 @@ import { buildCalendar } from '../src/lib/calendar.js';
 import {
   BACKBONE_2026_2027,
   dateFromWeekParts,
+  eventCycle,
   easterSunday,
   isoWeekParts,
   nextLabel,
@@ -22,6 +23,7 @@ import {
   applyYearToCalendar,
   ensureCurrentYear,
   previewYear,
+  readEvents,
   rollOverYear,
   saveYearBackbone,
   setYearStatus,
@@ -206,6 +208,84 @@ test('applying the national calendar rewrites the terms, holidays and official e
   assert.equal(day.type, 'break');
   assert.equal(ctx.calendar.dayByDate.get('2027-01-05').type, 'school');
   closeDatabase();
+});
+
+test('the two cycles have their own exam dates: MINESEC for the college, MINEDUB for the primary', () => {
+  const db = freshDb();
+  ensureCurrentYear(db);
+  const year = activeYear(db);
+  applyYearToCalendar(db, year.id);
+
+  const exams = db
+    .prepare("SELECT date, end_date, title, cycle FROM events WHERE source = 'national' AND category = 'exam' ORDER BY date, title")
+    .all();
+  // Official secondary exams open on 19 April (MINESEC) while the primary sits its own
+  // papers from 10 May (MINEDUB): a date that concerns one cycle is not shown to the other.
+  const college = exams.filter((e) => e.cycle === 'college').map((e) => [e.date, e.end_date, e.title]);
+  const primary = exams.filter((e) => e.cycle === 'primary').map((e) => [e.date, e.end_date, e.title]);
+  assert.deepEqual(college, [
+    ['2027-04-14', '2027-04-17', 'Mock exams, secondary / Examens blancs (secondaire)'],
+    ['2027-04-19', '2027-07-30', 'Official exams, secondary / Examens officiels (secondaire)'],
+    ['2027-04-26', '2027-05-07', 'Practical PE exams / Épreuves pratiques d’EPS'],
+    ['2027-05-03', '2027-05-21', 'Internal evaluations, secondary / Évaluations internes (secondaire)'],
+  ]);
+  assert.deepEqual(primary, [
+    ['2027-04-14', '2027-04-17', 'Mock exams, primary / Épreuves zéro (primaire)'],
+    ['2027-05-10', '2027-07-30', 'Official exams, primary / Examens officiels (primaire)'],
+  ]);
+
+  // The school-wide dates (rentrée, breaks, end of classes) belong to nobody in particular.
+  const anchors = db.prepare("SELECT cycle FROM events WHERE source = 'national' AND category <> 'exam'").all();
+  assert.equal(anchors.length > 0, true);
+  assert.equal(anchors.every((e) => e.cycle === ''), true);
+  closeDatabase();
+});
+
+test('reading the events of one cycle keeps that cycle and the whole school', () => {
+  const db = freshDb();
+  ensureCurrentYear(db);
+  const year = activeYear(db);
+  applyYearToCalendar(db, year.id);
+
+  const all = readEvents(db, { limit: 2000 });
+  const college = readEvents(db, { cycle: 'college', limit: 2000 });
+  const primary = readEvents(db, { cycle: 'primary', limit: 2000 });
+  assert.ok(college.length < all.length && primary.length < all.length);
+  assert.equal(college.every((e) => e.cycle === '' || e.cycle === 'college'), true);
+  assert.equal(primary.every((e) => e.cycle === '' || e.cycle === 'primary'), true);
+  assert.equal(college.some((e) => /secondaire/.test(e.title)), true);
+  // The college does not sit the primary's official exams and the other way round.
+  assert.equal(college.some((e) => /Examens officiels \(primaire\)/.test(e.title)), false);
+  assert.equal(primary.some((e) => /Examens officiels \(secondaire\)/.test(e.title)), false);
+  // Both keep the rentrée.
+  for (const list of [college, primary]) assert.ok(list.some((e) => e.title.includes('Rentrée scolaire')));
+  closeDatabase();
+});
+
+test('a cycle chosen when a date is added by hand is kept, and anything else falls back to the whole school', () => {
+  const db = freshDb();
+  ensureCurrentYear(db);
+  const year = activeYear(db);
+  const stmt = db.prepare(
+    `INSERT INTO events (date, end_date, title, category, cycle, source, school_year_id)
+     VALUES (?, ?, ?, 'event', ?, 'manual', ?)`,
+  );
+  stmt.run('2027-06-01', null, 'End-of-year outing', eventCycle('college'), year.id);
+  stmt.run('2027-06-02', null, 'Staff meeting', eventCycle(' nonsense '), year.id);
+  const rows = readEvents(db, { limit: 2000 }).filter((e) => e.source === 'manual');
+  assert.deepEqual(rows.map((e) => [e.title, e.cycle]), [
+    ['End-of-year outing', 'college'],
+    ['Staff meeting', ''],
+  ]);
+  closeDatabase();
+});
+
+test('rolling the year over keeps which cycle each exam period concerns', () => {
+  const rolled = rollOverBackbone(BACKBONE_2026_2027, '2027-2028');
+  const exams = planBackbone(rolled).events.filter((e) => e.category === 'exam');
+  assert.equal(exams.length, 6);
+  assert.equal(exams.filter((e) => e.cycle === 'college').length, 4);
+  assert.equal(exams.filter((e) => e.cycle === 'primary').length, 2);
 });
 
 test('a holiday the school added by hand survives a re-sync', () => {

@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { AverageRow, InfoNote, NoPupils } from '../components/Common';
+import { AverageRow, InfoNote, NoPupils, CollegeNote } from '../components/Common';
 import { MarkGrid } from '../components/MarkGrid';
 import { ClassSelect, WeekSelect } from '../components/Selectors';
 import { Card, CoteBadge, ErrorBox, LoadingBlock, PageHeader, SaveIndicator, Toolbar } from '../components/ui';
@@ -68,6 +68,7 @@ export default function WeeklyControls() {
           </div>
         )}
       </Toolbar>
+      <CollegeNote what="weekly" />
       {week && week.schoolDays === 0 && (
         <InfoNote tone="amber">{tr('There is no school this week (holidays). Marks can still be entered.', 'Pas de classe cette semaine (vacances). Vous pouvez quand même saisir des notes.')}</InfoNote>
       )}

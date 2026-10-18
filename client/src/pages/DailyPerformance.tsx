@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { AverageRow, InfoNote, NoPupils } from '../components/Common';
+import { AverageRow, InfoNote, NoPupils, CollegeNote } from '../components/Common';
 import { MarkGrid } from '../components/MarkGrid';
 import { ClassSelect, SchoolDayPicker } from '../components/Selectors';
 import { Card, ErrorBox, LoadingBlock, PageHeader, SaveIndicator, Toolbar } from '../components/ui';
@@ -61,6 +61,7 @@ export default function DailyPerformance() {
         <ClassSelect />
         <SchoolDayPicker />
       </Toolbar>
+      <CollegeNote what="daily" />
       {q.data && !isSchoolDay && (
         <InfoNote tone="amber">{tr('This date is not a school day — choose another day.', 'Cette date n’est pas un jour de classe — choisissez un autre jour.')}</InfoNote>
       )}

@@ -2,7 +2,9 @@ import { FileSpreadsheet, UserPlus, Users } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { fmtNum } from '../lib/format';
+import { useMetaData } from '../lib/hooks';
 import { useLang } from '../lib/i18n';
+import { useSelection } from '../lib/selection';
 import { EmptyState, cx } from './ui';
 
 export function NoPupils() {
@@ -51,5 +53,27 @@ export function InfoNote({ children, tone = 'slate' }: { children: ReactNode; to
     >
       {children}
     </div>
+  );
+}
+
+/**
+ * On a page that belongs to the primary, a word when a college class is selected: the
+ * college is marked subject by subject, séquence by séquence, in its own place.
+ */
+export function CollegeNote({ what }: { what: 'discipline' | 'weekly' | 'daily' }) {
+  const meta = useMetaData();
+  const { sel } = useSelection();
+  const { tr } = useLang();
+  const cls = meta.classes.find((c) => c.id === sel.classId);
+  if (cls?.cycle !== 'college') return null;
+  const whatFr = what === 'discipline' ? 'par discipline' : what === 'weekly' ? 'par contrôle hebdomadaire' : 'au jour le jour';
+  const whatEn = what === 'discipline' ? 'by discipline' : what === 'weekly' ? 'by weekly control' : 'day by day';
+  return (
+    <InfoNote tone="school">
+      {tr(
+        `${cls.name} is a college class: it is marked by subject and coefficient, séquence by séquence, not ${whatEn}. Its marks are entered in “Séquences”.`,
+        `${cls.name} est une classe du collège : elle est notée par matière et coefficient, séquence par séquence, pas ${whatFr}. Ses notes se saisissent dans « Séquences ».`,
+      )}
+    </InfoNote>
   );
 }

@@ -4,7 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { test } from 'node:test';
 import ExcelJS from 'exceljs';
-import { categorise, parsePlannerWorkbook, summarisePlanner } from '../src/services/calendarWorkbook.js';
+import { categorise, cycleFromTitle, parsePlannerWorkbook, summarisePlanner } from '../src/services/calendarWorkbook.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const FIXTURE = path.join(here, 'fixtures', 'planner-2026-2027.xlsx');
@@ -160,4 +160,16 @@ test('a workbook with no row of month names is refused with a clear reason', asy
   assert.deepEqual(parsed.events, []);
   assert.deepEqual(parsed.sheets, []);
   assert.deepEqual(parsed.skipped, ['Notes']);
+});
+
+test('a note that names a cycle belongs to that cycle, one that names both belongs to the school', () => {
+  assert.equal(cycleFromTitle('Évaluation S1 · (collège)'), 'college');
+  assert.equal(cycleFromTitle('BEPC BLANC · 14 au 17'), 'college');
+  assert.equal(cycleFromTitle('Semaine des challenges (Primaire) : Calcul mental'), 'primary');
+  assert.equal(cycleFromTitle('CEP BLANC NATIONAL CM2'), 'primary');
+  assert.equal(cycleFromTitle('COF 1 · Réunion des familles'), '');
+  // A note that names both cycles concerns the whole school, and so does a misspelling of
+  // both at once: guessing there would hide the date from one of the two calendars.
+  assert.equal(cycleFromTitle('Final Examination Primary / Secondery'), '');
+  assert.equal(cycleFromTitle("Concours d'entrée en 6e blanc pour les CM2"), '');
 });

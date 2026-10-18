@@ -17,6 +17,16 @@ import { addDays, dayOfWeek, isValidISODate, monthKeyOf, parseISO, toISO } from 
 export const EVENT_CATEGORIES = ['official', 'break', 'holiday', 'exam', 'deadline', 'event'];
 
 /**
+ * The school runs two cycles and MINESEC gives the college its own dates, so an event
+ * belongs either to the whole school (''), to the primary or to the college.
+ */
+export const EVENT_CYCLES = ['', 'primary', 'college'];
+export function eventCycle(value) {
+  const v = String(value ?? '').trim();
+  return v === 'primary' || v === 'college' ? v : '';
+}
+
+/**
  * The 2026/2027 school year as published by the joint order of 14 August 2026
  * (n° 002/AC/MINEDUB/MINESEC) — rentrée 7 September 2026, end of year 30 July 2027.
  *
@@ -59,11 +69,18 @@ export const BACKBONE_2026_2027 = {
     { name: 'Christmas holiday / Congés de Noël', start: '2026-12-18', end: '2027-01-04' },
     { name: 'Easter holiday / Congés de Pâques', start: '2027-03-25', end: '2027-04-12' },
   ],
+  /**
+   * The two cycles do not sit the same exams on the same days: MINESEC opens the official
+   * secondary exams on 19 April (with mock exams and the practical PE papers just before),
+   * while the primary's own exams start on 10 May. Each period says who it concerns.
+   */
   exams: [
-    { name: 'Mock exams, primary / Épreuves zéro (primaire)', start: '2027-04-14', end: '2027-04-17' },
-    { name: 'Official exams, secondary / Examens officiels (secondaire)', start: '2027-04-19', end: '2027-07-30' },
-    { name: 'Official exams, primary / Examens officiels (primaire)', start: '2027-05-10', end: '2027-07-30' },
-    { name: 'Practical PE exams / Épreuves pratiques d’EPS', start: '2027-04-26', end: '2027-05-07' },
+    { name: 'Mock exams, primary / Épreuves zéro (primaire)', start: '2027-04-14', end: '2027-04-17', cycle: 'primary' },
+    { name: 'Mock exams, secondary / Examens blancs (secondaire)', start: '2027-04-14', end: '2027-04-17', cycle: 'college' },
+    { name: 'Official exams, secondary / Examens officiels (secondaire)', start: '2027-04-19', end: '2027-07-30', cycle: 'college' },
+    { name: 'Practical PE exams / Épreuves pratiques d’EPS', start: '2027-04-26', end: '2027-05-07', cycle: 'college' },
+    { name: 'Internal evaluations, secondary / Évaluations internes (secondaire)', start: '2027-05-03', end: '2027-05-21', cycle: 'college' },
+    { name: 'Official exams, primary / Examens officiels (primaire)', start: '2027-05-10', end: '2027-07-30', cycle: 'primary' },
   ],
   /**
    * Public holidays of the year.
@@ -273,7 +290,10 @@ export function validateBackbone(input) {
     if (start && end && end < start) errors.push(`${what} ends before it starts`);
     if (!start || !end) return null;
     const name = typeof r.name === 'string' && r.name.trim() ? r.name.trim().slice(0, 120) : what;
-    return { name, start, end };
+    const out = { name, start, end };
+    // Whether the period concerns the primary, the college or the whole school.
+    if (r?.cycle === 'primary' || r?.cycle === 'college') out.cycle = r.cycle;
+    return out;
   };
   const list = (arr, what) => (Array.isArray(arr) ? arr.map((r, i) => range(r, `${what} ${i + 1}`)).filter(Boolean) : []);
 
@@ -438,7 +458,13 @@ export function planBackbone(backbone) {
   const events = [
     ...anchorEvents,
     ...breaks.map((r) => ({ date: r.start, end_date: r.end, title: r.name, category: 'break' })),
-    ...(backbone.exams ?? []).map((r) => ({ date: r.start, end_date: r.end, title: r.name, category: 'exam' })),
+    ...(backbone.exams ?? []).map((r) => ({
+      date: r.start,
+      end_date: r.end,
+      title: r.name,
+      category: 'exam',
+      cycle: r.cycle === 'primary' || r.cycle === 'college' ? r.cycle : '',
+    })),
   ];
 
   return { terms, holidays, events };

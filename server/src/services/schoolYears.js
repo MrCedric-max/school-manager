@@ -197,18 +197,51 @@ export function applyYearToCalendar(db, id, { activate = true } = {}) {
       db.prepare("DELETE FROM events WHERE source = 'national'").run();
     }
     const insertEvent = db.prepare(
-      `INSERT INTO events (date, end_date, title, category, source, school_year_id)
-       VALUES (?, ?, ?, ?, 'national', ?)
+      `INSERT INTO events (date, end_date, title, category, cycle, source, school_year_id)
+       VALUES (?, ?, ?, ?, ?, 'national', ?)
        ON CONFLICT DO NOTHING`,
     );
-    for (const e of plan.events) insertEvent.run(e.date, e.end_date, e.title, e.category, id);
+    // An exam period concerns one cycle: the college sits MINESEC's papers, the primary MINEDUB's.
+    for (const e of plan.events) insertEvent.run(e.date, e.end_date, e.title, e.category, e.cycle ?? '', id);
   })();
 
   const after = {
     terms: db.prepare('SELECT number, name, start_date, end_date, ua_months FROM terms ORDER BY number').all(),
     holidays: db.prepare('SELECT date, name FROM holidays ORDER BY date').all(),
   };
-  return diff(before, after, plan);
+  const out = diff(before, after, plan);
+  out.events = officialEventDiff(db, plan);
+  return out;
+}
+
+/**
+ * Which official dates applying this year would add to or drop from the calendar.
+ * The two cycles have their own exam periods, so this is what puts the college's
+ * MINESEC dates (and the primary's MINEDUB ones) on the calendar.
+ */
+function officialEventDiff(db, plan) {
+  const onFile = db
+    .prepare("SELECT id, date, end_date, title, category, cycle FROM events WHERE source = 'national'")
+    .all()
+    .map((e) => ({ date: e.date, endDate: e.end_date ?? null, title: e.title, category: e.category, cycle: e.cycle ?? '' }));
+  const key = (e) => `${e.date}|${e.endDate ?? ''}|${e.title}|${e.category}|${e.cycle}`;
+  const have = new Map(onFile.map((e) => [key(e), e]));
+  const want = new Map(plan.events.map((e) => [key({ ...e, endDate: e.end_date ?? null, cycle: e.cycle ?? '' }), e]));
+  const added = [...want].filter(([k]) => !have.has(k)).map(([, e]) => ({
+    date: e.date,
+    endDate: e.end_date ?? null,
+    title: e.title,
+    category: e.category,
+    cycle: e.cycle ?? '',
+  }));
+  const removed = [...have].filter(([k]) => !want.has(k)).map(([, e]) => ({
+    date: e.date,
+    endDate: e.endDate,
+    title: e.title,
+    category: e.category,
+    cycle: e.cycle ?? '',
+  }));
+  return { added, removed, total: plan.events.length };
 }
 
 function diff(before, after, plan) {
@@ -269,6 +302,24 @@ function safeJson(v) {
 }
 
 /**
+ * Reload the official dates that ship with the app for this year's label.
+ *
+ * The arrêté is republished (and corrected) from time to time — and the college sits its
+ * exams on other days than the primary — so when a fuller set of dates ships with the app
+ * the school reloads them here, then sees what would change before applying.
+ */
+export function refreshYearBackbone(db, id) {
+  const year = readYear(db, id);
+  const official = officialBackboneFor(year.label);
+  if (!official) throw badRequest(`The app ships no official dates for ${year.label}`);
+  db.prepare("UPDATE school_years SET official = ?, updated_at = (strftime(\'%Y-%m-%dT%H:%M:%fZ\',\'now\')) WHERE id = ?").run(
+    JSON.stringify(official),
+    id,
+  );
+  return readYear(db, id);
+}
+
+/**
  * What applying a year would change, without touching anything. The interface shows
  * this before the school confirms.
  */
@@ -292,11 +343,17 @@ export function previewYear(db, id) {
       .slice()
       .sort((a, b) => a.date.localeCompare(b.date)),
   };
-  return diff(before, after, plan);
+  const out = diff(before, after, plan);
+  out.events = officialEventDiff(db, plan);
+  return out;
 }
 
 /** Events of a year, national and school ones together, in date order. */
-export function readEvents(db, { from, to, limit = 500 } = {}) {
+/**
+ * Events of the year. Passing `cycle` keeps only what concerns that cycle and what
+ * concerns the whole school — the primary's calendar and the college's are not the same.
+ */
+export function readEvents(db, { from, to, cycle, limit = 500 } = {}) {
   const where = [];
   const args = [];
   if (from) {
@@ -307,7 +364,11 @@ export function readEvents(db, { from, to, limit = 500 } = {}) {
     where.push('date <= ?');
     args.push(to);
   }
-  const sql = `SELECT id, date, end_date, title, category, source, school_year_id, remind
+  if (cycle === 'primary' || cycle === 'college') {
+    where.push("cycle IN ('', ?)");
+    args.push(cycle);
+  }
+  const sql = `SELECT id, date, end_date, title, category, cycle, source, school_year_id, remind
                  FROM events ${where.length ? `WHERE ${where.join(' AND ')}` : ''}
                 ORDER BY date, category, title LIMIT ?`;
   return db.prepare(sql).all(...args, limit).map((e) => ({
@@ -316,6 +377,7 @@ export function readEvents(db, { from, to, limit = 500 } = {}) {
     endDate: e.end_date,
     title: e.title,
     category: e.category,
+    cycle: e.cycle === 'primary' || e.cycle === 'college' ? e.cycle : '',
     source: e.source,
     schoolYearId: e.school_year_id,
     remind: Boolean(e.remind),

@@ -1,4 +1,5 @@
 import { buildCalendar, describeDay, latestSchoolDay } from '../lib/calendar.js';
+import { cycleOf } from '../lib/cycles.js';
 import { todayInTimezone } from '../lib/dates.js';
 
 export function readSettings(db) {
@@ -91,12 +92,15 @@ export function readFramework(db) {
 export function readClasses(db) {
   return db
     .prepare(
-      `SELECT c.id, c.name, c.code, c.sort_order,
+      `SELECT c.id, c.name, c.code, c.sort_order, c.cycle,
               (SELECT COUNT(*) FROM pupils p WHERE p.class_id = c.id AND p.status = 'Active') AS enrolled,
               (SELECT COUNT(*) FROM pupils p WHERE p.class_id = c.id) AS registered
          FROM classes c ORDER BY c.sort_order, c.name`,
     )
-    .all();
+    .all()
+    // An empty cycle means "not looked at yet": the level decides which cycle the class is
+    // evaluated in, and the school can move one over in Settings.
+    .map((c) => ({ ...c, cycle: cycleOf(c) }));
 }
 
 /**

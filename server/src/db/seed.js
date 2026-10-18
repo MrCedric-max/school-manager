@@ -9,6 +9,8 @@ import {
   DEFAULT_SETTINGS,
   DEFAULT_TERMS,
 } from './defaults.js';
+import { cycleForLevel } from '../lib/cycles.js';
+import { ensureClassSubjects } from '../services/college.js';
 import { ensureCurrentYear } from '../services/schoolYears.js';
 
 const isEmpty = (db, table) => db.prepare(`SELECT COUNT(*) AS n FROM ${table}`).get().n === 0;
@@ -83,4 +85,25 @@ export function seedDefaults(db) {
   // The year the app runs on always has a row in school_years: the national calendar it
   // synchronises to (and from which the next year is prepared).
   ensureCurrentYear(db);
+
+  // Which cycle each class is evaluated in. Runs once per class: after it, `cycle` holds
+  // either what the level implies or what the school chose in Settings.
+  ensureCycles(db);
+}
+
+/**
+ * Place the classes that have not been looked at yet into a cycle, and give every college
+ * class its starting list of subjects.
+ */
+export function ensureCycles(db) {
+  const pending = db.prepare("SELECT id, code FROM classes WHERE cycle = ''").all();
+  if (!pending.length) return;
+  const setCycle = db.prepare('UPDATE classes SET cycle = ? WHERE id = ?');
+  db.transaction(() => {
+    for (const cls of pending) {
+      const cycle = cycleForLevel(cls.code);
+      setCycle.run(cycle, cls.id);
+      if (cycle === 'college') ensureClassSubjects(db, cls.id);
+    }
+  })();
 }

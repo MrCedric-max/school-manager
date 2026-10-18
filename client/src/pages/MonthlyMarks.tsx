@@ -1,5 +1,5 @@
 import { CircleAlert } from 'lucide-react';
-import { AverageRow, InfoNote, NoPupils } from '../components/Common';
+import { AverageRow, InfoNote, NoPupils, CollegeNote } from '../components/Common';
 import { MarkGrid } from '../components/MarkGrid';
 import { ClassSelect, MonthSelect } from '../components/Selectors';
 import { Card, CoteBadge, ErrorBox, LoadingBlock, PageHeader, SaveIndicator, Toolbar } from '../components/ui';
@@ -63,6 +63,7 @@ export default function MonthlyMarks() {
           </div>
         )}
       </Toolbar>
+      <CollegeNote what="discipline" />
       <InfoNote>
         {tr(
           'National language, Competences 3 & 6 and the attitude grades are entered in "Term marks" — they feed the term report card.',

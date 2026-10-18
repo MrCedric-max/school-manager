@@ -7,6 +7,7 @@ import {
   CalendarDays,
   ClipboardCheck,
   FileText,
+  GraduationCap,
   LayoutDashboard,
   ListChecks,
   LogOut,
@@ -61,6 +62,7 @@ const SECTIONS: Array<{ en: string; fr: string; items: NavItem[] }> = [
       { to: '/controls', en: 'Weekly controls', fr: 'Contrôles hebdo.', icon: <ClipboardCheck className={ICON} /> },
       { to: '/monthly-marks', en: 'Monthly marks', fr: 'Notes mensuelles', icon: <NotebookPen className={ICON} /> },
       { to: '/term-marks', en: 'Term marks', fr: 'Notes trimestrielles', icon: <ListChecks className={ICON} /> },
+      { to: '/sequences', en: 'Séquences (college)', fr: 'Séquences (collège)', icon: <GraduationCap className={ICON} /> },
     ],
   },
   {

@@ -5,7 +5,7 @@ import { config } from '../config.js';
 import { getDb } from '../db/index.js';
 import { dayOfWeek, isValidMonthKey } from '../lib/dates.js';
 import { badRequest, notFound } from '../lib/http.js';
-import { EVENT_CATEGORIES, officialBackboneFor } from '../lib/nationalCalendar.js';
+import { EVENT_CATEGORIES, officialBackboneFor, eventCycle } from '../lib/nationalCalendar.js';
 import { requireArray, requireDate, requireInt, requireString } from '../lib/validate.js';
 import { parsePlannerWorkbook, summarisePlanner } from '../services/calendarWorkbook.js';
 import { loadContext } from '../services/context.js';
@@ -18,6 +18,7 @@ import {
   readEvents,
   readSchoolYears,
   readYear,
+  refreshYearBackbone,
   rollOverYear,
   saveYearBackbone,
   setYearStatus,
@@ -122,7 +123,7 @@ calendarRouter.get('/years', (req, res) => {
   ensureCurrentYear(db);
   const years = readSchoolYears(db);
   const active = years.find((y) => y.status === 'active') ?? null;
-  const events = readEvents(db, { limit: 2000 });
+  const events = readEvents(db, { limit: 2000, cycle: typeof req.query.cycle === 'string' ? req.query.cycle : undefined });
   const bySource = events.reduce((acc, e) => {
     acc[e.source] = (acc[e.source] ?? 0) + 1;
     return acc;
@@ -179,6 +180,17 @@ calendarRouter.post('/years/:id/status', refuseDemoAccount, (req, res) => {
   res.json(setYearStatus(db, requireInt(req.params.id, 'school year'), status));
 });
 
+/**
+ * Reload the official dates that ship with the app for this year. Nothing is applied:
+ * the school sees what would change (including the exam periods of each cycle) first.
+ */
+calendarRouter.post('/years/:id/refresh', refuseDemoAccount, (req, res) => {
+  const db = getDb();
+  const id = requireInt(req.params.id, 'school year');
+  const year = refreshYearBackbone(db, id);
+  res.json({ year, preview: previewYear(db, id) });
+});
+
 /** What applying this year's official dates would change — shown before it happens. */
 calendarRouter.get('/years/:id/preview', (req, res) => {
   const db = getDb();
@@ -200,7 +212,8 @@ calendarRouter.get('/events', (req, res) => {
   const db = getDb();
   const from = typeof req.query.from === 'string' && req.query.from ? requireDate(req.query.from, 'from') : undefined;
   const to = typeof req.query.to === 'string' && req.query.to ? requireDate(req.query.to, 'to') : undefined;
-  res.json({ events: readEvents(db, { from, to, limit: 3000 }) });
+  const cycle = typeof req.query.cycle === 'string' ? req.query.cycle : undefined;
+  res.json({ events: readEvents(db, { from, to, cycle, limit: 3000 }) });
 });
 
 function eventPayload(body, { partial = false } = {}) {
@@ -217,6 +230,7 @@ function eventPayload(body, { partial = false } = {}) {
     out.category = category;
   }
   if (!partial || body.remind !== undefined) out.remind = body.remind === false || body.remind === 0 ? 0 : 1;
+  if (!partial || body.cycle !== undefined) out.cycle = eventCycle(body.cycle);
   return out;
 }
 
@@ -226,10 +240,10 @@ calendarRouter.post('/events', refuseDemoAccount, (req, res) => {
   const year = activeYear(db);
   const info = db
     .prepare(
-      `INSERT INTO events (date, end_date, title, category, source, school_year_id, remind)
-       VALUES (?, ?, ?, ?, 'manual', ?, ?)`,
+      `INSERT INTO events (date, end_date, title, category, cycle, source, school_year_id, remind)
+       VALUES (?, ?, ?, ?, ?, 'manual', ?, ?)`,
     )
-    .run(e.date, e.endDate, e.title, e.category, year?.id ?? null, e.remind);
+    .run(e.date, e.endDate, e.title, e.category, e.cycle, year?.id ?? null, e.remind);
   res.status(201).json({ id: Number(info.lastInsertRowid) });
 });
 
@@ -241,7 +255,7 @@ calendarRouter.put('/events/:id', refuseDemoAccount, (req, res) => {
   const patch = eventPayload(req.body ?? {}, { partial: true });
   const sets = [];
   const args = [];
-  for (const [key, column] of [['date', 'date'], ['endDate', 'end_date'], ['title', 'title'], ['category', 'category'], ['remind', 'remind']]) {
+  for (const [key, column] of [['date', 'date'], ['endDate', 'end_date'], ['title', 'title'], ['category', 'category'], ['cycle', 'cycle'], ['remind', 'remind']]) {
     if (patch[key] === undefined) continue;
     sets.push(`${column} = ?`);
     args.push(patch[key]);
@@ -312,15 +326,15 @@ calendarRouter.post('/events/import/commit', refuseDemoAccount, (req, res) => {
   const db = getDb();
   const year = activeYear(db);
   const stmt = db.prepare(
-    `INSERT INTO events (date, end_date, title, category, source, school_year_id, remind)
-     VALUES (?, NULL, ?, ?, 'import', ?, 1)
+    `INSERT INTO events (date, end_date, title, category, cycle, source, school_year_id, remind)
+     VALUES (?, NULL, ?, ?, ?, 'import', ?, 1)
      ON CONFLICT DO NOTHING`,
   );
   const removed = req.body?.replace === false ? 0 : db.prepare("DELETE FROM events WHERE source = 'import'").run().changes;
   let added = 0;
   db.transaction(() => {
     for (const e of entry.parsed.events) {
-      added += stmt.run(e.date, e.title, e.category, year?.id ?? null).changes;
+      added += stmt.run(e.date, e.title, e.category, eventCycle(e.cycle), year?.id ?? null).changes;
     }
   })();
   pendingPlanners.delete(String(req.body.importId));

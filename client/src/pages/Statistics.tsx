@@ -23,6 +23,7 @@ import { ClassSelect, MonthSelect, WeekSelect } from '../components/Selectors';
 import { Card, CardHeader, ErrorBox, LoadingBlock, PageHeader, Toolbar } from '../components/ui';
 import { api, qs } from '../lib/api';
 import { fmtNum, fmtPct, monthLabel } from '../lib/format';
+import { CollegeNote } from '../components/Common';
 import { useLang } from '../lib/i18n';
 import { useSelection } from '../lib/selection';
 import type { Lang, Statistics as Stats, SuccessRow } from '../lib/types';
@@ -242,6 +243,7 @@ export default function Statistics() {
         <WeekSelect />
         <MonthSelect />
       </Toolbar>
+      <CollegeNote what="discipline" />
       {q.isPending ? (
         <LoadingBlock />
       ) : q.error ? (

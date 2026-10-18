@@ -6,6 +6,7 @@ import ExcelJS from 'exceljs';
 import { buildCalendar } from '../lib/calendar.js';
 import { MONTH_NAMES, addDays, dayOfWeek, isValidISODate, monthNumberFromName } from '../lib/dates.js';
 import { PUPIL_STATUSES } from '../db/defaults.js';
+import { ensureCycles } from '../db/seed.js';
 import { readFramework, readSettings, readTerms } from './context.js';
 
 // ---- Cell helpers --------------------------------------------------------------
@@ -786,6 +787,9 @@ export function commitImport(db, parsed, { mode = 'replace' } = {}) {
         insertClass.run(c.name, clash ? `${c.code}${i + 1}` : c.code, i + 1);
       }
     });
+    // A class brought in by the workbook has no cycle yet: place it (SIL to CM2 in the
+    // primary, 6ème onwards in the college) and give the college ones their subjects.
+    ensureCycles(db);
     const classIdByName = new Map(db.prepare('SELECT id, name FROM classes').all().map((c) => [c.name, c.id]));
 
     const findPupil = db.prepare('SELECT * FROM pupils WHERE student_id = ?');
