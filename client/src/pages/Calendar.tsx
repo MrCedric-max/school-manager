@@ -53,7 +53,7 @@ function MonthGrid({ month, days, today, lang }: { month: CalendarData['months']
                   {d && (
                     <div
                       title={d.holiday ?? d.type}
-                      className={cx('rounded py-1 tabular-nums', TYPE_STYLE[d.type], d.date === today && 'ring-2 ring-emerald-700')}
+                      className={cx('rounded py-1 tabular-nums', TYPE_STYLE[d.type], d.date === today && 'ring-2 ring-school-700')}
                     >
                       {Number(d.date.slice(8))}
                     </div>

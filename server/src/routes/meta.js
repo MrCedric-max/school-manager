@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs';
 import { Router } from 'express';
 import { getDb } from '../db/index.js';
 import { ATTITUDE_GRADES, PUPIL_STATUSES, ROLL_MARKS } from '../db/defaults.js';
@@ -13,7 +14,13 @@ metaRouter.get('/meta', (req, res) => {
   const ctx = loadContext(db);
   const { logo, ...settings } = ctx.settings;
   res.json({
-    settings: { ...settings, hasLogo: Boolean(logo), logoVersion: logo ? String(logo.length) : '' },
+    settings: {
+      ...settings,
+      /** A logo of the school's own, uploaded in Settings (otherwise the crest that ships with the app is used). */
+      hasLogo: Boolean(logo),
+      /** Cache-busting: changes whenever the picture does, so the crest is not stale in the browser. */
+      logoVersion: logo ? String(logo.length) : 'crest',
+    },
     classes: readClasses(db),
     framework: ctx.framework,
     calendar: {
@@ -75,13 +82,26 @@ metaRouter.delete('/settings/logo', (req, res) => {
   res.json({ ok: true });
 });
 
-/** GET /api/logo — public (mounted before the sign-in check in app.js): <img> tags cannot send the session header. */
+/**
+ * The school crest shipped with the app, used whenever the school has not uploaded its own.
+ * Schools replace it in Settings; it is the same file the report cards print.
+ */
+export const CREST_FILE = new URL('../../assets/logo.png', import.meta.url).pathname;
+
+/**
+ * GET /api/logo — public (mounted before the sign-in check in app.js): <img> tags cannot send the
+ * session header. Serves the logo uploaded in Settings, or the school crest that ships with the app.
+ */
 export function sendLogo(req, res) {
   const row = getDb().prepare("SELECT value FROM settings WHERE key = 'logo'").get();
   const m = row?.value?.match(/^data:(image\/(?:png|jpeg|webp));base64,(.+)$/);
-  if (!m) throw notFound('No logo');
   res.set('Cache-Control', 'private, max-age=300');
-  res.type(m[1]).send(Buffer.from(m[2], 'base64'));
+  if (m) {
+    res.type(m[1]).send(Buffer.from(m[2], 'base64'));
+    return;
+  }
+  if (!existsSync(CREST_FILE)) throw notFound('No logo');
+  res.type('image/png').sendFile(CREST_FILE);
 }
 
 // ---- Classes ---------------------------------------------------------------

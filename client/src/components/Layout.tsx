@@ -6,7 +6,6 @@ import {
   CalendarDays,
   ClipboardCheck,
   FileText,
-  GraduationCap,
   LayoutDashboard,
   ListChecks,
   LogOut,
@@ -25,6 +24,7 @@ import { api, setSessionToken } from '../lib/api';
 import { fmtDate } from '../lib/format';
 import { useAuthStatus, useMetaData } from '../lib/hooks';
 import { useLang } from '../lib/i18n';
+import { SchoolLogo } from './SchoolLogo';
 import { cx } from './ui';
 
 interface NavItem {
@@ -110,16 +110,15 @@ export function Layout({ children }: { children: ReactNode }) {
   const sidebar = (
     <nav className="flex h-full flex-col">
       <Link to="/" className="flex items-center gap-3 px-5 py-5" onClick={() => setOpen(false)}>
-        {settings.hasLogo ? (
-          <img src={`/api/logo?v=${settings.logoVersion}`} alt="" className="h-10 w-10 rounded-lg bg-white object-contain p-0.5" />
-        ) : (
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-400 text-emerald-950">
-            <GraduationCap className="h-6 w-6" />
-          </div>
-        )}
+        <SchoolLogo
+          version={settings.logoVersion}
+          fallback={settings.schoolName}
+          className="h-10 w-10 rounded-lg bg-white object-contain p-0.5"
+          monogramClassName="h-10 w-10 rounded-lg bg-white/90 text-sm"
+        />
         <div className="min-w-0">
           <p className="truncate text-sm font-bold leading-tight text-white">{settings.schoolName || 'School Manager'}</p>
-          <p className="truncate text-xs text-emerald-200/80">
+          <p className="truncate text-xs text-school-200/80">
             {tr('School Manager', 'Gestion scolaire')} · {settings.academicYear}
           </p>
         </div>
@@ -127,7 +126,7 @@ export function Layout({ children }: { children: ReactNode }) {
       <div className="flex-1 space-y-5 overflow-y-auto px-3 pb-6">
         {SECTIONS.map((section) => (
           <div key={section.en}>
-            <p className="px-2 pb-1.5 text-[11px] font-semibold uppercase tracking-wider text-emerald-200/60">{lang === 'fr' ? section.fr : section.en}</p>
+            <p className="px-2 pb-1.5 text-[11px] font-semibold uppercase tracking-wider text-school-200/60">{lang === 'fr' ? section.fr : section.en}</p>
             <div className="space-y-0.5">
               {section.items.map((item) => (
                 <NavLink
@@ -138,7 +137,7 @@ export function Layout({ children }: { children: ReactNode }) {
                   className={({ isActive }) =>
                     cx(
                       'flex items-center gap-3 rounded-lg px-2.5 py-2 text-sm font-medium transition-colors',
-                      isActive ? 'bg-white/15 text-white' : 'text-emerald-100/85 hover:bg-white/10 hover:text-white',
+                      isActive ? 'bg-white/15 text-white' : 'text-school-100/85 hover:bg-white/10 hover:text-white',
                     )
                   }
                 >
@@ -154,11 +153,11 @@ export function Layout({ children }: { children: ReactNode }) {
         <button
           type="button"
           onClick={logout}
-          className="flex w-full items-center gap-3 rounded-lg px-2.5 py-2 text-sm font-medium text-emerald-100/85 hover:bg-white/10 hover:text-white"
+          className="flex w-full items-center gap-3 rounded-lg px-2.5 py-2 text-sm font-medium text-school-100/85 hover:bg-white/10 hover:text-white"
         >
           <LogOut className={ICON} />
           {tr('Sign out', 'Déconnexion')}
-          <span className="ml-auto truncate text-xs text-emerald-200/60">{auth?.user?.username}</span>
+          <span className="ml-auto truncate text-xs text-school-200/60">{auth?.user?.username}</span>
         </button>
       </div>
     </nav>
@@ -166,12 +165,12 @@ export function Layout({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-screen">
-      <aside className="no-print fixed inset-y-0 left-0 z-30 hidden w-64 bg-emerald-900 lg:block">{sidebar}</aside>
+      <aside className="no-print fixed inset-y-0 left-0 z-30 hidden w-64 bg-school-900 lg:block">{sidebar}</aside>
       {open && (
         <div className="no-print fixed inset-0 z-40 lg:hidden">
           <div className="absolute inset-0 bg-slate-900/50" onClick={() => setOpen(false)} />
-          <aside className="absolute inset-y-0 left-0 w-72 bg-emerald-900 shadow-xl">
-            <button type="button" className="absolute right-3 top-5 rounded-lg p-1 text-emerald-100 hover:bg-white/10" onClick={() => setOpen(false)} aria-label="Close menu">
+          <aside className="absolute inset-y-0 left-0 w-72 bg-school-900 shadow-xl">
+            <button type="button" className="absolute right-3 top-5 rounded-lg p-1 text-school-100 hover:bg-white/10" onClick={() => setOpen(false)} aria-label="Close menu">
               <X className="h-5 w-5" />
             </button>
             {sidebar}
@@ -186,7 +185,7 @@ export function Layout({ children }: { children: ReactNode }) {
           </button>
           <div className="flex min-w-0 flex-1 items-center gap-2 text-sm">
             <span className="hidden truncate font-medium text-slate-700 sm:inline">{fmtDate(today.date, lang, 'long')}</span>
-            {today.term && <span className="rounded-md bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-800">{tr('Term', 'Trimestre')} {today.term}</span>}
+            {today.term && <span className="rounded-md bg-school-50 px-2 py-0.5 text-xs font-semibold text-school-800">{tr('Term', 'Trimestre')} {today.term}</span>}
             {today.week && <span className="rounded-md bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-700">W{today.week}</span>}
             <span
               className={cx(
@@ -206,7 +205,7 @@ export function Layout({ children }: { children: ReactNode }) {
                 key={l}
                 type="button"
                 onClick={() => setLang(l)}
-                className={cx('rounded-md px-2 py-1 uppercase', lang === l ? 'bg-emerald-700 text-white' : 'text-slate-500 hover:text-slate-800')}
+                className={cx('rounded-md px-2 py-1 uppercase', lang === l ? 'bg-school-700 text-white' : 'text-slate-500 hover:text-slate-800')}
               >
                 {l}
               </button>

@@ -9,7 +9,7 @@ import { useLang } from '../lib/i18n';
 import { useSelection } from '../lib/selection';
 import type { Dashboard as DashboardData } from '../lib/types';
 
-function Bar({ value, max, tone = 'bg-emerald-600' }: { value: number | null; max: number; tone?: string }) {
+function Bar({ value, max, tone = 'bg-school-600' }: { value: number | null; max: number; tone?: string }) {
   const pct = value === null ? 0 : Math.max(0, Math.min(100, (value / max) * 100));
   return (
     <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100">
@@ -39,7 +39,7 @@ export default function Dashboard() {
       ) : d ? (
         <div className="space-y-5">
           {noPupils && (
-            <Card className="border-emerald-200 bg-emerald-50/60">
+            <Card className="border-school-200 bg-school-50/60">
               <CardHeader
                 icon={<FileSpreadsheet className="h-5 w-5" />}
                 title={tr('Getting started', 'Pour commencer')}
@@ -52,8 +52,8 @@ export default function Dashboard() {
                   { to: '/roll-call', icon: <CalendarCheck className="h-4 w-4" />, en: 'Take the roll call and record marks every day.', fr: 'Faites l’appel et saisissez les notes chaque jour.' },
                 ].map((s, i) => (
                   <li key={s.to}>
-                    <Link to={s.to} className="flex h-full gap-3 rounded-xl border border-emerald-200 bg-white p-3 hover:border-emerald-400">
-                      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-emerald-700 text-xs font-bold text-white">{i + 1}</span>
+                    <Link to={s.to} className="flex h-full gap-3 rounded-xl border border-school-200 bg-white p-3 hover:border-school-400">
+                      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-school-700 text-xs font-bold text-white">{i + 1}</span>
                       <span className="text-slate-700">{lang === 'fr' ? s.fr : s.en}</span>
                     </Link>
                   </li>
@@ -66,7 +66,7 @@ export default function Dashboard() {
             <StatCard label={tr('Enrolled pupils', 'Élèves inscrits')} value={d.totals.enrolled} hint={d.totals.registered !== d.totals.enrolled ? `${d.totals.registered} ${tr('registered', 'enregistrés')}` : undefined} icon={<Users className="h-5 w-5" />} />
             <StatCard label={tr('Classes', 'Classes')} value={d.totals.classes} icon={<School className="h-5 w-5" />} tone="sky" />
             <StatCard label={tr('General average', 'Moyenne générale')} value={d.totals.generalAverage === null ? '–' : `${fmtNum(d.totals.generalAverage, lang)}`} hint="/20" icon={<GraduationCap className="h-5 w-5" />} tone="violet" />
-            <StatCard label={tr('Attendance rate', 'Taux de présence')} value={fmtPct(d.totals.attendanceRate, lang, 1)} icon={<CalendarCheck className="h-5 w-5" />} tone="emerald" />
+            <StatCard label={tr('Attendance rate', 'Taux de présence')} value={fmtPct(d.totals.attendanceRate, lang, 1)} icon={<CalendarCheck className="h-5 w-5" />} tone="school" />
             <StatCard label={tr('School days', 'Jours de classe')} value={`${d.totals.schoolDaysElapsed} / ${d.totals.schoolDays}`} hint={tr('done / total', 'écoulés / total')} icon={<CalendarDays className="h-5 w-5" />} tone="amber" />
             <StatCard label={tr('Monthly evaluations', 'Évaluations mensuelles')} value={d.totals.monthlyEvaluations} hint={tr('recorded', 'enregistrées')} icon={<Award className="h-5 w-5" />} tone="rose" />
           </div>
@@ -130,9 +130,9 @@ export default function Dashboard() {
                         className="flex items-center gap-3 rounded-lg px-1 text-sm hover:bg-slate-50"
                       >
                         <span className="w-12 font-semibold text-slate-700">{c.name}</span>
-                        <Bar value={c.rollToday} max={Math.max(1, c.enrolled)} tone={done ? 'bg-emerald-600' : 'bg-amber-500'} />
+                        <Bar value={c.rollToday} max={Math.max(1, c.enrolled)} tone={done ? 'bg-school-600' : 'bg-amber-500'} />
                         <span className="w-14 text-right text-xs tabular-nums text-slate-500">
-                          {done ? <CheckCircle2 className="ml-auto h-4 w-4 text-emerald-600" /> : `${c.rollToday}/${c.enrolled}`}
+                          {done ? <CheckCircle2 className="ml-auto h-4 w-4 text-school-600" /> : `${c.rollToday}/${c.enrolled}`}
                         </span>
                       </Link>
                     );
@@ -203,7 +203,7 @@ export default function Dashboard() {
                     <span className="font-semibold tabular-nums">{d.rollMarks[m]}</span>
                   </div>
                 ))}
-                <Link to="/report-cards" className="mt-2 inline-flex items-center gap-1.5 text-sm font-medium text-emerald-700 hover:underline">
+                <Link to="/report-cards" className="mt-2 inline-flex items-center gap-1.5 text-sm font-medium text-school-700 hover:underline">
                   <Printer className="h-4 w-4" /> {tr('Print report cards', 'Imprimer les bulletins')}
                 </Link>
               </div>

@@ -10,7 +10,7 @@ export function NoPupils() {
   return (
     <EmptyState icon={<Users className="h-10 w-10" />} title={tr('No pupils in this class yet', 'Aucun élève dans cette classe')}>
       <div className="mt-3 flex flex-wrap justify-center gap-2">
-        <Link to="/settings" className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-700 px-3 py-1.5 text-sm font-medium text-white hover:bg-emerald-800">
+        <Link to="/settings" className="inline-flex items-center gap-1.5 rounded-lg bg-school-700 px-3 py-1.5 text-sm font-medium text-white hover:bg-school-800">
           <FileSpreadsheet className="h-4 w-4" /> {tr('Import the workbook', 'Importer le classeur')}
         </Link>
         <Link to="/pupils" className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50">
@@ -39,13 +39,13 @@ export function AverageRow({ label, values, leading = 1, trailing = 0, digits = 
   );
 }
 
-export function InfoNote({ children, tone = 'slate' }: { children: ReactNode; tone?: 'slate' | 'amber' | 'emerald' }) {
+export function InfoNote({ children, tone = 'slate' }: { children: ReactNode; tone?: 'slate' | 'amber' | 'school' }) {
   return (
     <div
       className={cx(
         'mb-4 rounded-xl border px-4 py-3 text-sm',
         tone === 'amber' && 'border-amber-200 bg-amber-50 text-amber-900',
-        tone === 'emerald' && 'border-emerald-200 bg-emerald-50 text-emerald-900',
+        tone === 'school' && 'border-school-200 bg-school-50 text-school-900',
         tone === 'slate' && 'border-slate-200 bg-white text-slate-600',
       )}
     >

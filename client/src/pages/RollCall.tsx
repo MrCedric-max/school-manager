@@ -157,7 +157,7 @@ export default function RollCall() {
                         <button
                           type="button"
                           onClick={() => markAllPresent(d.date)}
-                          className="mt-1 inline-flex items-center gap-1 rounded-md bg-emerald-50 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-800 hover:bg-emerald-100"
+                          className="mt-1 inline-flex items-center gap-1 rounded-md bg-school-50 px-1.5 py-0.5 text-[10px] font-semibold text-school-800 hover:bg-school-100"
                           title={tr('Mark everyone not yet marked as present', 'Marquer présents tous les élèves non encore marqués')}
                         >
                           <CheckCheck className="h-3 w-3" /> {tr('All P', 'Tous P')}
@@ -170,14 +170,14 @@ export default function RollCall() {
                     </th>
                   ))}
                   {(['P', 'A', 'L', 'E'] as const).map((m) => (
-                    <th key={m} className="border-b border-slate-200 bg-emerald-50 px-2 py-2 text-center font-semibold text-emerald-900">
+                    <th key={m} className="border-b border-slate-200 bg-school-50 px-2 py-2 text-center font-semibold text-school-900">
                       {m}
                     </th>
                   ))}
-                  <th className="border-b border-slate-200 bg-emerald-50 px-2 py-2 text-center font-semibold text-emerald-900">
+                  <th className="border-b border-slate-200 bg-school-50 px-2 py-2 text-center font-semibold text-school-900">
                     {tr('Week', 'Sem.')}
                   </th>
-                  <th className="border-b border-slate-200 bg-emerald-50 px-2 py-2 text-center font-semibold text-emerald-900" title={tr('Attendance since the start of the year', 'Présence depuis la rentrée')}>
+                  <th className="border-b border-slate-200 bg-school-50 px-2 py-2 text-center font-semibold text-school-900" title={tr('Attendance since the start of the year', 'Présence depuis la rentrée')}>
                     {tr('Year', 'Année')}
                   </th>
                 </tr>
@@ -217,7 +217,7 @@ export default function RollCall() {
                               onClick={() => setMark(p.id, d.date, CYCLE[(CYCLE.indexOf(m ?? null) + 1) % CYCLE.length])}
                               onKeyDown={(e) => onKey(e, p.id, d.date, r, c)}
                               className={cx(
-                                'h-8 w-10 rounded-md border text-sm font-bold outline-none transition focus-visible:ring-2 focus-visible:ring-emerald-600',
+                                'h-8 w-10 rounded-md border text-sm font-bold outline-none transition focus-visible:ring-2 focus-visible:ring-school-600',
                                 m ? MARK_STYLES[m] : 'border-dashed border-slate-300 bg-white text-slate-300 hover:border-slate-400',
                               )}
                             >
@@ -227,12 +227,12 @@ export default function RollCall() {
                         );
                       })}
                       {(['P', 'A', 'L', 'E'] as const).map((k) => (
-                        <td key={k} className="border-b border-slate-100 bg-emerald-50/40 px-2 text-center text-xs tabular-nums">
+                        <td key={k} className="border-b border-slate-100 bg-school-50/40 px-2 text-center text-xs tabular-nums">
                           {week[k] || ''}
                         </td>
                       ))}
-                      <td className="border-b border-slate-100 bg-emerald-50/40 px-2 text-center text-xs font-semibold tabular-nums">{fmtPct(rate(week), lang)}</td>
-                      <td className="border-b border-slate-100 bg-emerald-50/40 px-2 text-center text-xs tabular-nums text-slate-600">{fmtPct(rate(ytd), lang)}</td>
+                      <td className="border-b border-slate-100 bg-school-50/40 px-2 text-center text-xs font-semibold tabular-nums">{fmtPct(rate(week), lang)}</td>
+                      <td className="border-b border-slate-100 bg-school-50/40 px-2 text-center text-xs tabular-nums text-slate-600">{fmtPct(rate(ytd), lang)}</td>
                     </tr>
                   );
                 })}

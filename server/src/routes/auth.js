@@ -54,6 +54,12 @@ export function requireAuth(req, _res, next) {
   next();
 }
 
+/** Changes whenever the school picture does (its own logo, or the crest that ships with the app). */
+function logoVersion(db) {
+  const logo = db.prepare("SELECT value FROM settings WHERE key = 'logo'").get()?.value;
+  return logo ? String(logo.length) : 'crest';
+}
+
 export const authRouter = Router();
 
 authRouter.get('/status', (req, res) => {
@@ -62,7 +68,13 @@ authRouter.get('/status', (req, res) => {
   res.json({
     setupRequired: userCount(db) === 0,
     user: req.user,
-    school: { name: setting('school_name'), subtitle: setting('school_subtitle'), academicYear: setting('academic_year') },
+    school: {
+      name: setting('school_name'),
+      subtitle: setting('school_subtitle'),
+      academicYear: setting('academic_year'),
+      /** Cache-busting value for /api/logo, so the sign-in page shows the crest the school uses now. */
+      logoVersion: logoVersion(db),
+    },
     // Public demo account (DEMO_LOGIN=1 and invented data only), shown on the sign-in page.
     demo: demoCredentials(db),
     // How this request proved who it is — the app shows it and uses it to pick a transport that works.

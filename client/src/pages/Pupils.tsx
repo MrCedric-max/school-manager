@@ -11,7 +11,7 @@ import { useSelection } from '../lib/selection';
 import type { Pupil } from '../lib/types';
 
 const STATUS_TONE: Record<string, string> = {
-  Active: 'bg-emerald-50 text-emerald-700',
+  Active: 'bg-school-50 text-school-700',
   Suspended: 'bg-amber-50 text-amber-700',
   Transferred: 'bg-slate-100 text-slate-600',
   Expelled: 'bg-red-50 text-red-700',
@@ -347,7 +347,7 @@ export default function Pupils() {
                 {pupils.map((p) => {
                   const a = age(p.date_of_birth, meta.today.date);
                   return (
-                    <tr key={p.id} className="cursor-pointer border-b border-slate-100 hover:bg-emerald-50/40" onClick={() => edit(p)}>
+                    <tr key={p.id} className="cursor-pointer border-b border-slate-100 hover:bg-school-50/40" onClick={() => edit(p)}>
                       <td className="px-4 py-2 tabular-nums text-slate-400">{p.class_no}</td>
                       <td className="px-3 py-2 font-medium tabular-nums text-slate-600">{p.student_id}</td>
                       <td className="px-3 py-2 font-medium text-slate-900">{p.full_name}</td>

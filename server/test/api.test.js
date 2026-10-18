@@ -197,15 +197,30 @@ test('sign-in also works without cookies (Authorization header)', async () => {
   assert.equal((await call('/api/meta')).status, 401);
   assert.equal((await call('/api/meta', { token: 'x'.repeat(43) })).status, 401);
 
-  // The logo is public: <img> tags cannot send the header.
-  assert.equal((await call('/api/logo')).status, 404);
+  // The logo is public: <img> tags cannot send the header. Without one of its own, the school gets
+  // the crest that ships with the app, so no page is ever left without a picture.
+  r = await call('/api/logo');
+  assert.equal(r.status, 200);
+  assert.equal(r.res.headers.get('content-type'), 'image/png');
+  const crest = Buffer.from(await r.res.arrayBuffer());
+  assert.ok(crest.length > 1000, 'the crest is a real picture');
+
   const png = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
   r = await call('/api/settings/logo', { token, method: 'PUT', body: { dataUrl: `data:image/png;base64,${png}` } });
   assert.equal(r.status, 200);
   r = await call('/api/logo');
   assert.equal(r.status, 200);
   assert.equal(r.res.headers.get('content-type'), 'image/png');
+  const own = Buffer.from(await r.res.arrayBuffer());
+  assert.ok(own.length < crest.length, 'the school’s own picture replaces the crest');
   assert.equal((await call('/api/settings/logo', { method: 'DELETE' })).status, 401, 'changing the logo still needs a session');
+
+  // Removing it falls back to the crest again.
+  r = await call('/api/settings/logo', { token, method: 'DELETE' });
+  assert.equal(r.status, 200);
+  r = await call('/api/logo');
+  assert.equal(r.status, 200);
+  assert.deepEqual(Buffer.from(await r.res.arrayBuffer()), crest, 'back to the crest that ships with the app');
 
   // Password change returns a fresh token and ends the old sessions.
   r = await call('/api/auth/password', { token, method: 'POST', body: { currentPassword: 'new-password-1', newPassword: 'new-password-2' } });

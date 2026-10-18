@@ -137,7 +137,7 @@ function GradeCell({
   label: string;
 }) {
   const tone =
-    value === 'A+' ? 'text-emerald-700 font-bold' : value === 'A' ? 'text-emerald-700' : value === 'B' ? 'text-amber-700' : value === 'C' ? 'text-red-700' : 'text-slate-400';
+    value === 'A+' ? 'text-school-700 font-bold' : value === 'A' ? 'text-school-700' : value === 'B' ? 'text-amber-700' : value === 'C' ? 'text-red-700' : 'text-slate-400';
   return (
     <select
       aria-label={label}
@@ -236,9 +236,9 @@ export function MarkGrid({
               </th>
             ))}
             {computed.map((c) => (
-              <th key={c.key} className="border-b border-slate-200 bg-emerald-50 px-1.5 py-2 text-center font-semibold text-emerald-900">
+              <th key={c.key} className="border-b border-slate-200 bg-school-50 px-1.5 py-2 text-center font-semibold text-school-900">
                 <div className="leading-tight">{c.header}</div>
-                {c.sub && <div className="text-[10px] font-normal text-emerald-700/70">{c.sub}</div>}
+                {c.sub && <div className="text-[10px] font-normal text-school-700/70">{c.sub}</div>}
               </th>
             ))}
           </tr>
@@ -281,7 +281,7 @@ export function MarkGrid({
                 </td>
               ))}
               {computed.map((c) => (
-                <td key={c.key} className={cx('whitespace-nowrap border-b border-slate-100 bg-emerald-50/40 px-1.5 py-1 text-center tabular-nums', c.className)}>
+                <td key={c.key} className={cx('whitespace-nowrap border-b border-slate-100 bg-school-50/40 px-1.5 py-1 text-center tabular-nums', c.className)}>
                   {c.render(p)}
                 </td>
               ))}

@@ -1,6 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { AlertTriangle, Database, Download, FileSpreadsheet, ImagePlus, KeyRound, Plus, Save, School, ShieldCheck, Sparkles, Trash2, Upload } from 'lucide-react';
 import { Fragment, useEffect, useRef, useState, type FormEvent } from 'react';
+import { SchoolLogo } from '../components/SchoolLogo';
 import { Badge, Button, Card, CardHeader, Field, Input, Select, cx, useToast } from '../components/ui';
 import { api, downloadFile, isEmbedded, sessionTransport } from '../lib/api';
 import { fmtDate } from '../lib/format';
@@ -83,7 +84,7 @@ function ImportCard() {
         </div>
 
         {s && preview && (
-          <div className="space-y-4 rounded-xl border border-emerald-200 bg-emerald-50/40 p-4">
+          <div className="space-y-4 rounded-xl border border-school-200 bg-school-50/40 p-4">
             <div className="flex flex-wrap items-baseline justify-between gap-2">
               <p className="font-semibold text-slate-900">
                 {preview.fileName} — {s.school.name ?? '?'} {s.school.academicYear && `· ${s.school.academicYear}`}
@@ -232,22 +233,30 @@ function SchoolCard() {
           </Button>
           <input ref={logoInput} type="file" accept="image/png,image/jpeg,image/webp" className="hidden" onChange={(e) => e.target.files?.[0] && uploadLogo(e.target.files[0])} />
           <Button variant="secondary" icon={<ImagePlus className="h-4 w-4" />} onClick={() => logoInput.current?.click()}>
-            {s.hasLogo ? tr('Change logo', 'Changer le logo') : tr('Add a logo', 'Ajouter un logo')}
+            {s.hasLogo ? tr('Change the crest', 'Changer l’écusson') : tr('Use another crest', 'Utiliser un autre écusson')}
           </Button>
+          <SchoolLogo
+            version={s.logoVersion}
+            fallback={s.schoolName}
+            className="h-9 w-9 rounded border object-contain"
+            monogramClassName="h-9 w-9 rounded border text-xs"
+          />
+          <span className="text-xs text-slate-500">
+            {s.hasLogo
+              ? tr('Your crest — printed on the report cards.', 'Votre écusson — imprimé sur les bulletins.')
+              : tr('The crest that comes with the app.', 'L’écusson fourni avec l’application.')}
+          </span>
           {s.hasLogo && (
-            <>
-              <img src={`/api/logo?v=${s.logoVersion}`} alt="" className="h-9 w-9 rounded border object-contain" />
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={async () => {
-                  await api.del('/settings/logo');
-                  await qc.invalidateQueries({ queryKey: ['meta'] });
-                }}
-              >
-                {tr('Remove', 'Retirer')}
-              </Button>
-            </>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={async () => {
+                await api.del('/settings/logo');
+                await qc.invalidateQueries({ queryKey: ['meta'] });
+              }}
+            >
+              {tr('Restore the default crest', 'Rétablir l’écusson par défaut')}
+            </Button>
           )}
         </div>
       </form>
@@ -486,8 +495,8 @@ function FrameworkCard() {
           <tbody>
             {fw.competences.map((c) => (
               <Fragment key={c.number}>
-                <tr className="bg-emerald-50/60">
-                  <td colSpan={5} className="px-4 py-1.5 text-xs font-semibold text-emerald-900">
+                <tr className="bg-school-50/60">
+                  <td colSpan={5} className="px-4 py-1.5 text-xs font-semibold text-school-900">
                     C{c.number} — {lang === 'fr' ? c.title_fr : c.title_en} (/{c.max})
                   </td>
                 </tr>

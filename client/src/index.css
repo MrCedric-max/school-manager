@@ -2,6 +2,24 @@
 
 @theme {
   --font-sans: "Inter", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+
+  /*
+   * The school colours, taken from the school crest: the navy of the shield is --color-school-900
+   * (#002E52) and its sky-blue charges are --color-school-400 (#67BEED). Every screen, report and
+   * report card is built from this ramp, so a school that swaps the crest in Settings keeps a
+   * consistent palette (only these eleven values need to change).
+   */
+  --color-school-50: #eff7fd;
+  --color-school-100: #d8ecfa;
+  --color-school-200: #b0d9f3;
+  --color-school-300: #86c4eb;
+  --color-school-400: #67beed;
+  --color-school-500: #3a9bd8;
+  --color-school-600: #1f7cb8;
+  --color-school-700: #146094;
+  --color-school-800: #0a4a78;
+  --color-school-900: #002e52;
+  --color-school-950: #001b33;
 }
 
 @layer base {

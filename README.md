@@ -60,6 +60,25 @@ It is safe by design:
 - it cannot import, download or restore backups, delete all data or change its password;
 - it is not the administrator: on a new install you can still create your own account next to it.
 
+### School colours and crest
+
+The interface, the class reports and the report cards are dressed in the school's own colours, taken
+from the school crest: the navy of the shield (`#002E52`) and its sky blue (`#67BEED`). They live in
+one place — the `--color-school-*` ramp in `client/src/index.css` (50 is the palest tint, 900 the
+navy of the shield, 400 its sky blue). Swap those eleven values and the whole app, printed documents
+included, follows. Amber and red are kept for warnings and failures, so they still read as warnings.
+
+`server/assets/logo.png` is the crest that ships with the app. It is
+
+- served by `GET /api/logo` whenever the school has not uploaded its own (so no page is ever without
+  it, and it survives a fresh install);
+- printed on the **report cards** and on the **weekly / monthly / term class reports** as a
+  letterhead, under a two-tone rule in the two colours of the crest;
+- shown on the **sign-in page**, in the **sidebar** of every screen, and in *Settings*.
+
+*Settings → School* replaces it with the school's own picture (PNG, JPEG or WebP), or restores the
+crest that ships with the app.
+
 ---
 
 ## 2. Workbook → app

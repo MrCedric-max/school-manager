@@ -76,9 +76,9 @@ export function coteMeaning(code: string | null | undefined, cotes: Cote[], lang
 export function coteBadgeClass(code: string | null | undefined) {
   switch (code) {
     case 'A+':
-      return 'bg-emerald-600 text-white';
+      return 'bg-school-600 text-white';
     case 'A':
-      return 'bg-emerald-100 text-emerald-800';
+      return 'bg-school-100 text-school-800';
     case 'ECA/B':
       return 'bg-amber-100 text-amber-800';
     case 'NA':
@@ -89,10 +89,11 @@ export function coteBadgeClass(code: string | null | undefined) {
 }
 
 export const MARK_STYLES: Record<string, string> = {
-  P: 'bg-emerald-100 text-emerald-800 border-emerald-200',
+  P: 'bg-school-100 text-school-800 border-school-200',
   A: 'bg-red-100 text-red-700 border-red-200',
   L: 'bg-amber-100 text-amber-800 border-amber-200',
-  E: 'bg-sky-100 text-sky-800 border-sky-200',
+  // Present carries the school colour, so excused stays neutral grey instead of a second blue.
+  E: 'bg-slate-100 text-slate-700 border-slate-200',
 };
 
 /** Parse a typed mark: "12,5" → 12.5; '' → null; NaN when invalid. */

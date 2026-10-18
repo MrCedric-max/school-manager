@@ -1,6 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { GraduationCap, KeyRound, ShieldCheck, Sparkles } from 'lucide-react';
+import { KeyRound, ShieldCheck, Sparkles } from 'lucide-react';
 import { useState, type FormEvent } from 'react';
+import { SchoolLogo } from '../components/SchoolLogo';
 import { Button, Field, Input, cx } from '../components/ui';
 import { api, isEmbedded, sessionTransport } from '../lib/api';
 import type { AuthStatus } from '../lib/hooks';
@@ -54,7 +55,7 @@ export default function LoginPage({ status }: { status: AuthStatus }) {
   const demo = status.demo;
 
   return (
-    <div className="flex min-h-screen flex-col bg-gradient-to-br from-emerald-900 via-emerald-800 to-emerald-950">
+    <div className="flex min-h-screen flex-col bg-gradient-to-br from-school-900 via-school-800 to-school-950">
       <div className="flex justify-end p-4">
         <div className="flex rounded-lg bg-white/10 p-0.5 text-xs font-semibold">
           {(['en', 'fr'] as const).map((l) => (
@@ -62,7 +63,7 @@ export default function LoginPage({ status }: { status: AuthStatus }) {
               key={l}
               type="button"
               onClick={() => setLang(l)}
-              className={cx('rounded-md px-2.5 py-1 uppercase', lang === l ? 'bg-white text-emerald-900' : 'text-emerald-100 hover:text-white')}
+              className={cx('rounded-md px-2.5 py-1 uppercase', lang === l ? 'bg-white text-school-900' : 'text-school-100 hover:text-white')}
             >
               {l}
             </button>
@@ -72,23 +73,26 @@ export default function LoginPage({ status }: { status: AuthStatus }) {
       <div className="flex flex-1 items-center justify-center px-4 pb-16">
         <div className="w-full max-w-md">
           <div className="mb-6 flex flex-col items-center text-center text-white">
-            <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-400 text-emerald-950 shadow-lg">
-              <GraduationCap className="h-8 w-8" />
-            </div>
+            <SchoolLogo
+              version={status.school.logoVersion}
+              fallback={status.school.name}
+              className="mb-3 h-20 w-20 rounded-2xl bg-white/95 object-contain p-1 shadow-lg"
+              monogramClassName="mb-3 h-20 w-20 rounded-2xl bg-white/95 text-xl shadow-lg"
+            />
             <h1 className="text-2xl font-bold">{status.school.name || 'School Manager'}</h1>
-            <p className="text-sm text-emerald-100/80">
+            <p className="text-sm text-school-100/80">
               {status.school.subtitle} {status.school.academicYear && `· ${status.school.academicYear}`}
             </p>
           </div>
           <form onSubmit={submit} className="rounded-2xl bg-white p-6 shadow-xl">
             <div className="mb-5 flex items-center gap-2">
-              {setup ? <ShieldCheck className="h-5 w-5 text-emerald-700" /> : <KeyRound className="h-5 w-5 text-emerald-700" />}
+              {setup ? <ShieldCheck className="h-5 w-5 text-school-700" /> : <KeyRound className="h-5 w-5 text-school-700" />}
               <h2 className="text-lg font-semibold text-slate-900">
                 {setup ? tr('Create the administrator account', 'Créer le compte administrateur') : tr('Sign in', 'Connexion')}
               </h2>
             </div>
             {setup && (
-              <p className="mb-4 rounded-lg bg-emerald-50 p-3 text-sm text-emerald-900">
+              <p className="mb-4 rounded-lg bg-school-50 p-3 text-sm text-school-900">
                 {tr(
                   'First start: choose the username and password that will protect the school data.',
                   'Premier démarrage : choisissez l’identifiant et le mot de passe qui protégeront les données de l’école.',
@@ -143,12 +147,12 @@ export default function LoginPage({ status }: { status: AuthStatus }) {
             </div>
           )}
           {embedded && (
-            <p className="mt-4 text-center text-xs leading-relaxed text-emerald-100/75" data-testid="embedded-note">
+            <p className="mt-4 text-center text-xs leading-relaxed text-school-100/75" data-testid="embedded-note">
               {tr(
                 'Preview: this page is shown inside another site, where the browser refuses the app’s cookie — your sign-in is kept with a token for this tab.',
                 'Aperçu : cette page est affichée dans un autre site, où le navigateur refuse le cookie de l’application — votre connexion est conservée par un jeton propre à cet onglet.',
               )}{' '}
-              <span className="font-mono text-emerald-100/90" data-testid="session-channel">
+              <span className="font-mono text-school-100/90" data-testid="session-channel">
                 {sessionTransport() === 'query' ? tr('token in the address', 'jeton dans l’adresse') : 'X-Session-Token'}
               </span>
             </p>

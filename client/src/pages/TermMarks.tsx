@@ -38,7 +38,7 @@ export default function TermMarks() {
           C{c.number} · {lang === 'fr' ? c.short_fr : c.short_en}
         </th>
       ))}
-      <th colSpan={fw.competences.length + 5} className="border-b border-l border-slate-200 bg-white px-1 py-1.5 text-center font-semibold text-emerald-800">
+      <th colSpan={fw.competences.length + 5} className="border-b border-l border-slate-200 bg-white px-1 py-1.5 text-center font-semibold text-school-800">
         {tr('Automatic results', 'Résultats automatiques')}
       </th>
     </tr>
@@ -71,7 +71,7 @@ export default function TermMarks() {
       {tab === 'marks' && (
         <InfoNote>
           {tr('Grey columns come from', 'Les colonnes grises viennent des')}{' '}
-          <Link to="/monthly-marks" className="font-semibold text-emerald-700 underline">
+          <Link to="/monthly-marks" className="font-semibold text-school-700 underline">
             {tr('Monthly marks', 'Notes mensuelles')}
           </Link>{' '}
           ({monthLabel(month, lang)}).{' '}
@@ -110,7 +110,7 @@ export default function TermMarks() {
               { key: 'avg', header: tr('Average', 'Moyenne'), sub: '/20', render: (p) => <span className="font-semibold">{fmtNum(evals.get(p.id)?.average, lang)}</span> },
               { key: 'cote', header: 'Cote', render: (p) => <CoteBadge code={evals.get(p.id)?.cote} /> },
               { key: 'perf', header: 'Perf.', sub: '/10', render: (p) => fmtNum(perf(p.id), lang) },
-              { key: 'overall', header: tr('Overall', 'Global'), sub: '/20', render: (p) => <span className="font-bold text-emerald-900">{fmtNum(overallOf(p.id), lang)}</span> },
+              { key: 'overall', header: tr('Overall', 'Global'), sub: '/20', render: (p) => <span className="font-bold text-school-900">{fmtNum(overallOf(p.id), lang)}</span> },
             ]}
             footer={
               <AverageRow

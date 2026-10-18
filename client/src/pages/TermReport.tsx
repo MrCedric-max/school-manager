@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { NoPupils } from '../components/Common';
-import { CountsBar, RankCell, ReportActions, ReportTable, exportReportCsv, type ReportColumn } from '../components/ReportTable';
+import { CountsBar, RankCell, ReportActions, ReportLetterhead, ReportTable, exportReportCsv, type ReportColumn } from '../components/ReportTable';
 import { ClassSelect, TermSelect } from '../components/Selectors';
 import { Card, CoteBadge, ErrorBox, LoadingBlock, PageHeader, Toolbar } from '../components/ui';
 import { api, qs } from '../lib/api';
@@ -66,7 +66,7 @@ export default function TermReport() {
           stats: r.footer.attendance.rate,
           format: (v) => fmtPct(v, lang),
         },
-        { key: 'overall', group: tr('Overall & rank', 'Global & rang'), header: tr('Overall /20', 'Global /20'), csvHeader: 'Overall /20', render: (x) => <span className="font-bold text-emerald-900">{fmtNum(x.overall, lang)}</span>, csv: (x) => round2(x.overall), stats: r.footer.overall },
+        { key: 'overall', group: tr('Overall & rank', 'Global & rang'), header: tr('Overall /20', 'Global /20'), csvHeader: 'Overall /20', render: (x) => <span className="font-bold text-school-900">{fmtNum(x.overall, lang)}</span>, csv: (x) => round2(x.overall), stats: r.footer.overall },
         { key: 'rank', group: tr('Overall & rank', 'Global & rang'), header: tr('Rank', 'Rang'), csvHeader: 'Rank', render: (x) => <RankCell rank={x.rank} />, csv: (x) => x.rank },
       ]
     : [];
@@ -100,6 +100,10 @@ export default function TermReport() {
           <NoPupils />
         ) : r ? (
           <>
+            <ReportLetterhead
+              title={tr('TERM CLASS REPORT', 'RAPPORT TRIMESTRIEL DE CLASSE')}
+              period={`${r.class.name} · ${tr('Term', 'Trimestre')} ${r.term.number}`}
+            />
             <ReportTable rows={r.rows} columns={columns} />
             <CountsBar
               items={[

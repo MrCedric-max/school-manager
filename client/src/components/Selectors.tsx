@@ -128,12 +128,12 @@ export function SchoolDayPicker() {
             min={days[0]}
             max={days[days.length - 1]}
             onChange={(e) => e.target.value && pick(e.target.value)}
-            className="h-10 rounded-lg border border-slate-300 bg-white px-3 text-sm shadow-sm outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20"
+            className="h-10 rounded-lg border border-slate-300 bg-white px-3 text-sm shadow-sm outline-none focus:border-school-600 focus:ring-2 focus:ring-school-600/20"
           />
         </div>
         <StepButton dir="next" label={tr('Next school day', 'Jour suivant')} disabled={idx < 0 || idx >= days.length - 1} onClick={() => update({ date: days[idx + 1] })} />
       </div>
-      <span className={cx('text-xs', sel.date === meta.today.date ? 'text-emerald-700' : 'text-slate-500')}>
+      <span className={cx('text-xs', sel.date === meta.today.date ? 'text-school-700' : 'text-slate-500')}>
         {fmtDate(sel.date, lang, 'long')}
         {sel.date === meta.today.date ? ` · ${tr('today', "aujourd'hui")}` : ''}
       </span>

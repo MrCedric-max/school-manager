@@ -22,11 +22,11 @@ export function cx(...classes: Array<string | false | null | undefined>) {
 type Variant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'subtle';
 
 const VARIANTS: Record<Variant, string> = {
-  primary: 'bg-emerald-700 text-white hover:bg-emerald-800 shadow-sm disabled:bg-emerald-700/50',
+  primary: 'bg-school-700 text-white hover:bg-school-800 shadow-sm disabled:bg-school-700/50',
   secondary: 'bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 shadow-sm disabled:text-slate-400',
   ghost: 'text-slate-600 hover:bg-slate-100 disabled:text-slate-300',
   danger: 'bg-red-600 text-white hover:bg-red-700 shadow-sm disabled:bg-red-600/50',
-  subtle: 'bg-emerald-50 text-emerald-800 hover:bg-emerald-100 disabled:text-emerald-800/50',
+  subtle: 'bg-school-50 text-school-800 hover:bg-school-100 disabled:text-school-800/50',
 };
 
 export function Button({
@@ -43,7 +43,7 @@ export function Button({
     <button
       type="button"
       className={cx(
-        'inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600 disabled:cursor-not-allowed',
+        'inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-school-600 disabled:cursor-not-allowed',
         size === 'sm' ? 'h-8 px-3 text-sm' : 'h-10 px-4 text-sm',
         VARIANTS[variant],
         className,
@@ -65,7 +65,7 @@ export function CardHeader({ title, subtitle, actions, icon }: { title: ReactNod
   return (
     <div className="flex flex-wrap items-start justify-between gap-3 border-b border-slate-100 px-5 py-4">
       <div className="flex items-start gap-3">
-        {icon && <div className="mt-0.5 text-emerald-700">{icon}</div>}
+        {icon && <div className="mt-0.5 text-school-700">{icon}</div>}
         <div>
           <h2 className="text-base font-semibold text-slate-900">{title}</h2>
           {subtitle && <p className="mt-0.5 text-sm text-slate-500">{subtitle}</p>}
@@ -101,7 +101,7 @@ export function Badge({ children, className }: { children: ReactNode; className?
 }
 
 export function Spinner({ className }: { className?: string }) {
-  return <Loader2 className={cx('h-5 w-5 animate-spin text-emerald-700', className)} />;
+  return <Loader2 className={cx('h-5 w-5 animate-spin text-school-700', className)} />;
 }
 
 export function LoadingBlock({ label }: { label?: string }) {
@@ -150,7 +150,7 @@ export function Field({ label, hint, children, className }: { label: ReactNode; 
 }
 
 const inputClass =
-  'h-10 rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900 shadow-sm outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 disabled:bg-slate-50 disabled:text-slate-500';
+  'h-10 rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900 shadow-sm outline-none transition focus:border-school-600 focus:ring-2 focus:ring-school-600/20 disabled:bg-slate-50 disabled:text-slate-500';
 
 export function Input({ className, ...rest }: InputHTMLAttributes<HTMLInputElement>) {
   return <input className={cx(inputClass, className)} {...rest} />;
@@ -221,7 +221,7 @@ export function Tabs<T extends string>({ value, onChange, tabs }: { value: T; on
           onClick={() => onChange(t.value)}
           className={cx(
             'rounded-md px-3 py-1.5 text-sm font-medium transition-colors',
-            value === t.value ? 'bg-white text-emerald-800 shadow-sm' : 'text-slate-600 hover:text-slate-900',
+            value === t.value ? 'bg-white text-school-800 shadow-sm' : 'text-slate-600 hover:text-slate-900',
           )}
         >
           {t.label}
@@ -231,9 +231,9 @@ export function Tabs<T extends string>({ value, onChange, tabs }: { value: T; on
   );
 }
 
-export function StatCard({ label, value, hint, icon, tone = 'emerald' }: { label: ReactNode; value: ReactNode; hint?: ReactNode; icon?: ReactNode; tone?: 'emerald' | 'amber' | 'sky' | 'violet' | 'rose' | 'slate' }) {
+export function StatCard({ label, value, hint, icon, tone = 'school' }: { label: ReactNode; value: ReactNode; hint?: ReactNode; icon?: ReactNode; tone?: 'school' | 'amber' | 'sky' | 'violet' | 'rose' | 'slate' }) {
   const tones = {
-    emerald: 'bg-emerald-50 text-emerald-700',
+    school: 'bg-school-50 text-school-700',
     amber: 'bg-amber-50 text-amber-700',
     sky: 'bg-sky-50 text-sky-700',
     violet: 'bg-violet-50 text-violet-700',
@@ -265,7 +265,7 @@ export function SaveIndicator({ state, error, onRetry }: { state: SaveState; err
     );
   if (state === 'saved')
     return (
-      <span className="inline-flex items-center gap-1.5 text-xs text-emerald-700">
+      <span className="inline-flex items-center gap-1.5 text-xs text-school-700">
         <CheckCircle2 className="h-3.5 w-3.5" /> {tr('All changes saved', 'Tout est enregistré')}
       </span>
     );
@@ -308,7 +308,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             key={t.id}
             className={cx(
               'pointer-events-auto flex items-start gap-2 rounded-xl border px-4 py-3 text-sm shadow-lg',
-              t.kind === 'success' && 'border-emerald-200 bg-emerald-50 text-emerald-900',
+              t.kind === 'success' && 'border-school-200 bg-school-50 text-school-900',
               t.kind === 'error' && 'border-red-200 bg-red-50 text-red-900',
               t.kind === 'info' && 'border-slate-200 bg-white text-slate-800',
             )}
@@ -335,9 +335,9 @@ export function CoteBadge({ code, className }: { code: string | null | undefined
   if (!code) return <span className="text-slate-300">–</span>;
   const tone =
     code === 'A+'
-      ? 'bg-emerald-600 text-white'
+      ? 'bg-school-600 text-white'
       : code === 'A'
-        ? 'bg-emerald-100 text-emerald-800'
+        ? 'bg-school-100 text-school-800'
         : code === 'ECA/B'
           ? 'bg-amber-100 text-amber-800'
           : 'bg-red-100 text-red-700';

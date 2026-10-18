@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { NoPupils } from '../components/Common';
-import { CountsBar, RankCell, ReportActions, ReportTable, exportReportCsv, type ReportColumn } from '../components/ReportTable';
+import { CountsBar, RankCell, ReportActions, ReportLetterhead, ReportTable, exportReportCsv, type ReportColumn } from '../components/ReportTable';
 import { ClassSelect, WeekSelect } from '../components/Selectors';
 import { Card, CoteBadge, ErrorBox, LoadingBlock, PageHeader, Toolbar } from '../components/ui';
 import { api, qs } from '../lib/api';
@@ -118,6 +118,10 @@ export default function WeeklyReport() {
           <NoPupils />
         ) : r ? (
           <>
+            <ReportLetterhead
+              title={tr('WEEKLY CLASS REPORT', 'RAPPORT HEBDOMADAIRE DE CLASSE')}
+              period={`${r.class.name} · W${r.week.number} · ${fmtDate(r.week.monday, lang)} – ${fmtDate(r.week.friday, lang)}`}
+            />
             <ReportTable rows={r.rows} columns={columns} />
             <CountsBar
               items={[

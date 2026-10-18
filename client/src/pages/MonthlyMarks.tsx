@@ -36,7 +36,7 @@ export default function MonthlyMarks() {
           </th>
         );
       })}
-      <th colSpan={competences.length + 6} className="border-b border-l border-slate-200 bg-white px-1 py-1.5 text-center font-semibold text-emerald-800">
+      <th colSpan={competences.length + 6} className="border-b border-l border-slate-200 bg-white px-1 py-1.5 text-center font-semibold text-school-800">
         {tr('Automatic results', 'Résultats automatiques')}
       </th>
     </tr>
@@ -117,7 +117,7 @@ export default function MonthlyMarks() {
               { key: 'avg', header: tr('Average', 'Moyenne'), sub: '/20', render: (p) => <span className="font-semibold">{fmtNum(evals.get(p.id)?.average, lang)}</span> },
               { key: 'cote', header: 'Cote', render: (p) => <CoteBadge code={evals.get(p.id)?.cote} /> },
               { key: 'perf', header: tr('Perf.', 'Perf.'), sub: '/10', render: (p) => fmtNum(perf(p.id), lang) },
-              { key: 'overall', header: tr('Overall', 'Global'), sub: `/20 (${Math.round(academicWeight * 100)}/${Math.round((1 - academicWeight) * 100)})`, render: (p) => <span className="font-bold text-emerald-900">{fmtNum(overallOf(p.id), lang)}</span> },
+              { key: 'overall', header: tr('Overall', 'Global'), sub: `/20 (${Math.round(academicWeight * 100)}/${Math.round((1 - academicWeight) * 100)})`, render: (p) => <span className="font-bold text-school-900">{fmtNum(overallOf(p.id), lang)}</span> },
             ]}
             footer={
               <AverageRow

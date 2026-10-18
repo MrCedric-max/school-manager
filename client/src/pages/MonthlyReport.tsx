@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { NoPupils } from '../components/Common';
-import { CountsBar, RankCell, ReportActions, ReportTable, exportReportCsv, type ReportColumn } from '../components/ReportTable';
+import { CountsBar, RankCell, ReportActions, ReportLetterhead, ReportTable, exportReportCsv, type ReportColumn } from '../components/ReportTable';
 import { ClassSelect, MonthSelect } from '../components/Selectors';
 import { Card, CoteBadge, ErrorBox, LoadingBlock, PageHeader, Toolbar } from '../components/ui';
 import { api, qs } from '../lib/api';
@@ -87,7 +87,7 @@ export default function MonthlyReport() {
           group: tr('Overall & rank', 'Global & rang'),
           header: tr('Overall /20', 'Global /20'),
           csvHeader: 'Overall /20',
-          render: (x) => <span className="font-bold text-emerald-900">{fmtNum(x.overall, lang)}</span>,
+          render: (x) => <span className="font-bold text-school-900">{fmtNum(x.overall, lang)}</span>,
           csv: (x) => round2(x.overall),
           stats: r.footer.overall,
         },
@@ -122,6 +122,10 @@ export default function MonthlyReport() {
           <NoPupils />
         ) : r ? (
           <>
+            <ReportLetterhead
+              title={tr('MONTHLY CLASS REPORT', 'RAPPORT MENSUEL DE CLASSE')}
+              period={`${r.class.name} · ${monthLabel(r.month, lang)}`}
+            />
             <ReportTable rows={r.rows} columns={columns} />
             <CountsBar
               items={[

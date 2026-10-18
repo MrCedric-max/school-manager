@@ -2,8 +2,10 @@ import { Download, Printer } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { downloadCsv } from '../lib/csv';
 import { fmtNum } from '../lib/format';
+import { useMetaData } from '../lib/hooks';
 import { useLang } from '../lib/i18n';
 import type { Stats } from '../lib/types';
+import { SchoolLogo } from './SchoolLogo';
 import { Button, cx } from './ui';
 
 export interface ReportColumn<R> {
@@ -125,6 +127,33 @@ export function CountsBar({ items }: { items: Array<[string, ReactNode]> }) {
           {label}: <strong className="text-slate-900">{value}</strong>
         </span>
       ))}
+    </div>
+  );
+}
+
+/**
+ * Letterhead printed above a class report: the crest, the school, and which report this is.
+ * On screen the sidebar already carries the crest, so this only appears on paper.
+ */
+export function ReportLetterhead({ title, period }: { title: string; period?: string }) {
+  const settings = useMetaData().settings;
+  const school = [settings?.schoolName, settings?.schoolSubtitle].filter(Boolean).join(' — ');
+  return (
+    <div className="hidden border-b-2 border-school-800 print:block">
+      <div className="flex items-center gap-3 border-b border-school-400 px-4 pb-2 pt-3">
+        <SchoolLogo
+          version={settings?.logoVersion}
+          fallback={settings?.schoolName}
+          className="h-12 w-12 object-contain"
+          monogramClassName="h-12 w-12 rounded-full border-2 border-school-800 text-[8px] font-bold leading-tight"
+        />
+        <div className="flex-1 text-center">
+          <p className="text-sm font-extrabold uppercase tracking-wide text-school-900">{school}</p>
+          <p className="text-xs font-bold">{title}</p>
+          {period ? <p className="text-[11px] text-slate-600">{period}</p> : null}
+        </div>
+        <div className="w-12" />
+      </div>
     </div>
   );
 }

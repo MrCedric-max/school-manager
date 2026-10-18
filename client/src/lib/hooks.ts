@@ -7,7 +7,7 @@ export interface AuthStatus {
   setupRequired: boolean;
   /** `demo` is true for the public demo account (limited: no import, backups or password change). */
   user: { id: number; username: string; demo: boolean } | null;
-  school: { name: string; subtitle: string; academicYear: string };
+  school: { name: string; subtitle: string; academicYear: string; logoVersion: string };
   /** Public demo account shown on the sign-in page (only while the data is invented). */
   demo: { username: string; password: string } | null;
   /** How this request proved who it is — diagnostics for embedded previews (see Settings). */

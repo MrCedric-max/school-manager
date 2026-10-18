@@ -27,10 +27,13 @@ import { useLang } from '../lib/i18n';
 import { useSelection } from '../lib/selection';
 import type { Lang, Statistics as Stats, SuccessRow } from '../lib/types';
 
-const GREEN = '#047857';
-const MARK_COLORS: Record<string, string> = { P: '#059669', A: '#dc2626', L: '#d97706', E: '#0284c7' };
-/** Colour of a success rate: green from 75%, amber from the pass mark, red below it. */
-const rateColor = (rate: number) => (rate >= 75 ? '#047857' : rate >= 50 ? '#f59e0b' : '#ef4444');
+// Charts use the school colours (see index.css): the navy of the crest, its sky blue for contrast.
+const NAVY = '#002e52';
+const SKY = '#1f7cb8';
+/** Roll marks: present is the school blue, late amber, absent red, excused neutral grey. */
+const MARK_COLORS: Record<string, string> = { P: SKY, A: '#dc2626', L: '#d97706', E: '#64748b' };
+/** Colour of a success rate: school blue from 75%, amber from the pass mark, red below it. */
+const rateColor = (rate: number) => (rate >= 75 ? SKY : rate >= 50 ? '#f59e0b' : '#ef4444');
 
 function ChartCard({
   title,
@@ -256,7 +259,7 @@ export default function Statistics() {
                 <XAxis dataKey="name" tick={{ fontSize: 11 }} interval={0} angle={-20} textAnchor="end" height={60} />
                 <YAxis domain={[0, 10]} tick={{ fontSize: 11 }} />
                 <Tooltip formatter={(v) => fmtNum(Number(v), lang)} />
-                <Bar dataKey="value" fill={GREEN} radius={[4, 4, 0, 0]} name={tr('Average /10', 'Moyenne /10')} />
+                <Bar dataKey="value" fill={NAVY} radius={[4, 4, 0, 0]} name={tr('Average /10', 'Moyenne /10')} />
               </BarChart>
             </ResponsiveContainer>
           </ChartCard>
@@ -272,7 +275,7 @@ export default function Statistics() {
                 <XAxis dataKey="name" tick={{ fontSize: 11 }} interval={0} />
                 <YAxis domain={[0, 20]} tick={{ fontSize: 11 }} />
                 <Tooltip formatter={(v) => fmtNum(Number(v), lang)} />
-                <Bar dataKey="value" fill="#0369a1" radius={[4, 4, 0, 0]} name={tr('Average /20', 'Moyenne /20')} />
+                <Bar dataKey="value" fill={SKY} radius={[4, 4, 0, 0]} name={tr('Average /20', 'Moyenne /20')} />
               </BarChart>
             </ResponsiveContainer>
           </ChartCard>
@@ -290,7 +293,7 @@ export default function Statistics() {
                 <Tooltip formatter={(v) => `${fmtNum(Number(v), lang, 1)} %`} labelFormatter={(_, p) => (p?.[0]?.payload ? `${p[0].payload.name} — ${p[0].payload.label}` : '')} />
                 <Bar dataKey="value" radius={[4, 4, 0, 0]} name="%">
                   {s.disciplines.map((d) => (
-                    <Cell key={d.code} fill={(d.pct ?? 0) >= 0.9 ? '#047857' : (d.pct ?? 0) >= 0.75 ? '#10b981' : (d.pct ?? 0) >= 0.5 ? '#f59e0b' : '#ef4444'} />
+                    <Cell key={d.code} fill={(d.pct ?? 0) >= 0.9 ? NAVY : (d.pct ?? 0) >= 0.75 ? SKY : (d.pct ?? 0) >= 0.5 ? '#f59e0b' : '#ef4444'} />
                   ))}
                 </Bar>
               </BarChart>
@@ -308,7 +311,7 @@ export default function Statistics() {
                 <PolarAngleAxis dataKey="name" tick={{ fontSize: 11 }} />
                 <PolarRadiusAxis domain={[0, 100]} tick={{ fontSize: 10 }} />
                 <Tooltip formatter={(v) => `${fmtNum(Number(v), lang, 1)} %`} />
-                <Radar dataKey="value" stroke={GREEN} fill={GREEN} fillOpacity={0.35} name="%" />
+                <Radar dataKey="value" stroke={NAVY} fill={NAVY} fillOpacity={0.35} name="%" />
               </RadarChart>
             </ResponsiveContainer>
           </ChartCard>
@@ -348,7 +351,7 @@ export default function Statistics() {
                 <XAxis dataKey="name" tick={{ fontSize: 11 }} />
                 <YAxis domain={[0, 100]} unit="%" tick={{ fontSize: 11 }} />
                 <Tooltip formatter={(v) => `${fmtNum(Number(v), lang, 1)} %`} />
-                <Line type="monotone" dataKey="value" stroke={GREEN} strokeWidth={2.5} dot={{ r: 4 }} connectNulls name="%" />
+                <Line type="monotone" dataKey="value" stroke={NAVY} strokeWidth={2.5} dot={{ r: 4 }} connectNulls name="%" />
               </LineChart>
             </ResponsiveContainer>
           </ChartCard>

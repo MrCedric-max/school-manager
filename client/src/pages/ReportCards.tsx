@@ -3,6 +3,7 @@ import { Printer } from 'lucide-react';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { NoPupils } from '../components/Common';
 import { PrintHint } from '../components/Layout';
+import { SchoolLogo } from '../components/SchoolLogo';
 import { ClassSelect, MonthSelect, TermSelect } from '../components/Selectors';
 import { Button, Card, ErrorBox, Field, LoadingBlock, PageHeader, Select, Tabs, Toolbar, cx } from '../components/ui';
 import { api, qs } from '../lib/api';
@@ -15,25 +16,27 @@ import type { Cote, Lang, Meta, MonthlyCard, MonthlyCards, SchoolHeader, TermCar
 const n2 = (v: number | null | undefined, lang: Lang) => fmtNum(v, lang, 2);
 const mark = (v: number | null | undefined, lang: Lang) => (v === null || v === undefined ? '' : fmtNum(v, lang, Number.isInteger(v) ? 0 : 2));
 
-function CardHeader({ school, title, hasLogo, logoVersion }: { school: SchoolHeader; title: string; hasLogo: boolean; logoVersion: string }) {
+function CardHeader({ school, title, logoVersion }: { school: SchoolHeader; title: string; logoVersion: string }) {
+  // Two-tone rule under the letterhead, like the crest: the navy of the shield over its sky blue.
   return (
-    <div className="mb-1.5 flex items-center gap-3 border-b-2 border-emerald-800 pb-1.5">
-      {hasLogo ? (
-        <img src={`/api/logo?v=${logoVersion}`} alt="" className="h-14 w-14 object-contain" />
-      ) : (
-        <div className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-emerald-800 text-center text-[9px] font-bold leading-tight text-emerald-800">
-          {school.name.split(' ').slice(-1)[0]}
+    <div className="mb-1.5 border-b-2 border-school-800">
+      <div className="flex items-center gap-3 border-b border-school-400 pb-1.5">
+        <SchoolLogo
+          version={logoVersion}
+          fallback={school.name}
+          className="h-14 w-14 object-contain"
+          monogramClassName="h-14 w-14 rounded-full border-2 border-school-800 text-[9px] font-bold leading-tight"
+        />
+        <div className="flex-1 text-center">
+          <p className="text-[15px] font-extrabold uppercase tracking-wide text-school-900">
+            {school.name}
+            {school.subtitle ? ` — ${school.subtitle}` : ''}
+          </p>
+          <p className="text-[13px] font-bold">{title}</p>
+          <p className="text-[11px]">Academic year / Année scolaire {school.academicYear}</p>
         </div>
-      )}
-      <div className="flex-1 text-center">
-        <p className="text-[15px] font-extrabold uppercase tracking-wide text-emerald-900">
-          {school.name}
-          {school.subtitle ? ` — ${school.subtitle}` : ''}
-        </p>
-        <p className="text-[13px] font-bold">{title}</p>
-        <p className="text-[11px]">Academic year / Année scolaire {school.academicYear}</p>
+        <div className="w-12" />
       </div>
-      <div className="w-12" />
     </div>
   );
 }
@@ -80,7 +83,7 @@ function Remarks({ pupilId, period, initial }: { pupilId: number; period: string
             save(e.target.value);
           }}
           placeholder={tr('Type the class council remarks (optional) — they will be printed here.', 'Saisissez les appréciations du conseil de classe (facultatif) — elles seront imprimées ici.')}
-          className="h-14 w-full resize-none rounded border border-dashed border-slate-300 bg-amber-50/40 p-1.5 text-[11px] outline-none focus:border-emerald-600"
+          className="h-14 w-full resize-none rounded border border-dashed border-slate-300 bg-school-50/60 p-1.5 text-[11px] outline-none focus:border-school-600"
         />
         <p className="text-right text-[9px] text-slate-400">
           {state === 'saving' ? tr('Saving…', 'Enregistrement…') : state === 'saved' ? tr('Saved', 'Enregistré') : state === 'error' ? tr('Not saved', 'Non enregistré') : ''}
@@ -125,7 +128,7 @@ function SummaryBoxes({ items }: { items: Array<[string, ReactNode]> }) {
   return (
     <table className="mt-1">
       <tbody>
-        <tr className="bg-emerald-50 text-[8.5px] font-semibold leading-tight">
+        <tr className="bg-school-50 text-[8.5px] font-semibold leading-tight">
           {items.map(([label]) => (
             <td key={label} className="text-center">
               {label}
@@ -152,7 +155,7 @@ function PerformanceBlock({ meta, values, attendance, title, lang }: { meta: Met
   return (
     <table className="mt-1.5">
       <thead>
-        <tr className="bg-emerald-50">
+        <tr className="bg-school-50">
           <th colSpan={4} className="text-left text-[10px]">
             {title}
           </th>
@@ -196,7 +199,7 @@ function PerformanceList({ meta, values, attendance, title, lang }: { meta: Meta
   return (
     <table>
       <thead>
-        <tr className="bg-emerald-50">
+        <tr className="bg-school-50">
           <th colSpan={2} className="text-left text-[9.5px] leading-tight">
             {title}
           </th>
@@ -226,7 +229,7 @@ function MonthlyCardView({ data, card, meta, lang }: { data: MonthlyCards; card:
   const att = card.attendance;
   return (
     <div className="report-card mx-auto mb-6 shadow-lg">
-      <CardHeader school={data.school} title="MONTHLY REPORT CARD / BULLETIN MENSUEL" hasLogo={meta.settings.hasLogo} logoVersion={meta.settings.logoVersion} />
+      <CardHeader school={data.school} title="MONTHLY REPORT CARD / BULLETIN MENSUEL" logoVersion={meta.settings.logoVersion} />
       <IdentityRow
         items={[
           ['Class / Classe:', data.class.name],
@@ -237,7 +240,7 @@ function MonthlyCardView({ data, card, meta, lang }: { data: MonthlyCards; card:
       />
       <table>
         <thead>
-          <tr className="bg-emerald-800 text-[10px] text-white">
+          <tr className="bg-school-800 text-[10px] text-white">
             <th className="w-[34%] text-left">COMPETENCES / DISCIPLINES</th>
             <th className="w-[5%]">Max</th>
             <th className="w-[27%] text-left">Critères d&apos;évaluation / Assessment criteria</th>
@@ -251,7 +254,7 @@ function MonthlyCardView({ data, card, meta, lang }: { data: MonthlyCards; card:
           {card.competences.map((c) => (
             <CompetenceRows key={c.number} c={c} cotes={cotes} lang={lang} />
           ))}
-          <tr className="bg-emerald-100 font-bold">
+          <tr className="bg-school-100 font-bold">
             <td colSpan={3}>TOTAL DES POINTS / TOTAL POINTS (/{card.total.max})</td>
             <td className="text-center">{mark(card.total.note, lang)}</td>
             <td className="text-center">{fmtPct(card.total.pct, lang, 1)}</td>
@@ -302,7 +305,7 @@ function MonthlyCardView({ data, card, meta, lang }: { data: MonthlyCards; card:
 function CompetenceRows({ c, cotes, lang }: { c: MonthlyCard['competences'][number]; cotes: Cote[]; lang: Lang }) {
   return (
     <>
-      <tr className="bg-emerald-50">
+      <tr className="bg-school-50">
         <td colSpan={7} className="text-[10px] font-bold">
           COMPETENCE {c.number} : {c.title_fr} / {c.title_en}
         </td>
@@ -340,7 +343,7 @@ function TermCardView({ data, card, meta, lang }: { data: TermCards; card: TermC
   const att = card.attendance;
   return (
     <div className="report-card mx-auto mb-6 shadow-lg">
-      <CardHeader school={data.school} title="TERM REPORT CARD / BULLETIN TRIMESTRIEL" hasLogo={meta.settings.hasLogo} logoVersion={meta.settings.logoVersion} />
+      <CardHeader school={data.school} title="TERM REPORT CARD / BULLETIN TRIMESTRIEL" logoVersion={meta.settings.logoVersion} />
       <IdentityRow
         items={[
           ['Classe:', data.class.name],
@@ -351,7 +354,7 @@ function TermCardView({ data, card, meta, lang }: { data: TermCards; card: TermC
       />
       <table>
         <thead>
-          <tr className="bg-emerald-800 text-[9.5px] text-white">
+          <tr className="bg-school-800 text-[9.5px] text-white">
             <th className="w-[30%] text-left">DISCIPLINES</th>
             <th className="w-[22%] text-left">Critères d&apos;évaluation / Assessment criteria</th>
             {months.map((m, i) => (
@@ -369,7 +372,7 @@ function TermCardView({ data, card, meta, lang }: { data: TermCards; card: TermC
           {card.competences.map((c) => (
             <TermCompetenceRows key={c.number} c={c} lang={lang} months={months.length} />
           ))}
-          <tr className="bg-emerald-100 font-bold">
+          <tr className="bg-school-100 font-bold">
             <td colSpan={2}>TOTAL DES POINTS /{card.totals.max}</td>
             {card.totals.ua.map((t, i) => (
               <td key={i} colSpan={2} className="text-center">
@@ -429,7 +432,7 @@ function TermCardView({ data, card, meta, lang }: { data: TermCards; card: TermC
         />
           <table>
           <thead>
-            <tr className="bg-emerald-50 text-[9.5px]">
+            <tr className="bg-school-50 text-[9.5px]">
               <th className="text-left">AUTRES ÉVALUATIONS / OTHER ASSESSMENTS</th>
               {months.map((_, i) => (
                 <th key={i} className="w-[12%]">
@@ -467,7 +470,7 @@ function TermCardView({ data, card, meta, lang }: { data: TermCards; card: TermC
 function TermCompetenceRows({ c, lang, months }: { c: TermCard['competences'][number]; lang: Lang; months: number }) {
   return (
     <>
-      <tr className="bg-emerald-50">
+      <tr className="bg-school-50">
         <td colSpan={4 + months * 2} className="text-[9.5px] font-bold">
           COMPETENCE {c.number} : {c.title_fr} / {c.title_en}
         </td>
