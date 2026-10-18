@@ -42,6 +42,19 @@ function safeJsonArray(value) {
   }
 }
 
+/**
+ * Holiday periods of the national calendar (Christmas, Easter). They are events written
+ * by the national sync — the school's own events never take days off the calendar.
+ */
+export function readBreaks(db) {
+  return db
+    .prepare(
+      `SELECT date AS start, COALESCE(end_date, date) AS end, title AS name
+         FROM events WHERE category = 'break' AND source = 'national' ORDER BY date`,
+    )
+    .all();
+}
+
 export function readFramework(db) {
   const competences = db.prepare('SELECT * FROM competences ORDER BY number').all();
   const disciplines = db
@@ -94,12 +107,14 @@ export function loadContext(db, { today } = {}) {
   const settings = readSettings(db);
   const terms = readTerms(db);
   const holidays = db.prepare('SELECT date, name FROM holidays ORDER BY date').all();
+  const breaks = readBreaks(db);
   const calendar = buildCalendar({
     yearStart: settings.yearStart,
     yearEnd: settings.yearEnd,
     week1Start: settings.week1Start,
     terms,
     holidays,
+    breaks,
   });
   const framework = readFramework(db);
   const todayIso = today || process.env.SCHOOL_TODAY || todayInTimezone(settings.timezone);
@@ -108,6 +123,7 @@ export function loadContext(db, { today } = {}) {
     settings,
     terms,
     holidays,
+    breaks,
     calendar,
     framework,
     today: todayInfo,

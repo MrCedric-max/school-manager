@@ -5,6 +5,7 @@ import { Button, Card, CardHeader, ErrorBox, Field, Input, LoadingBlock, PageHea
 import { api } from '../lib/api';
 import { fmtDate, monthLabel } from '../lib/format';
 import { useLang } from '../lib/i18n';
+import { CalendarSync } from '../components/CalendarSync';
 import type { CalendarData, CalendarDay } from '../lib/types';
 
 const TYPE_STYLE: Record<string, string> = {
@@ -52,7 +53,7 @@ function MonthGrid({ month, days, today, lang }: { month: CalendarData['months']
                 <td key={j} className="p-0.5">
                   {d && (
                     <div
-                      title={d.holiday ?? d.type}
+                      title={d.holiday ?? d.breakName ?? d.type}
                       className={cx('rounded py-1 tabular-nums', TYPE_STYLE[d.type], d.date === today && 'ring-2 ring-school-700')}
                     >
                       {Number(d.date.slice(8))}
@@ -139,6 +140,8 @@ export default function CalendarPage() {
         <StatCard label={tr('Break weekdays', 'Jours de vacances')} value={data.summary.breakWeekdays} tone="sky" />
         <StatCard label={tr('First – last day', 'Premier – dernier jour')} value={<span className="text-base">{fmtDate(data.summary.firstSchoolDay, lang)} – {fmtDate(data.summary.lastSchoolDay, lang)}</span>} tone="slate" />
       </div>
+
+      <CalendarSync />
 
       <Card className="mb-5">
           <CardHeader

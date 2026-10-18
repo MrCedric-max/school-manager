@@ -3,11 +3,15 @@ import { config, databasePath, demoLoginConfig } from './config.js';
 import { closeDatabase, getDb, openDatabase } from './db/index.js';
 import { userCount } from './routes/auth.js';
 import { syncDemoAccount } from './services/demo-login.js';
+import { startScheduler } from './services/scheduler.js';
 
 const file = databasePath();
 openDatabase(file);
 const demo = syncDemoAccount(getDb());
 const app = createApp();
+
+// Background jobs: the daily reminders, and preparing next year's calendar from this one.
+const scheduler = process.env.SCHEDULER_OFF === '1' ? null : startScheduler({ db: getDb() });
 
 const server = app.listen(config.port, config.host, () => {
   console.log(`School Manager is running on http://${config.host === '0.0.0.0' ? 'localhost' : config.host}:${config.port}`);
@@ -19,6 +23,7 @@ const server = app.listen(config.port, config.host, () => {
 
 function shutdown(signal) {
   console.log(`${signal} received, shutting down…`);
+  scheduler?.stop();
   server.close(() => {
     closeDatabase();
     process.exit(0);

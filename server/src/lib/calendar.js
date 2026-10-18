@@ -25,12 +25,19 @@ export function weekOf(iso, week1Start) {
  *
  * @param {{yearStart:string, yearEnd:string, week1Start:string,
  *          terms:{number:number,name:string,start_date:string,end_date:string,ua_months:string[]}[],
- *          holidays:{date:string,name:string}[]}} input
+ *          holidays:{date:string,name:string}[],
+ *          breaks?:{start:string,end:string,name:string}[]}} input
+ *
+ * `breaks` are the holiday periods of the national calendar (Christmas, Easter). They fall
+ * inside a term — the arrêté splits a term around them — and their weekdays are days off
+ * without being public holidays.
  */
-export function buildCalendar({ yearStart, yearEnd, week1Start, terms, holidays }) {
+export function buildCalendar({ yearStart, yearEnd, week1Start, terms, holidays, breaks = [] }) {
   const holidayByDate = new Map(holidays.map((h) => [h.date, h.name]));
   const sortedTerms = [...terms].sort((a, b) => a.number - b.number);
   const termOf = (iso) => sortedTerms.find((t) => iso >= t.start_date && iso <= t.end_date)?.number ?? null;
+  const sortedBreaks = [...breaks].sort((a, b) => a.start.localeCompare(b.start));
+  const breakOf = (iso) => sortedBreaks.find((b) => iso >= b.start && iso <= b.end) ?? null;
 
   const days = [];
   if (yearStart && yearEnd && yearStart <= yearEnd) {
@@ -38,8 +45,10 @@ export function buildCalendar({ yearStart, yearEnd, week1Start, terms, holidays 
       const dow = dayOfWeek(d);
       const weekend = dow === 0 || dow === 6;
       const term = termOf(d);
+      const onBreak = breakOf(d);
       let type;
       if (holidayByDate.has(d)) type = 'holiday';
+      else if (onBreak && !weekend) type = 'break';
       else if (weekend) type = 'weekend';
       else if (term) type = 'school';
       else type = 'break';
@@ -51,6 +60,7 @@ export function buildCalendar({ yearStart, yearEnd, week1Start, terms, holidays 
         term,
         type,
         holiday: holidayByDate.get(d) ?? null,
+        breakName: onBreak?.name ?? null,
       });
     }
   }

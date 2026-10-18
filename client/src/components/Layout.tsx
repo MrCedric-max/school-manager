@@ -1,6 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query';
 import {
   BarChart3,
+  BellRing,
   BookOpenCheck,
   CalendarCheck,
   CalendarDays,
@@ -78,6 +79,7 @@ const SECTIONS: Array<{ en: string; fr: string; items: NavItem[] }> = [
     items: [
       { to: '/pupils', en: 'Pupils', fr: 'Élèves', icon: <Users className={ICON} /> },
       { to: '/calendar', en: 'Calendar', fr: 'Calendrier', icon: <CalendarDays className={ICON} /> },
+      { to: '/reminders', en: 'Reminders', fr: 'Rappels', icon: <BellRing className={ICON} /> },
       { to: '/settings', en: 'Settings & import', fr: 'Paramètres & import', icon: <Settings className={ICON} /> },
     ],
   },

@@ -10,6 +10,7 @@ import { calendarRouter } from './routes/calendar.js';
 import { entriesRouter } from './routes/entries.js';
 import { metaRouter, sendLogo } from './routes/meta.js';
 import { pupilsRouter } from './routes/pupils.js';
+import { remindersRouter } from './routes/reminders.js';
 import { reportsRouter } from './routes/reports.js';
 
 /**
@@ -128,6 +129,7 @@ export function createApp({ clientDist = config.clientDist } = {}) {
   app.use('/api/calendar', calendarRouter);
   app.use('/api', entriesRouter);
   app.use('/api', reportsRouter);
+  app.use('/api/reminders', remindersRouter);
   app.use('/api', adminRouter);
   app.use('/api', (req, res) => res.status(404).json({ error: 'Not found' }));
 

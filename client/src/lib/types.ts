@@ -468,6 +468,8 @@ export interface CalendarDay {
   term: number | null;
   type: DayType;
   holiday: string | null;
+  /** The holiday period this day falls in, when it is one (Christmas, Easter…). */
+  breakName?: string | null;
 }
 
 export interface CalendarData {
@@ -495,4 +497,209 @@ export interface ImportSummary {
   counts: { pupils: number; attendance: number; controls: number; performance: number; marks: number; attitudes: number };
   warnings: string[];
   warningCount: number;
+}
+
+// ---- The national calendar and the reminders ---------------------------------
+
+export type EventCategory = 'official' | 'break' | 'holiday' | 'exam' | 'deadline' | 'event';
+export type EventSource = 'national' | 'import' | 'manual';
+
+/** A date of the school year: an official one, or one of the school's own. */
+export interface CalendarEvent {
+  id: number;
+  date: string;
+  endDate: string | null;
+  title: string;
+  category: EventCategory;
+  source: EventSource;
+  schoolYearId: number | null;
+  remind: boolean;
+}
+
+/** One part of a term, on either side of a holiday. */
+export interface TermSegment {
+  start: string;
+  end: string;
+}
+
+/**
+ * The official dates of a school year, as published by MINEDUB/MINESEC: the backbone the
+ * app synchronises to.
+ */
+export interface Backbone {
+  reference: string;
+  yearStart: string;
+  yearEnd: string;
+  week1Start: string;
+  anchors: Partial<Record<'adminReturn' | 'teacherReturn' | 'pupilReturn' | 'classesEnd' | 'yearEnd', string>>;
+  terms: Array<{ number: number; name: string; segments: TermSegment[] }>;
+  breaks: Array<{ name: string; start: string; end: string }>;
+  exams: Array<{ name: string; start: string; end: string }>;
+  holidays: Array<{ date: string; name: string; movable?: boolean }>;
+}
+
+export interface SchoolYear {
+  id: number;
+  label: string;
+  status: 'active' | 'draft' | 'archived';
+  startDate: string;
+  endDate: string;
+  week1Start: string;
+  notes: string;
+  createdAt: string;
+  updatedAt: string;
+  backbone: Backbone;
+  plan: {
+    terms: Array<{ number: number; name: string; start: string; end: string; segments: TermSegment[]; uaMonths: string[]; schoolDays: number }>;
+    holidays: Array<{ date: string; name: string }>;
+    events: Array<{ date: string; end_date: string | null; title: string; category: EventCategory }>;
+  };
+}
+
+export interface SchoolYearsData {
+  years: SchoolYear[];
+  activeId: number | null;
+  hasOfficial: boolean;
+  events: CalendarEvent[];
+  eventSources: Record<string, number>;
+  categories: EventCategory[];
+}
+
+/** What applying a year's official dates would change. */
+export interface YearDiff {
+  terms: Array<{
+    number: number;
+    name: string;
+    from: { start: string; end: string; uaMonths: string[] } | null;
+    to: { start: string; end: string; uaMonths: string[] } | null;
+    changed: boolean;
+    schoolDays: number;
+  }>;
+  holidays: {
+    added: Array<{ date: string; name: string }>;
+    removed: Array<{ date: string; name: string }>;
+    renamed: Array<{ date: string; name: string; was: string }>;
+  };
+  events: number;
+  schoolDays: number;
+}
+
+export interface PlannerSummary {
+  title: string | null;
+  sheets: string[];
+  skipped: string[];
+  count: number;
+  byCategory: Record<string, number>;
+  months: Array<{ month: string; count: number }>;
+  from: string | null;
+  to: string | null;
+  sample: Array<{ date: string; title: string; category: EventCategory }>;
+}
+
+export interface PlannerPreview {
+  importId: string;
+  fileName: string;
+  summary: PlannerSummary;
+  alreadyImported: number;
+}
+
+// ---- Reminders ---------------------------------------------------------------
+
+export interface ReminderSettings {
+  enabled: boolean;
+  leadDays: number[];
+  categories: EventCategory[];
+  hour: number;
+  autoPrepare: boolean;
+  prepareDays: number;
+  lastRun: string;
+}
+
+export interface MailStatus {
+  configured: boolean;
+  dryRun: boolean;
+  host: string;
+  port: number;
+  secure: boolean;
+  user: string;
+  from: string;
+  missing: string[];
+  reason: string;
+}
+
+export interface Subscriber {
+  id: number;
+  email: string;
+  name: string;
+  active: boolean;
+  createdAt: string;
+}
+
+export interface AccountEmail {
+  id: number;
+  username: string;
+  email: string;
+  demo: boolean;
+}
+
+export interface Recipient {
+  email: string;
+  name: string;
+  source: 'user' | 'subscriber';
+}
+
+export interface ReminderGroup {
+  date: string;
+  lead: number;
+  sendOn: string;
+  due: boolean;
+  subject: string;
+  text: string;
+  items: Array<{ key: string; title: string; category: EventCategory; source?: EventSource; endDate?: string | null }>;
+}
+
+export interface ReminderPreview {
+  today: string;
+  horizon: number;
+  enabled: boolean;
+  leadDays: number[];
+  categories: EventCategory[];
+  recipients: Recipient[];
+  mail: MailStatus;
+  groups: ReminderGroup[];
+}
+
+export interface OutboxMessage {
+  id: number;
+  recipient: string;
+  subject: string;
+  body: string;
+  ics: string;
+  status: 'sent' | 'dry-run' | 'failed';
+  detail: string;
+  createdAt: string;
+}
+
+export interface ReminderLogEntry {
+  id: number;
+  key: string;
+  date: string;
+  lead: number;
+  recipient: string;
+  status: string;
+  detail: string;
+  sentAt: string;
+  eventTitle: string;
+}
+
+export interface RemindersData {
+  settings: ReminderSettings;
+  mail: MailStatus;
+  subscribers: Subscriber[];
+  accounts: AccountEmail[];
+  recipients: Recipient[];
+  preview: ReminderPreview;
+  outbox: OutboxMessage[];
+  log: ReminderLogEntry[];
+  today: string;
 }

@@ -189,6 +189,88 @@ export const migrations = [
   UPDATE control_subjects SET competence = 1 WHERE code IN ('english', 'french');
   UPDATE control_subjects SET competence = 2 WHERE code IN ('maths', 'scitech');
   `,
+
+  // v4 — the national school calendar (one row per school year, kept in step with the
+  // MINEDUB/MINESEC arrêté), the events that hang off it, and the e-mail reminders
+  // that put those events into everybody's own calendar.
+  `
+  -- The backbone of each year: the official dates, kept so the year can be rolled over
+  -- (and so last year's calendar is still on file once the new one is active).
+  CREATE TABLE school_years (
+    id          INTEGER PRIMARY KEY,
+    label       TEXT NOT NULL UNIQUE,
+    start_date  TEXT NOT NULL,
+    end_date    TEXT NOT NULL,
+    week1_start TEXT NOT NULL,
+    status      TEXT NOT NULL DEFAULT 'active'
+                CHECK (status IN ('active', 'draft', 'archived')),
+    official    TEXT NOT NULL DEFAULT '{}',
+    notes       TEXT NOT NULL DEFAULT '',
+    created_at  TEXT NOT NULL DEFAULT ${NOW},
+    updated_at  TEXT NOT NULL DEFAULT ${NOW}
+  );
+
+  -- Events of the school year: official anchors (rentrée, exam periods) and the school's
+  -- own dates, imported every year from the planner workbook.
+  CREATE TABLE events (
+    id             INTEGER PRIMARY KEY,
+    date           TEXT NOT NULL,
+    end_date       TEXT,
+    title          TEXT NOT NULL,
+    category       TEXT NOT NULL DEFAULT 'event'
+                   CHECK (category IN ('official', 'break', 'holiday', 'exam', 'deadline', 'event')),
+    source         TEXT NOT NULL DEFAULT 'manual'
+                   CHECK (source IN ('national', 'import', 'manual')),
+    school_year_id INTEGER REFERENCES school_years(id) ON DELETE CASCADE,
+    remind         INTEGER NOT NULL DEFAULT 1,
+    created_at     TEXT NOT NULL DEFAULT ${NOW}
+  );
+  CREATE INDEX idx_events_date ON events(date);
+  CREATE UNIQUE INDEX idx_events_unique ON events(date, category, title);
+
+  -- Public holidays written by the national sync (manual ones are left alone).
+  ALTER TABLE holidays ADD COLUMN source TEXT NOT NULL DEFAULT 'manual';
+
+  -- Staff who receive reminders without having an account of their own.
+  CREATE TABLE reminder_subscribers (
+    id         INTEGER PRIMARY KEY,
+    email      TEXT NOT NULL UNIQUE COLLATE NOCASE,
+    name       TEXT NOT NULL DEFAULT '',
+    active     INTEGER NOT NULL DEFAULT 1,
+    created_at TEXT NOT NULL DEFAULT ${NOW}
+  );
+
+  -- One row per reminder already sent: keeps a second run from sending it again.
+  -- "key" names what the reminder is about ("event:12", "holiday:2026-12-25",
+  -- "term:1:start") so reminders for things that are not events are deduplicated too.
+  CREATE TABLE reminder_log (
+    id        INTEGER PRIMARY KEY,
+    key       TEXT NOT NULL,
+    event_id  INTEGER REFERENCES events(id) ON DELETE CASCADE,
+    date      TEXT NOT NULL,
+    lead_days INTEGER NOT NULL,
+    recipient TEXT NOT NULL,
+    status    TEXT NOT NULL,
+    detail    TEXT NOT NULL DEFAULT '',
+    sent_at   TEXT NOT NULL DEFAULT ${NOW}
+  );
+  CREATE UNIQUE INDEX idx_reminder_log_sent ON reminder_log(key, date, lead_days, recipient);
+
+  -- Every message handed to the mail service, sent or only prepared (dry run).
+  CREATE TABLE outbox (
+    id         INTEGER PRIMARY KEY,
+    recipient  TEXT NOT NULL,
+    subject    TEXT NOT NULL,
+    body       TEXT NOT NULL,
+    ics        TEXT NOT NULL DEFAULT '',
+    status     TEXT NOT NULL,
+    detail     TEXT NOT NULL DEFAULT '',
+    created_at TEXT NOT NULL DEFAULT ${NOW}
+  );
+  CREATE INDEX idx_outbox_created ON outbox(created_at);
+
+  ALTER TABLE users ADD COLUMN email TEXT;
+  `,
 ];
 
 export function migrate(db) {

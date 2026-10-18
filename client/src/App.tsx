@@ -21,6 +21,7 @@ const TermReport = lazy(() => import('./pages/TermReport'));
 const ReportCards = lazy(() => import('./pages/ReportCards'));
 const Pupils = lazy(() => import('./pages/Pupils'));
 const CalendarPage = lazy(() => import('./pages/Calendar'));
+const RemindersPage = lazy(() => import('./pages/Reminders'));
 const SettingsPage = lazy(() => import('./pages/Settings'));
 
 const queryClient = new QueryClient({
@@ -71,6 +72,7 @@ function MetaGate() {
             <Route path="/report-cards" element={<ReportCards />} />
             <Route path="/pupils" element={<Pupils />} />
             <Route path="/calendar" element={<CalendarPage />} />
+            <Route path="/reminders" element={<RemindersPage />} />
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>

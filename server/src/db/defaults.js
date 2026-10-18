@@ -20,6 +20,15 @@ export const DEFAULT_SETTINGS = {
   ]),
   demo_mode: '0',
   logo: '',
+  // Reminders: off until the school switches them on (Reminders page). The mail server
+  // itself is configured with MAIL_* environment variables, never stored here.
+  reminder_enabled: '1',
+  reminder_lead_days: '7,1',
+  reminder_categories: 'official,break,holiday,exam,deadline,event',
+  reminder_hour: '7',
+  reminder_auto_prepare: '1',
+  reminder_prepare_days: '120',
+  reminder_last_run: '',
 };
 
 export const DEFAULT_CLASSES = [

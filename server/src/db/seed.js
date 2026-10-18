@@ -9,6 +9,7 @@ import {
   DEFAULT_SETTINGS,
   DEFAULT_TERMS,
 } from './defaults.js';
+import { ensureCurrentYear } from '../services/schoolYears.js';
 
 const isEmpty = (db, table) => db.prepare(`SELECT COUNT(*) AS n FROM ${table}`).get().n === 0;
 
@@ -36,8 +37,10 @@ export function seedDefaults(db) {
     }
 
     if (isEmpty(db, 'holidays')) {
-      const stmt = db.prepare('INSERT INTO holidays (date, name) VALUES (?, ?)');
-      for (const [date, name] of DEFAULT_HOLIDAYS) stmt.run(date, name);
+      // Source 'national': these are the official dates, and the national sync owns them
+      // (a holiday added by hand afterwards is kept when the year is re-applied).
+      const stmt = db.prepare('INSERT INTO holidays (date, name, source) VALUES (?, ?, ?)');
+      for (const [date, name] of DEFAULT_HOLIDAYS) stmt.run(date, name, name.includes('est.') ? 'manual' : 'national');
     }
 
     if (isEmpty(db, 'competences')) {
@@ -76,4 +79,8 @@ export function seedDefaults(db) {
       DEFAULT_PERFORMANCE_AREAS.forEach((a, i) => stmt.run(...a, i + 1));
     }
   })();
+
+  // The year the app runs on always has a row in school_years: the national calendar it
+  // synchronises to (and from which the next year is prepared).
+  ensureCurrentYear(db);
 }
