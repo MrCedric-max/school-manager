@@ -60,6 +60,19 @@ export function sumOrNull(values: Array<number | null | undefined>) {
   return nums.length ? nums.reduce((a, b) => a + b, 0) : null;
 }
 
+/**
+ * One label in the two languages of the school, as the printed cards show it: the two
+ * sides are joined by a slash, and a word that is the same in both is printed once
+ * ("Religion", "Sport", "Coef.").
+ */
+export function both(a: string | null | undefined, b: string | null | undefined): string {
+  const x = (a ?? '').trim();
+  const y = (b ?? '').trim();
+  if (!x) return y;
+  if (!y) return x;
+  return x.toLowerCase() === y.toLowerCase() ? x : `${x} / ${y}`;
+}
+
 export function coteFor(pct: number | null | undefined, cotes: Cote[]) {
   if (!isNum(pct)) return null;
   for (const c of cotes) if (pct >= c.min - 1e-9) return c.code;

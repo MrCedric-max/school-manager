@@ -8,7 +8,7 @@ import Bulletins from './Bulletins';
 import { ClassSelect, MonthSelect, TermSelect } from '../components/Selectors';
 import { Button, Card, ErrorBox, Field, LoadingBlock, PageHeader, Select, Tabs, Toolbar, cx } from '../components/ui';
 import { api, qs } from '../lib/api';
-import { coteMeaning, fmtNum, fmtPct, monthLabel } from '../lib/format';
+import { both, coteMeaning, fmtNum, fmtPct, monthLabel } from '../lib/format';
 import { useMetaData } from '../lib/hooks';
 import { useLang } from '../lib/i18n';
 import { useSelection } from '../lib/selection';
@@ -166,13 +166,13 @@ function PerformanceBlock({ meta, values, attendance, title, lang }: { meta: Met
         {left.map((a, i) => (
           <tr key={a.code}>
             <td className="w-[35%]">
-              {i + 1} — {a.label_en}
+              {i + 1} — {both(a.label_en, a.label_fr)}
             </td>
             <td className="w-[15%] text-center font-semibold">{n2(values[a.code], lang)}</td>
             {right[i] ? (
               <>
                 <td className="w-[35%]">
-                  {half + i + 1} — {right[i].label_en}
+                  {half + i + 1} — {both(right[i].label_en, right[i].label_fr)}
                 </td>
                 <td className="w-[15%] text-center font-semibold">{n2(values[right[i].code], lang)}</td>
               </>
@@ -210,7 +210,7 @@ function PerformanceList({ meta, values, attendance, title, lang }: { meta: Meta
         {meta.framework.areas.map((a, i) => (
           <tr key={a.code}>
             <td>
-              {i + 1} — {a.label_en} / {a.label_fr}
+              {i + 1} — {both(a.label_en, a.label_fr)}
             </td>
             <td className="w-[26%] text-center font-semibold">{n2(values[a.code], lang)}</td>
           </tr>
@@ -245,9 +245,9 @@ function MonthlyCardView({ data, card, meta, lang }: { data: MonthlyCards; card:
             <th className="w-[34%] text-left">COMPETENCES / DISCIPLINES</th>
             <th className="w-[5%]">Max</th>
             <th className="w-[27%] text-left">Critères d&apos;évaluation / Assessment criteria</th>
-            <th className="w-[7%]">Note</th>
+            <th className="w-[7%]">Note / Mark</th>
             <th className="w-[7%]">%</th>
-            <th className="w-[6%]">Cote</th>
+            <th className="w-[6%]">Cote / Grade</th>
             <th className="w-[14%]">Appreciation / Appréciation</th>
           </tr>
         </thead>
@@ -324,7 +324,7 @@ function CompetenceRows({ c, cotes, lang }: { c: MonthlyCard['competences'][numb
       ))}
       <tr className="font-semibold">
         <td>
-          Total COMPETENCE {c.number} /{c.max}
+          Total COMPETENCE {c.number} / COMPETENCE {c.number} total /{c.max}
         </td>
         <td className="text-center">{c.max}</td>
         <td />
@@ -347,7 +347,7 @@ function TermCardView({ data, card, meta, lang }: { data: TermCards; card: TermC
       <CardHeader school={data.school} title="TERM REPORT CARD / BULLETIN TRIMESTRIEL" logoVersion={meta.settings.logoVersion} />
       <IdentityRow
         items={[
-          ['Classe:', data.class.name],
+          ['Classe / Class:', data.class.name],
           ['Term / Trimestre:', data.term.name],
           ['Code:', card.pupil.studentId],
           ['Noms et prénoms / Names:', card.pupil.name],
@@ -356,16 +356,16 @@ function TermCardView({ data, card, meta, lang }: { data: TermCards; card: TermC
       <table>
         <thead>
           <tr className="bg-school-800 text-[9.5px] text-white">
-            <th className="w-[30%] text-left">DISCIPLINES</th>
+            <th className="w-[30%] text-left">DISCIPLINES / SUBJECTS</th>
             <th className="w-[22%] text-left">Critères d&apos;évaluation / Assessment criteria</th>
             {months.map((m, i) => (
               <th key={i} colSpan={2} className="w-[9%]">
-                Note UA{i + 1}
-                <div className="text-[8px] font-normal">{monthLabel(m, 'fr', false)}</div>
+                Note UA{i + 1} / UA{i + 1} mark
+                <div className="text-[8px] font-normal">{monthLabel(m, 'fr', false)} / {monthLabel(m, 'en', false)}</div>
               </th>
             ))}
             <th colSpan={2} className="w-[10%]">
-              Note trimestre
+              Note trimestre / Term mark
             </th>
           </tr>
         </thead>
@@ -374,7 +374,7 @@ function TermCardView({ data, card, meta, lang }: { data: TermCards; card: TermC
             <TermCompetenceRows key={c.number} c={c} lang={lang} months={months.length} />
           ))}
           <tr className="bg-school-100 font-bold">
-            <td colSpan={2}>TOTAL DES POINTS /{card.totals.max}</td>
+            <td colSpan={2}>TOTAL DES POINTS / TOTAL POINTS /{card.totals.max}</td>
             {card.totals.ua.map((t, i) => (
               <td key={i} colSpan={2} className="text-center">
                 {mark(t, lang)}
@@ -385,7 +385,7 @@ function TermCardView({ data, card, meta, lang }: { data: TermCards; card: TermC
             </td>
           </tr>
           <tr className="font-bold">
-            <td colSpan={2}>MOYENNE /20 (ACADEMIC AVERAGE)</td>
+            <td colSpan={2}>MOYENNE / AVERAGE /20 (ACADÉMIQUE / ACADEMIC)</td>
             {card.averages.ua.map((a, i) => (
               <td key={i} colSpan={2} className="text-center">
                 {n2(a, lang)}
@@ -446,8 +446,7 @@ function TermCardView({ data, card, meta, lang }: { data: TermCards; card: TermC
             {card.attitudes.map((a, i) => (
               <tr key={a.code}>
                 <td>
-                  {i + 1} — {a.label_fr}
-                  {a.label_fr !== a.label_en ? ` / ${a.label_en}` : ''}
+                  {i + 1} — {both(a.label_fr, a.label_en)}
                 </td>
                 {a.ua.map((g, j) => (
                   <td key={j} className="text-center font-semibold">

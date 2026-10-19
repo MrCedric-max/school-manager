@@ -3,6 +3,42 @@
 
 const NOW = "(strftime('%Y-%m-%dT%H:%M:%fZ','now'))";
 
+/** A string literal for SQL, so a text holding an apostrophe is written safely. */
+const lit = (s) => `'${String(s).replace(/'/g, "''")}'`;
+
+/**
+ * v7 — the report cards are printed in the two languages of the school. A discipline
+ * still carrying the one-language text that came with the app is given both, so a card
+ * reads « Communiquer en français / Communicate in French » and the criteria read
+ * « Orale / Oral ». A text the school wrote itself is left alone.
+ *
+ * [code, label, criteria, the label it replaces, the criteria it replaces]
+ */
+const BILINGUAL_DISCIPLINES = [
+  ['1A', 'Communiquer en français / Communicate in French (40 points)', '1: Orale / Oral 10 pts ; 2: Écrite / Written 15 pts (15 pts pour le savoir-être / for attitudes)',
+    'Communiquer en Français (40 points)', '1: Orale 10 pts ; 2: Écrite 15 pts (15 pts pour le savoir-être)'],
+  ['1B', 'Communiquer en anglais / Communicate in English (40 points)', '1: Orale / Oral 20 pts ; 2: Écrite / Written 15 pts (5 pts pour le savoir-être / for attitudes)',
+    'Communicate in English (40 marks)', '1: Oral 20 marks ; 2: Written 15 marks (5 marks for attitudes)'],
+  ['1C', 'Pratiquer une langue nationale / Use a national language (20 points)', '1: Orale / Oral 10 pts ; 2: Écrite / Written 7 pts ; 3: Pratique / Practice 3 pts',
+    'Pratiquer une langue nationale / Use a national language (20 points)', '1: Orale 10 pts ; 2: Écrite 7 pts ; 3: Pratique 3 pts'],
+  ['2A', 'Utiliser les notions de base en mathématiques / Use basic notions in mathematics (30 points)', '1: Orale / Oral 5 pts ; 2: Écrite / Written 20 pts (5 pts pour le savoir-être / for attitudes)',
+    'Utiliser les notions de base en mathématiques / Use basic notions in mathematics (30 points)', '1: Orale 5 pts ; 2: Écrite 20 pts (5 pts pour le savoir-être)'],
+  ['2B', 'Utiliser les notions de base en Sciences et Technologies / Use basic notions in science and technology (30 points)', '1: Orale / Oral 5 pts ; 2: Écrite / Written 5 pts ; 3: Pratique / Practice 15 pts (5 pts pour le savoir-être / for attitudes)',
+    'Utiliser les notions de base en Sciences et Technologies / Use basic notions in science and technology (30 points)', '1: Orale 5 pts ; 2: Écrite 5 pts ; 3: Pratique 15 pts (5 pts pour le savoir-être)'],
+  ['3A', 'Pratiquer les valeurs sociales / Practise social values (20 points)', '1: Orale / Oral 3 pts ; 2: Écrite / Written 3 pts ; 3: Pratique / Practice 10 pts (4 pts pour le savoir-être / for attitudes)',
+    'Pratiquer les valeurs sociales / Practice of social values (20 points)', '1: Orale 3 pts ; 2: Écrite 3 pts ; 3: Pratique 10 pts (4 pts pour le savoir-être)'],
+  ['3B', 'Pratiquer les valeurs citoyennes / Practise citizenship values (20 points)', '1: Orale / Oral 5 pts ; 2: Écrite / Written 5 pts ; 3: Pratique / Practice 8 pts (2 pts pour le savoir-être / for attitudes)',
+    'Pratiquer les valeurs citoyennes / Practice of citizenship values (20 points)', '1: Orale 5 pts ; 2: Écrite 5 pts ; 3: Pratique 8 pts (2 pts pour le savoir-être)'],
+  ['4A', 'Démontrer l\'autonomie, l\'esprit d\'initiative, de créativité et d\'entrepreneuriat / Demonstrate autonomy, initiative, creativity and entrepreneurship (20 points)', '1: Orale / Oral 5 pts ; 2: Écrite / Written 3 pts ; 3: Pratique / Practice 10 pts (2 pts pour le savoir-être / for attitudes)',
+    'Démontrer l\'autonomie, l\'esprit d\'initiative, de créativité et d\'entrepreneuriat / Demonstrate autonomy, initiative, creativity and entrepreneurship (20 points)', '1: Orale 5 pts ; 2: Écrite 3 pts ; 3: Pratique 10 pts (2 pts pour le savoir-être)'],
+  ['5A', 'Utiliser les concepts de base et les outils des TIC / Use basic concepts and tools of ICT (20 points)', '1: Orale / Oral 3 pts ; 2: Écrite / Written 3 pts ; 3: Pratique / Practice 10 pts (4 pts pour le savoir-être / for attitudes)',
+    'Utiliser les concepts de base et les outils des TIC / Using basic concepts and tools of ICT (20 points)', '1: Orale 3 pts ; 2: Écrite 3 pts ; 3: Pratique 10 pts (4 pts pour le savoir-être)'],
+  ['6A1', 'Pratiquer les activités physiques et sportives / Practise physical and sports activities (20 points)', '1: Orale / Oral 3 pts ; 2: Écrite / Written 3 pts ; 3: Pratique / Practice 10 pts (4 pts pour le savoir-être / for attitudes)',
+    'Pratiquer les activités physiques et sportives / Practise physical sports (20 points)', '1: Orale 3 pts ; 2: Écrite 3 pts ; 3: Pratique 10 pts (4 pts pour le savoir-être)'],
+  ['6B', 'Pratiquer les activités artistiques / Practise artistic activities (20 points)', '1: Orale / Oral 4 pts ; 2: Écrite / Written 3 pts ; 3: Pratique / Practice 10 pts (3 pts pour le savoir-être / for attitudes)',
+    'Pratiquer les activités artistiques / Practise artistic activities (20 points)', '1: Orale 4 pts ; 2: Écrite 3 pts ; 3: Pratique 10 pts (3 pts pour le savoir-être)'],
+];
+
 export const migrations = [
   // v1 — initial schema mirroring the School_Manager workbook.
   `
@@ -328,7 +364,15 @@ export const migrations = [
   // one cycle only. An empty cycle means the whole school.
   `
   ALTER TABLE events ADD COLUMN cycle TEXT NOT NULL DEFAULT '';
-  `
+  `,
+
+  // v7 — the one-language discipline texts of the report cards, in the two languages of
+  // the school. Only the rows still holding the text shipped earlier are touched.
+  BILINGUAL_DISCIPLINES.map(
+    ([code, label, criteria, wasLabel, wasCriteria]) =>
+      `UPDATE disciplines SET label = ${lit(label)}, criteria = ${lit(criteria)}
+        WHERE code = ${lit(code)} AND label = ${lit(wasLabel)} AND criteria = ${lit(wasCriteria)};`,
+  ).join('\n')
 ];
 
 export function migrate(db) {

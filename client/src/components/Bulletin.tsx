@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { SchoolLogo } from './SchoolLogo';
 import { useLang } from '../lib/i18n';
-import { fmtDate, fmtNum } from '../lib/format';
+import { both, fmtDate, fmtNum } from '../lib/format';
 import { api } from '../lib/api';
 import type { CollegeBulletin, BulletinPupil, Lang } from '../lib/types';
 import { Input } from './ui';
@@ -58,10 +58,10 @@ export function Bulletin({
             {sequences.map((s) => (
               <Th key={s}>Seq. {s}</Th>
             ))}
-            <Th>Trim. {bulletin.term.number}</Th>
+            <Th>Trim. / Term {bulletin.term.number}</Th>
             <Th>Rang / Rank</Th>
-            <Th className="text-left">Appréciation</Th>
-            <Th>Moy. Gén.</Th>
+            <Th className="text-left">Appréciation / Remark</Th>
+            <Th>Moy. Gén. / Average</Th>
             <Th className="text-left">Enseignants / Teachers</Th>
           </tr>
         </thead>
@@ -76,7 +76,7 @@ export function Bulletin({
                 const row = rowOf(s.code);
                 return (
                   <tr key={s.code} className="border-b border-slate-200">
-                    <Td className="text-left">{s.label}</Td>
+                    <Td className="text-left">{both(s.label, s.labelEn)}</Td>
                     <Td>{s.coefficient}</Td>
                     {sequences.map((n) => (
                       <Td key={n}>{n2(row?.seq[n], lang)}</Td>
@@ -90,7 +90,7 @@ export function Bulletin({
                 );
               }),
               <tr key={`g${no}`} className="border-b-2 border-school-300 bg-school-50/70 font-bold">
-                <Td className="text-left">{group?.label ?? `Moy. ${no}e Groupe`}</Td>
+                <Td className="text-left">{group ? both(group.label, group.labelEn) : `Moy. ${no}e Groupe / Group ${no} average`}</Td>
                 <Td>{groupRow?.coefficient ?? group?.coefficient ?? ''}</Td>
                 {sequences.map((n) => (
                   <Td key={n}>{n2(groupRow?.seq?.[n], lang)}</Td>
@@ -110,20 +110,20 @@ export function Bulletin({
         <Block title="Résultats de l'élève / Pupil's results">
           <Line label="Points" value={n2(pupil.points, lang)} />
           <Line label="Coef" value={String(pupil.coefficient)} />
-          <Line label="Moy. Académique /20" value={n2(pupil.average, lang)} strong />
-          <Line label="Note de Conduite /20" value={<Conduct pupilId={pupil.pupilId} period={`T:${bulletin.term.number}`} value={pupil.conduct} />} />
-          <Line label="Appréciation" value={pupil.average === null ? '' : mention(pupil.average, lang)} />
+          <Line label="Moy. Académique / Academic average /20" value={n2(pupil.average, lang)} strong />
+          <Line label="Note de Conduite / Conduct /20" value={<Conduct pupilId={pupil.pupilId} period={`T:${bulletin.term.number}`} value={pupil.conduct} />} />
+          <Line label="Appréciation / Mention" value={pupil.average === null ? '' : mention(pupil.average, lang)} />
           <Line label="Rang / Rank" value={`${pupil.rank ?? '–'} / ${bulletin.classProfile.count}`} />
         </Block>
         <Block title="Profil de la classe / Class profile">
-          <Line label="Moy. Gén." value={n2(bulletin.classProfile.average, lang)} />
+          <Line label="Moy. Gén. / Average" value={n2(bulletin.classProfile.average, lang)} />
           <Line label="Moy. Premier / Best" value={n2(bulletin.classProfile.best, lang)} />
           <Line label="Moy. Dernier / Last" value={n2(bulletin.classProfile.worst, lang)} />
           <Line label="Admis / Passing" value={`${bulletin.classProfile.passing} / ${bulletin.classProfile.count}`} />
         </Block>
         <Block title="Rappel / Reminder">
           {sequences.map((n) => (
-            <Line key={n} label={`Moy. Seq. ${n}`} value={n2(pupil.sequenceAverages[n], lang)} />
+            <Line key={n} label={`Moy. Seq. ${n} / Seq. ${n} average`} value={n2(pupil.sequenceAverages[n], lang)} />
           ))}
           <Line label="Absence Just. / Excused" value={String(pupil.attendance.justified)} />
           <Line label="Absence N. Just. / Unexcused" value={String(pupil.attendance.unjustified)} />
@@ -241,13 +241,13 @@ function birth(pupil: BulletinPupil, lang: Lang) {
   return [when, pupil.placeOfBirth].filter(Boolean).join(' à / at ');
 }
 
-/** The mention printed for a mark: Insuffisant, Passable, Assez Bien, Bien, Très Bien. */
+/** The mention printed for a mark, in both languages: Assez Bien / Fairly good… */
 export function mention(average: number, _lang: Lang) {
-  if (average >= 16) return 'Très Bien';
-  if (average >= 14) return 'Bien';
-  if (average >= 12) return 'Assez Bien';
-  if (average >= 10) return 'Passable';
-  return 'Insuffisant';
+  if (average >= 16) return 'Très Bien / Very good';
+  if (average >= 14) return 'Bien / Good';
+  if (average >= 12) return 'Assez Bien / Fairly good';
+  if (average >= 10) return 'Passable / Pass';
+  return 'Insuffisant / Insufficient';
 }
 
 /** Conduite /20: typed once a term and printed under the pupil's results. */
