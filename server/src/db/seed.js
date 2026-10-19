@@ -1,0 +1,109 @@
+import {
+  DEFAULT_ATTITUDES,
+  DEFAULT_CLASSES,
+  DEFAULT_COMPETENCES,
+  DEFAULT_CONTROL_SUBJECTS,
+  DEFAULT_DISCIPLINES,
+  DEFAULT_HOLIDAYS,
+  DEFAULT_PERFORMANCE_AREAS,
+  DEFAULT_SETTINGS,
+  DEFAULT_TERMS,
+} from './defaults.js';
+import { cycleForLevel } from '../lib/cycles.js';
+import { ensureClassSubjects } from '../services/college.js';
+import { ensureCurrentYear } from '../services/schoolYears.js';
+
+const isEmpty = (db, table) => db.prepare(`SELECT COUNT(*) AS n FROM ${table}`).get().n === 0;
+
+/**
+ * Fill reference tables with the workbook's defaults. Idempotent: only empty
+ * tables / missing settings are filled, so user changes are never overwritten.
+ */
+export function seedDefaults(db) {
+  db.transaction(() => {
+    const insertSetting = db.prepare('INSERT OR IGNORE INTO settings (key, value) VALUES (?, ?)');
+    for (const [key, value] of Object.entries(DEFAULT_SETTINGS)) insertSetting.run(key, value);
+
+    if (isEmpty(db, 'classes')) {
+      const stmt = db.prepare('INSERT INTO classes (name, code, sort_order) VALUES (?, ?, ?)');
+      DEFAULT_CLASSES.forEach(([name, code], i) => stmt.run(name, code, i + 1));
+    }
+
+    if (isEmpty(db, 'terms')) {
+      const stmt = db.prepare(
+        'INSERT INTO terms (number, name, start_date, end_date, ua_months) VALUES (?, ?, ?, ?, ?)',
+      );
+      for (const t of DEFAULT_TERMS) {
+        stmt.run(t.number, t.name, t.start_date, t.end_date, JSON.stringify(t.ua_months));
+      }
+    }
+
+    if (isEmpty(db, 'holidays')) {
+      // Source 'national': these are the official dates, and the national sync owns them
+      // (a holiday added by hand afterwards is kept when the year is re-applied).
+      const stmt = db.prepare('INSERT INTO holidays (date, name, source) VALUES (?, ?, ?)');
+      for (const [date, name] of DEFAULT_HOLIDAYS) stmt.run(date, name, name.includes('est.') ? 'manual' : 'national');
+    }
+
+    if (isEmpty(db, 'competences')) {
+      const stmt = db.prepare(
+        'INSERT INTO competences (number, title_fr, title_en, short_fr, short_en) VALUES (@number, @title_fr, @title_en, @short_fr, @short_en)',
+      );
+      for (const c of DEFAULT_COMPETENCES) stmt.run(c);
+    }
+
+    if (isEmpty(db, 'disciplines')) {
+      const stmt = db.prepare(
+        `INSERT INTO disciplines (code, competence, label, short_fr, short_en, max, criteria, on_monthly_card, sort_order)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      );
+      DEFAULT_DISCIPLINES.forEach((d, i) => stmt.run(...d, i + 1));
+    }
+
+    if (isEmpty(db, 'attitudes')) {
+      const stmt = db.prepare('INSERT INTO attitudes (code, label_fr, label_en, sort_order) VALUES (?, ?, ?, ?)');
+      DEFAULT_ATTITUDES.forEach((a, i) => stmt.run(...a, i + 1));
+    }
+
+    if (isEmpty(db, 'control_subjects')) {
+      const stmt = db.prepare(
+        'INSERT INTO control_subjects (code, label_fr, label_en, short_fr, short_en, max, competence, sort_order) VALUES (?, ?, ?, ?, ?, 20, ?, ?)',
+      );
+      DEFAULT_CONTROL_SUBJECTS.forEach(([code, labelFr, labelEn, shortFr, shortEn, competence], i) =>
+        stmt.run(code, labelFr, labelEn, shortFr, shortEn, competence, i + 1),
+      );
+    }
+
+    if (isEmpty(db, 'performance_areas')) {
+      const stmt = db.prepare(
+        'INSERT INTO performance_areas (code, label_fr, label_en, max, sort_order) VALUES (?, ?, ?, 10, ?)',
+      );
+      DEFAULT_PERFORMANCE_AREAS.forEach((a, i) => stmt.run(...a, i + 1));
+    }
+  })();
+
+  // The year the app runs on always has a row in school_years: the national calendar it
+  // synchronises to (and from which the next year is prepared).
+  ensureCurrentYear(db);
+
+  // Which cycle each class is evaluated in. Runs once per class: after it, `cycle` holds
+  // either what the level implies or what the school chose in Settings.
+  ensureCycles(db);
+}
+
+/**
+ * Place the classes that have not been looked at yet into a cycle, and give every college
+ * class its starting list of subjects.
+ */
+export function ensureCycles(db) {
+  const pending = db.prepare("SELECT id, code FROM classes WHERE cycle = ''").all();
+  if (!pending.length) return;
+  const setCycle = db.prepare('UPDATE classes SET cycle = ? WHERE id = ?');
+  db.transaction(() => {
+    for (const cls of pending) {
+      const cycle = cycleForLevel(cls.code);
+      setCycle.run(cycle, cls.id);
+      if (cycle === 'college') ensureClassSubjects(db, cls.id);
+    }
+  })();
+}

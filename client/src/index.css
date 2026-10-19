@@ -1,0 +1,149 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+
+  /*
+   * The school colours, taken from the school crest: the navy of the shield is --color-school-900
+   * (#002E52) and its sky-blue charges are --color-school-400 (#67BEED). Every screen, report and
+   * report card is built from this ramp, so a school that swaps the crest in Settings keeps a
+   * consistent palette (only these eleven values need to change).
+   */
+  --color-school-50: #eff7fd;
+  --color-school-100: #d8ecfa;
+  --color-school-200: #b0d9f3;
+  --color-school-300: #86c4eb;
+  --color-school-400: #67beed;
+  --color-school-500: #3a9bd8;
+  --color-school-600: #1f7cb8;
+  --color-school-700: #146094;
+  --color-school-800: #0a4a78;
+  --color-school-900: #002e52;
+  --color-school-950: #001b33;
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    @apply bg-slate-50 text-slate-900;
+  }
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+}
+
+/* Data-entry grids */
+.grid-input {
+  @apply h-8 w-full min-w-12 rounded-md border border-transparent bg-transparent px-1.5 text-center text-sm tabular-nums outline-none transition;
+}
+.grid-input:hover {
+  @apply border-slate-200 bg-white;
+}
+.grid-input:focus {
+  @apply border-emerald-600 bg-white ring-2 ring-emerald-600/20;
+}
+.grid-input[aria-invalid="true"] {
+  @apply border-red-400 bg-red-50 text-red-700;
+}
+
+.table-sticky th.sticky-col,
+.table-sticky td.sticky-col {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+}
+
+/* Report cards are designed for A4 */
+.report-card {
+  width: 210mm;
+  min-height: 297mm;
+  padding: 7mm 9mm;
+  background: white;
+  color: #0f172a;
+  font-size: 10px;
+  line-height: 1.25;
+}
+.report-card table {
+  border-collapse: collapse;
+  width: 100%;
+}
+.report-card th,
+.report-card td {
+  border: 1px solid #94a3b8;
+  padding: 1.5px 4px;
+}
+
+@page {
+  size: A4;
+  margin: 10mm;
+}
+
+@page card {
+  size: A4;
+  margin: 0;
+}
+
+@page landscape {
+  size: A4 landscape;
+  margin: 8mm;
+}
+
+@media print {
+  html,
+  body {
+    background: white !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+  main {
+    padding: 0 !important;
+  }
+  .lg\:pl-64 {
+    padding-left: 0 !important;
+  }
+  .print-landscape {
+    page: landscape;
+  }
+  .report-card {
+    page: card;
+    min-height: 0 !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+    break-after: page;
+    page-break-after: always;
+  }
+  .report-card:last-child {
+    break-after: auto;
+    page-break-after: auto;
+  }
+  .print-plain {
+    border: 0 !important;
+    box-shadow: none !important;
+  }
+  .print-table {
+    font-size: 9px;
+  }
+  .print-table th,
+  .print-table td {
+    padding: 1.5px 3px !important;
+    font-size: 9px !important;
+    line-height: 1.2 !important;
+  }
+  .print-table .rank-badge,
+  .print-table .cote-badge {
+    height: auto !important;
+    min-width: 0 !important;
+    padding: 0 4px !important;
+    font-size: 9px !important;
+    line-height: 1.4 !important;
+  }
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
