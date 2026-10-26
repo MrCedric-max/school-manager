@@ -392,10 +392,14 @@ def build_title_page(doc):
          space_before=8, space_after=2)
     para(doc, "", space_after=18)
     rule(doc)
+    lit = (f"{COUNTS['rhymes']} rhymes · {COUNTS['chants']} chants · {COUNTS['songs']} songs · "
+           f"{COUNTS['dialogues'] + COUNTS['dramas']} dialogues and dramas · "
+           f"{COUNTS['presentations']} presentations")
     para(doc, f"{COUNTS['themes']} themes · {COUNTS['units']} weeks · "
-              f"{COUNTS['words']} new words · {COUNTS['songs']} songs · "
-              f"{COUNTS['rhymes']} rhymes · {COUNTS['drama']} dramas and presentations",
-         size=10.5, italic=True, align=WD_ALIGN_PARAGRAPH.CENTER, space_before=8)
+              f"{COUNTS['words']} new words", size=10.5, italic=True,
+         align=WD_ALIGN_PARAGRAPH.CENTER, space_before=8, space_after=1)
+    para(doc, lit, size=10, italic=True, colour=GREY,
+         align=WD_ALIGN_PARAGRAPH.CENTER, space_after=1)
     para(doc, CONTENT["licence"], size=8.5, colour=LIGHT,
          align=WD_ALIGN_PARAGRAPH.CENTER, space_before=48)
     para(doc, CONTENT["provenance"]["scheme"], size=7.5, colour=LIGHT,

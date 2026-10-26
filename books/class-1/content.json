@@ -4896,12 +4896,16 @@
   "certificate": "This pupil can speak, read and write English in Class 1. Teacher: ______________  Date: ____________"
  },
  "counts": {
+  "rhymes": 3,
+  "chants": 9,
+  "songs": 4,
+  "dialogues": 5,
+  "dramas": 3,
+  "presentations": 8,
+  "other": 0,
   "themes": 8,
   "units": 32,
-  "words": 127,
-  "rhymes": 3,
-  "songs": 4,
-  "drama": 16
+  "words": 127
  },
  "licence": "Written for École Azobe (Cameroon). Free to photocopy for the school's pupils; not for sale.",
  "provenance": {

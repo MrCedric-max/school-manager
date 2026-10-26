@@ -143,6 +143,36 @@ def build_unit(w, theme):
     }
 
 
+def lit_bucket(kind):
+    """Classify a Literature and Drama step. Every week must land in exactly one bucket."""
+    k = kind.lower()
+    if "rhyme" in k:
+        return "rhymes"
+    if "song" in k:
+        return "songs"
+    if "chant" in k:
+        return "chants"
+    if "dialogue" in k:
+        return "dialogues"
+    if "drama" in k:
+        return "dramas"
+    if "performance" in k:
+        return "presentations"
+    return "other"
+
+
+def build_counts(themes, weeks, seen):
+    buckets = {"rhymes": 0, "chants": 0, "songs": 0, "dialogues": 0, "dramas": 0,
+               "presentations": 0, "other": 0}
+    for w in weeks:
+        buckets[lit_bucket(w["lit"]["k"])] += 1
+    total = sum(buckets.values())
+    if total != len(weeks) or buckets["other"]:
+        raise SystemExit(f"literature buckets do not add up: {buckets} (weeks {len(weeks)})")
+    buckets.update({"themes": len(themes), "units": len(weeks), "words": len(seen)})
+    return buckets
+
+
 def main():
     meta = load("meta.json")
     themes = load("themes.json")
@@ -194,15 +224,7 @@ def main():
             "usefulSentences": meta["usefulSentences"],
             "certificate": meta["certificate"],
         },
-        "counts": {
-            "themes": len(out_themes),
-            "units": len(weeks),
-            "words": len(seen),
-            "rhymes": sum(1 for u in weeks if "rhyme" in u["lit"]["k"].lower()),
-            "songs": sum(1 for u in weeks if "song" in u["lit"]["k"].lower()),
-            "drama": sum(1 for u in weeks if any(k in u["lit"]["k"].lower()
-                                                for k in ("drama", "dialogue", "performance"))),
-        },
+        "counts": build_counts(out_themes, weeks, seen),
         "licence": "Written for École Azobe (Cameroon). Free to photocopy for the school's pupils; not for sale.",
         "provenance": {
             "scheme": "Class 1 Integrated Scheme of Work, EFEDI Schools, Azobe-EFEDI, 2025/2026 "
@@ -216,8 +238,10 @@ def main():
     OUT.write_text(json.dumps(content, ensure_ascii=False, indent=1) + "\n")
     c = content["counts"]
     print(f"wrote {OUT}")
-    print(f"themes {c['themes']} · weeks {c['units']} · words {c['words']} · "
-          f"rhymes {c['rhymes']} · songs {c['songs']} · drama/presentation {c['drama']}")
+    print(f"themes {c['themes']} · weeks {c['units']} · words {c['words']}")
+    print(f"literature: {c['rhymes']} rhymes · {c['chants']} chants · {c['songs']} songs · "
+          f"{c['dialogues']} dialogues · {c['dramas']} dramas · "
+          f"{c['presentations']} presentations")
 
 
 if __name__ == "__main__":
