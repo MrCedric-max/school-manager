@@ -1,42 +1,38 @@
-# École Azobe — School Manager
+# Books Pro — English Learning & Curriculum
 
-A web school-manager for **ÉCOLE AZOBE (AZOBE – EFEDI), 2026/2027**, built from the
-school's Google Drive folder (84 documents). Open `index.html` in a browser, or serve
-the folder with any static server:
+A web app built **only** from the 8 books in the Google Drive folder **`books pro`**:
+
+| Book (in `books pro`) | Used as |
+|---|---|
+| `GnGozbEwKKuzJeFZwlP44jd4P7XPAoUUz9lMqJEX.pdf` — **TEST MASTER** (Atalay Oguz) | Quiz module: 16,161 questions (Grammar 9,246 · Vocabulary 5,859 · Miscellaneous 1,056), answer key pp. 403–431, playable Elementary Tests 1–2 transcribed |
+| `worksheets-grammar.pdf` | Worksheets module: all 60 worksheets catalogued by topic, with completion tracking |
+| `Class 2 Integrated Scheme of Work.pdf` | Schemes module (EFEDI, Level 1) |
+| `Class 3 Integrated Scheme of Work.pdf` | Schemes module (EFEDI) |
+| `Class 4 Integrated Scheme of Work.pdf` | Schemes module (EFEDI) |
+| `Class 5 Integrated Scheme of Work.pdf` | Schemes module (EFEDI) |
+| `Class 6 Integrated Scheme of Work.pdf` | Schemes module, incl. the full 8-theme / 32-week programme browsable in-app |
+| `digital-65ae24fecf49b7.61315711.pdf` | Listed as **unidentified** — Drive's reader could not extract it; open it in Drive to identify, then update `data/books-pro.json` |
+
+## Run it
+
+No build step, no dependencies — open `index.html`, or serve the folder:
 
 ```bash
-python3 -m http.server 8000   # then visit http://localhost:8000
+python3 -m http.server 8000   # http://localhost:8000
 ```
 
-## What it does
-
-| Module | Drive source it uses |
-|---|---|
-| **Dashboard** | `School_Manager` workbook — 244 pupils, 11 classes (SIL → 2nde), 180 school days; recorded CM1 data from `TRUE MANANGER` |
-| **Pupils & Classes** | Workbook *Registration* sheet: ID pattern (`CE2-13`), class sizes, statuses. Names are entered/imported locally — real pupil names are **not** stored in this repo |
-| **Roll Call** | *Roll_Call*: P / A / L / E marks, attendance % |
-| **Weekly Controls** | *Weekly_Controls*: English, Mathematics, French, Science & Technology /20 |
-| **Daily Performance** | *Daily_Performance*: 7 areas /10 (Assignments … Obedience) |
-| **Grades & Report Card** | Competence framework /280 (term) and /180 (monthly card), cotes A+ ≥90% · A ≥75% · ECA/B ≥50% · NA, overall = 70% academic + 30% daily performance, print-ready |
-| **Curriculum** | Class 6 English integrated scheme (8 themes × 32 weeks), Class 1–6 integrated schemes, Class 1 Citizenship, Class 6 Access Pack & Autism/EAL guide, Research Methodology library |
-| **Calendar 2026-27** | `Azobe Calendrier_scolaire_2026_2027` — terms and key dates |
-| **Document Library** | All **84 Drive files** catalogued, searchable, open-in-Drive; duplicates and private files flagged |
-| **TEST MASTER Quiz** | *TEST MASTER* book (16,161 questions: Grammar 9,246 · Vocabulary 5,859 · Miscellaneous 1,056) — structure + playable Elementary Tests 1–2 |
-| **Import & Data** | Import the Registration CSV, export/import app data (JSON), reset to the clean workbook roll |
-
-Data you enter is saved in the browser (localStorage) — export JSON regularly for backup.
+Worksheet ticks and quiz scores are saved in the browser (localStorage).
 
 ## Files
 
-- `index.html`, `assets/` — the app (no build step, no dependencies)
-- `data/catalog.json` — all 84 Drive documents (id, title, category, Drive link, how used)
-- `data/school.json` — school structure extracted from the workbooks
-- `docs/INVENTORY.md` — full inventory, workbook facts, duplicates and privacy notes
-- `scripts/build_data.py`, `scripts/make_school_json.py` — generators for the data files
+- `index.html`, `assets/` — the app (`assets/books-data.js` is generated, do not edit by hand)
+- `data/books-pro.json` — the 8-book catalogue (Drive ids, links, descriptions)
+- `scripts/build_books_data.py` — regenerates `assets/books-data.js` from the catalogue + transcribed contents (TEST MASTER structure/quizzes, Class 6 weeks, from the preserved copy in `azobe-school-manager/assets/school-data.js`)
+- `NEW-REPOSITORY.md` — how this moves to its own repository (**books-pro**)
+- `azobe-school-manager/` — the earlier École Azobe school-manager app (whole-Drive scope), preserved as requested; open `azobe-school-manager/index.html`
 
-## Notes
+## Note on scope
 
-- `School_Manager` (244 pupils) is treated as canonical; `TRUE MANANGER` (241) is the
-  earlier working copy with recorded CM1 results, shown on the Dashboard.
-- Personal files in the folder (`My Passport`, `Capiemp certificate`, `OLALHND`) are
-  catalogued as **PRIVATE** and are never used with pupils.
+The previous version of this project used the whole Drive (84 files). At the owner's
+request it was re-scoped to the `books pro` folder only (8 files). Nothing from the
+other folders (Research Methodology, Citizenship, workbooks, personal files) is used here.

@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>École Azobe — School Manager</title>
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="brand"><div class="brand-mark">A</div><div><strong>ÉCOLE AZOBE</strong><span>School Manager · 2026/2027</span></div></div>
+    <nav id="nav">
+      <button data-view="dashboard" class="active">🏠 Dashboard</button>
+      <button data-view="pupils">👥 Pupils &amp; Classes</button>
+      <button data-view="rollcall">✅ Roll Call</button>
+      <button data-view="controls">📝 Weekly Controls</button>
+      <button data-view="performance">⭐ Daily Performance</button>
+      <button data-view="grades">🎓 Grades &amp; Report Card</button>
+      <button data-view="curriculum">📚 Curriculum</button>
+      <button data-view="calendar">🗓️ Calendar 2026-27</button>
+      <button data-view="documents">🗂️ Document Library</button>
+      <button data-view="quiz">✍️ TEST MASTER Quiz</button>
+      <button data-view="data">💾 Import &amp; Data</button>
+    </nav>
+    <p class="side-note">Built from your Drive folder: School_Manager workbook, Azobe calendar, Class 1–6 schemes, Class 6 English, Class 1 Citizenship, Research Methodology &amp; TEST MASTER (84 files catalogued).</p>
+  </aside>
+  <main>
+    <header class="topbar"><h1 id="viewTitle">Dashboard</h1><div class="top-actions"><span id="saveState" class="muted"></span><button id="exportBtn" class="btn small">Export data (JSON)</button></div></header>
+    <section id="view"></section>
+  </main>
+</div>
+<script src="assets/data.js"></script>
+<script src="assets/school-data.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
