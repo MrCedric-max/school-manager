@@ -54,3 +54,30 @@ Scene notes worth keeping if you regenerate:
   Safe to delete, or keep as spares.
 - Nothing in the book shows a Cameroonian landscape outside the village/town setting; a
   designer may want a Mount Cameroon or a northern savannah scene for variety.
+
+## Theme art added for the 8-theme scheme (Oct 2026)
+
+| File | Used for | Notes |
+|---|---|---|
+| `print/theme-health.jpg` | Theme 6 opener, week 24 | tippy-tap handwashing, toothbrush, covered food, clean yard |
+| `print/theme-games.jpg` | Theme 7 opener, weeks 25 & 28 | football, skipping rope, clap game, bottle-cap board game |
+| `print/theme-communication.jpg` | Theme 8 opener, weeks 29 & 32 | mobile phone, radio, letter, talking drum, face-to-face talk |
+
+Prompts for these three:
+
+> Children's book illustration, flat vector style, Cameroonian setting. **[scene]**. Soft
+> rounded shapes, thick clean outlines, flat colour fills, no gradients. Wide horizontal
+> composition. No text, no letters, no numbers.
+
+Scenes: (a) two children washing hands at a tippy-tap with soap and towel, a third
+brushing teeth, covered plate and clean water nearby; (b) children on a swept schoolyard —
+football, skipping rope, clap game, board game with bottle caps, mango tree behind;
+(c) girl on a mobile phone, boy with a radio, mother writing a letter, father with a
+talking drum, two children talking with blank speech bubbles.
+
+## Removed with the 8-theme rewrite
+
+`unit-03-numbers`, `unit-04-colours` and `unit-08-animals` no longer match any week of the
+scheme (the scheme has no numbers/colours/animals theme for Class 1) and were deleted from
+`print/`. Their prompts are still in git history if the school wants a numbers or colours
+supplement.

@@ -1,93 +1,130 @@
 #!/usr/bin/env python3
-"""Validate books/class-1/content.json before building the book.
+"""Validate the Class 1 book content against the Integrated Scheme of Work.
 
+    python3 scripts/expand_class1_content.py      # first, to build content.json
     python3 scripts/validate_class1_content.py
 
-Checks the structure the builder depends on, that every illustration exists,
-and reports word/song/story counts.
+Checks
+  * the hand-written scheme files parse and cover weeks 1..32 exactly once
+  * each week has the scheme's four fields: core competency, grammar focus,
+    phonics focus and mini-project component
+  * each week has the seven CBA steps the book prints
+  * every illustration the book will reference exists in illustrations/print
+  * the generated content.json agrees with its own counts
 """
 import json
 import pathlib
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[1] / "books" / "class-1"
-CONTENT = json.loads((ROOT / "content.json").read_text())
+SRC = ROOT / "content"
 ART = ROOT / "illustrations" / "print"
 
-errors = []
-warnings = []
-words_seen = {}
+errors, warnings = [], []
 
-meta = CONTENT["meta"]
-for key in ("title", "subtitle", "level", "edition", "school", "insideCover", "howToUse"):
-    if key not in meta:
-        errors.append(f"meta.{key} missing")
 
-units = [u for th in CONTENT["themes"] for u in th["units"]]
-if meta.get("units") != len(units):
-    errors.append(f"meta.units={meta.get('units')} but {len(units)} units present")
-if meta.get("themes") != len(CONTENT["themes"]):
-    errors.append(f"meta.themes={meta.get('themes')} but {len(CONTENT['themes'])} themes present")
+def load(p):
+    try:
+        return json.loads(p.read_text())
+    except Exception as e:  # noqa: BLE001
+        errors.append(f"{p.name}: {e}")
+        return None
 
-nums = [u["n"] for u in units]
-if nums != list(range(1, len(units) + 1)):
-    errors.append(f"unit numbers are not 1..{len(units)}: {nums}")
 
-required = ("title", "week", "competence", "image", "caption", "words", "listen",
-            "talk", "practice", "challenge", "song", "story", "check", "homework")
-for th in CONTENT["themes"]:
-    img = ART / th["image"]
-    if not img.exists():
-        errors.append(f"theme {th['n']} image missing: {th['image']}")
-    for u in th["units"]:
-        for key in required:
-            if key not in u:
-                errors.append(f"unit {u.get('n')} missing '{key}'")
-        if not (ART / u["image"]).exists():
-            errors.append(f"unit {u['n']} image missing: {u['image']}")
-        if len(u["practice"]) < 4:
-            warnings.append(f"unit {u['n']} has only {len(u['practice'])} exercises")
-        for ex in u["practice"]:
-            kind = ex["type"]
-            need = {"match": ("left", "right"), "gaps": ("lines",), "trace": ("items",),
-                    "tick": ("options", "rows"), "draw": (), "order": ("lines",),
-                    "gap-sentence": ("lines",)}.get(kind)
-            if need is None:
-                errors.append(f"unit {u['n']} exercise {ex.get('id')}: unknown type {kind}")
-                continue
-            for k in need:
-                if k not in ex:
-                    errors.append(f"unit {u['n']} exercise {ex['id']}: needs '{k}'")
-            if kind == "match" and len(ex.get("left", [])) != len(ex.get("right", [])):
-                errors.append(f"unit {u['n']} exercise {ex['id']}: match columns differ in length")
-        if len(u["song"]["lines"]) < 2:
-            warnings.append(f"unit {u['n']}: song has fewer than 2 lines")
-        if len(u["story"]["lines"]) < 4:
-            warnings.append(f"unit {u['n']}: story is short ({len(u['story']['lines'])} lines)")
-        if not u["story"].get("say"):
-            errors.append(f"unit {u['n']}: story has no 'say' line")
-        for w in u["words"]:
-            if not w.get("en") or not w.get("fr"):
-                errors.append(f"unit {u['n']}: incomplete word entry {w}")
-            words_seen.setdefault(w["en"].lower(), []).append(u["n"])
+themes = load(SRC / "themes.json")
+weeks = (load(SRC / "weeks-01-20.json") or []) + (load(SRC / "weeks-21-32.json") or [])
+meta = load(SRC / "meta.json")
+content = load(ROOT / "content.json")
 
-# the builder adds an automatic A–Z index, so full coverage is guaranteed;
-# what matters is that curated topic groups do not invent words
-dict_words = {w.lower() for g in CONTENT["appendix"]["pictureDictionary"] for w in g["words"]}
-invented = sorted(dict_words - set(words_seen))
-if invented:
-    warnings.append(f"picture dictionary has words never taught: {invented}")
+if themes is not None:
+    if len(themes) != 8:
+        errors.append(f"expected 8 themes, found {len(themes)}")
+    nums = [t["n"] for t in themes]
+    if nums != list(range(1, 9)):
+        errors.append(f"theme numbers: {nums}")
+    for t in themes:
+        for key in ("title", "weeks", "image", "blurb", "objectives",
+                    "project", "projectSteps"):
+            if key not in t:
+                errors.append(f"theme {t.get('n')}: missing '{key}'")
+        if not (ART / t["image"]).exists():
+            errors.append(f"theme {t['n']}: image missing {t['image']}")
+        if len(t["projectSteps"]) < 3:
+            warnings.append(f"theme {t['n']}: only {len(t['projectSteps'])} project steps")
 
-print(f"themes: {len(CONTENT['themes'])}   units: {len(units)}")
-print(f"word entries: {sum(len(u['words']) for u in units)}   unique: {len(words_seen)}")
-print(f"picture-dictionary words: {len(dict_words)}")
-print(f"songs: {len(units)}   stories: {len(units)}   exercises: "
-      f"{sum(len(u['practice']) for u in units)}")
-dupes = {w: n for w, n in words_seen.items() if len(n) > 1}
-print(f"words taught twice: {len(dupes)}")
+if weeks:
+    weeks.sort(key=lambda w: w["n"])
+    got = [w["n"] for w in weeks]
+    if got != list(range(1, 33)):
+        errors.append(f"weeks are not 1..32: {got}")
+    for w in weeks:
+        for key in ("title", "comp", "gram", "phon", "mini", "sit", "listen",
+                    "read", "write", "words", "lit", "integ", "rubric"):
+            if key not in w:
+                errors.append(f"week {w['n']}: missing '{key}'")
+        for field, sub in (("gram", ("focus", "box", "examples")),
+                           ("phon", ("focus", "words")),
+                           ("sit", ("t", "q")),
+                           ("listen", ("t", "l")),
+                           ("read", ("t", "i", "task")),
+                           ("lit", ("k", "t", "l"))):
+            block = w.get(field) or {}
+            for s in sub:
+                if s not in block or not block[s]:
+                    errors.append(f"week {w['n']}: {field}.{s} is empty")
+        if not 4 <= len(w["words"]) <= 7:
+            warnings.append(f"week {w['n']}: {len(w['words'])} words")
+        if len(w["rubric"]) != 3:
+            warnings.append(f"week {w['n']}: {len(w['rubric'])} rubric criteria (3 expected)")
+        if len(w["listen"]["l"]) < 3:
+            warnings.append(f"week {w['n']}: only {len(w['listen']['l'])} listening lines")
+        if len(w["sit"]["q"]) < 2:
+            warnings.append(f"week {w['n']}: fewer than 2 situation questions")
+        img = w.get("image")
+        if img and not (ART / img).exists():
+            errors.append(f"week {w['n']}: image missing {img}")
+        for a, b in w["words"]:
+            if not a.strip() or not b.strip():
+                errors.append(f"week {w['n']}: incomplete word pair {a!r}/{b!r}")
 
+if meta is not None:
+    for key in ("title", "subtitle", "level", "edition", "school", "insideCover",
+                "howToUse", "cba", "stripGuide", "usefulSentences", "certificate"):
+        if key not in meta:
+            errors.append(f"meta: missing '{key}'")
+
+if content is not None:
+    c = content["counts"]
+    units = [u for t in content["themes"] for u in t["units"]]
+    words = {w["en"].lower() for u in units for w in u["language"]["words"]}
+    if c["units"] != 32 or len(units) != 32:
+        errors.append(f"content.json has {len(units)} units (counts say {c['units']})")
+    if c["themes"] != len(content["themes"]):
+        errors.append("content.json theme count mismatch")
+    if c["words"] != len(words):
+        errors.append(f"content.json word count {c['words']} != actual {len(words)}")
+    for u in units:
+        if len(u["rubric"]["criteria"]) != 3:
+            errors.append(f"unit {u['n']}: rubric needs 3 criteria")
+        if u["rubric"]["levels"] != ["Not yet", "Getting there", "Yes, I can"]:
+            errors.append(f"unit {u['n']}: unexpected rubric levels")
+    for t in content["themes"]:
+        if len(t["units"]) != 4:
+            errors.append(f"theme {t['n']}: {len(t['units'])} units (4 expected)")
+
+print(f"themes: {len(themes or [])}   weeks: {len(weeks)}")
+if weeks:
+    print(f"grammar foci: {len({w['gram']['focus'] for w in weeks})} distinct")
+    print(f"phonics foci: {len({w['phon']['focus'] for w in weeks})} distinct")
+    print(f"mini-project steps: {sum(1 for w in weeks if w['mini'])}/32")
+    print(f"rhymes/songs/drama: " + ", ".join(
+        f"{k}: {sum(1 for w in weeks if k in w['lit']['k'].lower())}"
+        for k in ("rhyme", "song", "drama", "dialogue", "performance")))
+if content is not None:
+    print("content.json:", content["counts"])
 for w in warnings:
     print("WARN:", w)
 for e in errors:
     print("ERROR:", e)
+print("\nRESULT:", "FAIL" if errors else "OK")
 sys.exit(1 if errors else 0)

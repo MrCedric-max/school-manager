@@ -1,0 +1,78 @@
+{
+  "title": "My English Book",
+  "subtitle": "Pupil's Book · Class 1",
+  "level": "Class 1 (Primary One) · ages 5–6 · Level I",
+  "edition": "First edition · 2025/2026",
+  "school": "EFEDI Schools · Azobe-EFEDI",
+  "country": "Cameroon",
+  "authors": "Written for the Class 1 Integrated Scheme of Work (EFEDI Schools, 2025/2026)",
+  "insideCover": [
+    "This book belongs to: ______________________________",
+    "Class: ____________________   School: ____________________________",
+    "My teacher: ______________________________",
+    "",
+    "Write your name on this page. Draw a sun and colour it yellow.",
+    "If you find this book, please return it to the school."
+  ],
+  "howToUse": [
+    "Every week is one unit. One unit takes five short lessons of 30 minutes.",
+    "Each unit follows the same seven steps, so you learn the routine once: Let's start · Listen and say · Read · Write · New words and grammar · Phonics · Rhyme, song or drama.",
+    "In the middle of the unit you find \"I integrate\" — a small real-life task where you use everything you have learned that week.",
+    "At the end of the unit there is a mini project. Step by step, the mini projects build the theme strip you present in week 4 of each theme.",
+    "The last box of every unit is \"Check yourself\". Nobody marks it for you: you decide if you can do it, then colour the star.",
+    "Do not write in the book if the school re-uses copies — say the answers aloud or use an exercise book."
+  ],
+  "cba": {
+    "title": "How this book works — learning by doing",
+    "intro": "This book follows the Competency-Based Approach (CBA) of the Cameroon primary curriculum and the seven domains of your Class 1 Integrated Scheme of Work. A competence is not only what you know: it is what you can do, in a real situation, with what you know.",
+    "blocks": [
+      {
+        "title": "1. We start from a real situation",
+        "text": "Every week opens with \"Let's start\": a small scene from home, the market, the road, the classroom or the playground. You talk about it before you read or write anything. English must be useful from the first minute."
+      },
+      {
+        "title": "2. Seven domains, one week",
+        "text": "Your scheme gives seven domains: Listening and Speaking, Reading, Writing, Grammar/Vocabulary/Pronunciation, Phonics, Literature and Drama, and the Culminating Project. Each week in this book has one step for each of them, in that order."
+      },
+      {
+        "title": "3. I integrate",
+        "text": "In the middle of each unit, a task asks you to use the week's words, sounds and sentences together — for example, give directions to a visitor, or ask politely to borrow a broom. This is the heart of the CBA."
+      },
+      {
+        "title": "4. The mini project builds the strip",
+        "text": "Each week you add one small thing to a strip: a drawing, a label, a sentence, a polite phrase. After four weeks the strip is complete and you present it — My Home Snapshot Strip, My Village/Town Strip, My School Day Strip, What People Do Strip, How We Travel Strip, Staying Clean Strip, My Game Strip, How We Communicate Strip."
+      },
+      {
+        "title": "5. You check yourself",
+        "text": "Every unit ends with three criteria and three levels: Not yet, Getting there, Yes, I can. Your teacher uses the same criteria. Nobody has to fail: you practise until you can say \"Yes, I can\"."
+      }
+    ]
+  },
+  "stripGuide": {
+    "title": "My strip: what I need",
+    "intro": "A strip is a long piece of paper or card folded into four parts — one part for each week of the theme. Keep it in your folder. You will present it in the last week of the theme.",
+    "materials": ["A strip of paper or card, folded in four", "Crayons or coloured pencils", "Your exercise book for writing labels", "Glue or tape for pictures"],
+    "rules": [
+      "Draw big and clear. Colour inside the lines.",
+      "Write the label under the drawing, in English.",
+      "One part of the strip = one week. Do not jump ahead.",
+      "Keep your spelling neat: copy the words from the book.",
+      "Present your strip standing up, looking at your friends, with a loud clear voice."
+    ]
+  },
+  "usefulSentences": [
+    ["Good morning, teacher.", "Bonjour, maîtresse / maître."],
+    ["May I come in, please?", "Puis-je entrer, s'il vous plaît ?"],
+    ["May I go out, please?", "Puis-je sortir, s'il vous plaît ?"],
+    ["May I borrow your pencil, please?", "Puis-je emprunter ton crayon ?"],
+    ["I am sorry, Madam.", "Je suis désolé(e), Madame."],
+    ["Thank you very much.", "Merci beaucoup."],
+    ["What is this? — It is a ______.", "Qu'est-ce que c'est ? — C'est un(e) ______."],
+    ["Where is the ______? — It is near the ______.", "Où est le ______ ? — Il est près de ______."],
+    ["What is your name? — My name is ______.", "Comment t'appelles-tu ? — Je m'appelle ______."],
+    ["Can I play with you?", "Puis-je jouer avec vous ?"],
+    ["Water, please.", "De l'eau, s'il vous plaît."],
+    ["I can do it!", "Je peux le faire !"]
+  ],
+  "certificate": "This pupil can speak, read and write English in Class 1. Teacher: ______________  Date: ____________"
+}

@@ -34,21 +34,27 @@ Worksheet ticks and quiz scores are saved in the browser (localStorage).
 
 ## Class 1 Pupil's Book
 
-`books/class-1/` holds a book written for this school: **My English Book — Pupil's Book,
-Class 1** (A4, print-ready DOCX). The Drive `books pro` folder only has EFEDI schemes from
-Class 2 up, so this one is original material, set in Cameroon and following the Class 2
-scheme's shape.
+`books/class-1/` holds **My English Book — Pupil's Book, Class 1** (A4, print-ready DOCX),
+built on the **Class 1 Integrated Scheme of Work** (EFEDI Schools, 2025/2026) that lives in
+the Drive `books pro` folder: 8 themes, 32 weeks, the scheme's per-week competencies,
+grammar and phonics foci, mini-project steps, and its eight culminating "strip" projects.
 
-- `books/class-1/My-English-Book-Class-1-Pupils-Book.docx` — the book (3 themes, 12 units,
-  117 words, 12 songs, 12 stories, picture dictionary, progress record, certificate)
-- `books/class-1/content.json` — all the text, editable
-- `books/class-1/illustrations/` — print-resolution art + the prompts used to make it
-- `books/class-1/README.md` — what is inside, how to rebuild, known gaps
-- `scripts/build_class1_docx.py`, `scripts/validate_class1_content.py`
+Each week is shaped by the Competency-Based Approach (APC-ESV): entry situation → the
+scheme's seven domains → an integration task → mini project → criterion-referenced
+self-assessment (Not yet / Getting there / Yes, I can). See `books/class-1/source/CBA-NOTES.md`
+for the sources behind those choices.
+
+- `books/class-1/My-English-Book-Class-1-Pupils-Book.docx` — the book
+- `books/class-1/content/` — hand-written scheme data (themes, 32 weeks, front matter)
+- `books/class-1/content.json` — generated, read by the builder
+- `books/class-1/source/` — text extract + parsed digests of the scheme (audit trail)
+- `books/class-1/illustrations/` — print art + prompts
+- `scripts/expand_class1_content.py`, `scripts/validate_class1_content.py`, `scripts/build_class1_docx.py`
 
 ```bash
 pip install python-docx
-python3 scripts/validate_class1_content.py && python3 scripts/build_class1_docx.py
+python3 scripts/expand_class1_content.py && python3 scripts/validate_class1_content.py \
+  && python3 scripts/build_class1_docx.py
 ```
 
 ## Note on scope
