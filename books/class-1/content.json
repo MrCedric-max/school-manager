@@ -1,0 +1,2156 @@
+{
+  "meta": {
+    "title": "My English Book",
+    "subtitle": "Pupil's Book · Class 1",
+    "level": "Class 1 (Primary One) · ages 5–6",
+    "edition": "First edition · 2026/2027",
+    "school": "École Azobe / EFEDI Schools",
+    "country": "Cameroon",
+    "authors": "Prepared for École Azobe",
+    "themes": 3,
+    "units": 12,
+    "insideCover": [
+      "This book belongs to: ______________________________",
+      "Class: ____________________   School: ____________________________",
+      "My teacher: ______________________________",
+      "",
+      "Write your name on this page. Draw a sun and colour it yellow.",
+      "If you find this book, please return it to the school."
+    ],
+    "howToUse": [
+      "One unit takes about two weeks: two or three short lessons of 30 minutes.",
+      "Each unit has the same steps: Listen and say · New words · Talk with a friend · Say it together · Do it · Check yourself.",
+      "Do not write in the book if the school re-uses copies — say the answers aloud, or use an exercise book.",
+      "The teacher's notes for every unit are in the Class 1 Teacher's Guide (same theme order).",
+      "Read the story at the end of each unit aloud. Pupils join in with the repeated line."
+    ],
+    "songLines": [
+      "Good morning, good morning,",
+      "How are you today?",
+      "I am fine, I am fine,",
+      "Thank you very much!",
+      "Good afternoon, good afternoon,",
+      "How are you today?",
+      "I am fine, I am fine,",
+      "Hooray, hooray, hooray!"
+    ],
+    "summaries": []
+  },
+  "themes": [
+    {
+      "n": 1,
+      "title": "Hello, My Family",
+      "weeks": "Weeks 1–4",
+      "image": "theme-home.jpg",
+      "blurb": "At home with Mother, Father, Grandmother and the baby. We greet people, say our name, talk about our family, count to five and learn nine colours.",
+      "units": [
+        {
+          "n": 1,
+          "title": "Hello! Good Morning",
+          "week": "Week 1",
+          "competence": "To greet people at home and at school, to say my name and to ask someone else's name.",
+          "image": "unit-01-hello.jpg",
+          "caption": "Bih and Ngo greet their teacher at the school gate.",
+          "words": [
+            {
+              "en": "hello",
+              "fr": "bonjour"
+            },
+            {
+              "en": "good morning",
+              "fr": "bonjour (le matin)"
+            },
+            {
+              "en": "good afternoon",
+              "fr": "bon après-midi"
+            },
+            {
+              "en": "goodbye",
+              "fr": "au revoir"
+            },
+            {
+              "en": "name",
+              "fr": "le nom"
+            },
+            {
+              "en": "my",
+              "fr": "mon / ma"
+            },
+            {
+              "en": "your",
+              "fr": "ton / ta"
+            },
+            {
+              "en": "teacher",
+              "fr": "l'enseignant(e)"
+            }
+          ],
+          "listen": {
+            "instructions": "Listen to your teacher. Then say the words with your teacher.",
+            "lines": [
+              "Teacher: Good morning, children.",
+              "Pupils: Good morning, teacher.",
+              "Teacher: Good morning, Bih. How are you?",
+              "Bih: I am fine, thank you.",
+              "Teacher: Good morning, Ngo.",
+              "Ngo: Good morning, teacher. I am fine."
+            ]
+          },
+          "talk": {
+            "instructions": "Stand in a circle. Greet the child on your right. Say your name. Then listen to your friend's name.",
+            "questions": [
+              "What is your name?",
+              "My name is ______.",
+              "Good morning, ______. How are you?",
+              "I am fine, thank you."
+            ]
+          },
+          "practice": [
+            {
+              "id": "1A",
+              "instructions": "Match. Draw a line from the English word to the French word.",
+              "type": "match",
+              "left": [
+                "hello",
+                "goodbye",
+                "good morning"
+              ],
+              "right": [
+                "au revoir",
+                "bonjour",
+                "bonjour (le matin)"
+              ]
+            },
+            {
+              "id": "1B",
+              "instructions": "Trace the words. Start at the dot. Say the word as you trace it.",
+              "type": "trace",
+              "items": [
+                "hello",
+                "good morning",
+                "Goodbye"
+              ]
+            },
+            {
+              "id": "1C",
+              "instructions": "Complete the conversation with your teacher. Fill in the gaps.",
+              "type": "gaps",
+              "lines": [
+                "A: Good _____, Aisha.",
+                "B: Good _____, Bih. How are _____?",
+                "A: I am _____, thank you."
+              ],
+              "wordbank": [
+                "morning",
+                "morning",
+                "you",
+                "fine"
+              ]
+            },
+            {
+              "id": "1D",
+              "instructions": "Say the right greeting. Your teacher will say the time of day.",
+              "type": "tick",
+              "options": [
+                "Good morning",
+                "Good afternoon",
+                "Goodbye"
+              ],
+              "rows": [
+                "At 7 o'clock, going to school",
+                "At 2 o'clock after lunch",
+                "Leaving school at 4 o'clock"
+              ]
+            }
+          ],
+          "challenge": "Work with a friend. One of you is the teacher, the other is a new pupil. Greet and say your names. Then swap.",
+          "song": {
+            "title": "Song: Good Morning",
+            "lines": [
+              "Good morning, good morning,",
+              "How are you today?",
+              "I am fine, I am fine,",
+              "Thank you very much!"
+            ]
+          },
+          "story": {
+            "title": "Story: The New Girl",
+            "lines": [
+              "It is the first day of school. Ngo is new.",
+              "She stands at the gate. She feels shy.",
+              "A girl comes to her. \"Hello! Can I play with you?\" asks Bih.",
+              "\"Yes!\" says Ngo.",
+              "Ngo says, \"Good morning. My name is Ngo.\"",
+              "Bih says, \"Good morning, Ngo. My name is Bih.\"",
+              "Now they are two good friends.",
+              "They walk to the classroom together."
+            ],
+            "say": "Good morning. My name is ______."
+          },
+          "check": [
+            "I can greet somebody in the morning.",
+            "I can say my name.",
+            "I can ask a friend's name.",
+            "I know these words in English: hello, goodbye, name."
+          ],
+          "homework": "Greet three people at home in English this evening. Say: \"Good evening!\" Ask them their name in English."
+        },
+        {
+          "n": 2,
+          "title": "My Family",
+          "week": "Week 2",
+          "competence": "To name the people in my family and to say who I live with.",
+          "image": "unit-02-family.jpg",
+          "caption": "This is my family. We live together in our home.",
+          "words": [
+            {
+              "en": "mother",
+              "fr": "la mère"
+            },
+            {
+              "en": "father",
+              "fr": "le père"
+            },
+            {
+              "en": "grandmother",
+              "fr": "la grand-mère"
+            },
+            {
+              "en": "grandfather",
+              "fr": "le grand-père"
+            },
+            {
+              "en": "brother",
+              "fr": "le frère"
+            },
+            {
+              "en": "sister",
+              "fr": "la sœur"
+            },
+            {
+              "en": "baby",
+              "fr": "le bébé"
+            },
+            {
+              "en": "family",
+              "fr": "la famille"
+            }
+          ],
+          "listen": {
+            "instructions": "Listen to the teacher. Then repeat each line. Show the person on the picture.",
+            "lines": [
+              "This is my family. We live in our home.",
+              "This is my mother. She cooks every day.",
+              "This is my father. He works in the field.",
+              "This is my grandmother. She tells us stories.",
+              "This is my baby sister. She sleeps in the afternoon.",
+              "My family loves me. I love my family."
+            ]
+          },
+          "talk": {
+            "instructions": "Show your family to your friend. Say who they are. Ask your friend about their family.",
+            "questions": [
+              "Who is this?",
+              "This is my ______.",
+              "Who do you live with?",
+              "I live with my ______."
+            ]
+          },
+          "practice": [
+            {
+              "id": "2A",
+              "instructions": "Look at the picture of the family. Say the words. Write the missing letter in each word.",
+              "type": "gaps",
+              "lines": [
+                "m_th_r",
+                "f_th_r",
+                "gr_ndmoth_r",
+                "b_by",
+                "br_th_r",
+                "s_st_r"
+              ],
+              "wordbank": [
+                "mother",
+                "father",
+                "grandmother",
+                "baby",
+                "brother",
+                "sister"
+              ]
+            },
+            {
+              "id": "2B",
+              "instructions": "Circle the right word.",
+              "type": "gap-sentence",
+              "lines": [
+                "My ______ cooks the food. (mother / father)",
+                "My ______ tells us stories before bed. (grandmother / baby)",
+                "My ______ is very small. He cannot walk. (baby / grandfather)"
+              ]
+            },
+            {
+              "id": "2C",
+              "instructions": "Talk. Sit with a friend. Look at the picture. Tick what you can see.",
+              "type": "tick",
+              "options": [
+                "see",
+                "not see"
+              ],
+              "rows": [
+                "a mother",
+                "a baby",
+                "a father with a broom",
+                "a bicycle",
+                "a hen with chicks"
+              ]
+            },
+            {
+              "id": "2D",
+              "instructions": "Draw your family in the box with your crayon. Then say: \"This is my ______.\"",
+              "type": "draw",
+              "caption": "My family"
+            }
+          ],
+          "challenge": "Play \"Who is it?\". One pupil says: \"My father's mother.\" The others answer: \"Grandmother!\"",
+          "song": {
+            "title": "Song: Finger Family",
+            "lines": [
+              "Mother finger, mother finger, where are you?",
+              "Here I am, here I am, how do you do?",
+              "Father finger, father finger, where are you?",
+              "Here I am, here I am, how do you do?"
+            ]
+          },
+          "story": {
+            "title": "Story: The Pot of Beans",
+            "lines": [
+              "Mother cooks beans. The pot smells sweet.",
+              "Baby cries. \"Ay, ay, ay!\"",
+              "Grandmother carries the baby. She sings to the baby.",
+              "Father brings water from the tap.",
+              "Bih sets the plates. Ngo brings the spoons.",
+              "Everyone sits on the mat. The family eats together.",
+              "Mother says: \"Thank you, my children. We eat together.\"",
+              "The beans are sweet. The family is happy."
+            ],
+            "say": "This is my family. We eat together."
+          },
+          "check": [
+            "I can name six people in my family.",
+            "I can say who I live with.",
+            "I can ask \"Who is this?\"",
+            "I listen to my friend when they speak."
+          ],
+          "homework": "Ask your mother or grandmother the names of your family in English. Draw one person from your family in your exercise book and label it."
+        },
+        {
+          "n": 3,
+          "title": "One, Two, Three — Count!",
+          "week": "Week 3",
+          "competence": "To count from 1 to 10 and to say how many things are in a group.",
+          "image": "unit-03-numbers.jpg",
+          "caption": "Count the things. How many?",
+          "words": [
+            {
+              "en": "one",
+              "fr": "un"
+            },
+            {
+              "en": "two",
+              "fr": "deux"
+            },
+            {
+              "en": "three",
+              "fr": "trois"
+            },
+            {
+              "en": "four",
+              "fr": "quatre"
+            },
+            {
+              "en": "five",
+              "fr": "cinq"
+            },
+            {
+              "en": "six",
+              "fr": "six"
+            },
+            {
+              "en": "seven",
+              "fr": "sept"
+            },
+            {
+              "en": "eight",
+              "fr": "huit"
+            },
+            {
+              "en": "nine",
+              "fr": "neuf"
+            },
+            {
+              "en": "ten",
+              "fr": "dix"
+            },
+            {
+              "en": "banana",
+              "fr": "la banane"
+            },
+            {
+              "en": "ball",
+              "fr": "le ballon"
+            },
+            {
+              "en": "basket",
+              "fr": "le panier"
+            }
+          ],
+          "listen": {
+            "instructions": "Listen and point. Say the number after your teacher.",
+            "lines": [
+              "one ball",
+              "two bananas",
+              "three mangoes",
+              "four chickens",
+              "five paw-paws",
+              "six books",
+              "seven stones",
+              "eight leaves",
+              "nine spoons",
+              "ten fingers"
+            ]
+          },
+          "talk": {
+            "instructions": "Pick up some stones. Put them on the table. Your friend counts them in English.",
+            "questions": [
+              "How many?",
+              "One, two, three…",
+              "How many fingers do you have?",
+              "I have ten fingers."
+            ]
+          },
+          "practice": [
+            {
+              "id": "3A",
+              "instructions": "Count and write the number word. Use the word bank.",
+              "type": "gaps",
+              "lines": [
+                "● = ______",
+                "● ● = ______",
+                "● ● ● = ______",
+                "● ● ● ● = ______",
+                "● ● ● ● ● = ______"
+              ],
+              "wordbank": [
+                "one",
+                "two",
+                "three",
+                "four",
+                "five"
+              ]
+            },
+            {
+              "id": "3B",
+              "instructions": "Count the picture. Circle the right number.",
+              "type": "gap-sentence",
+              "lines": [
+                "In the picture there are ______ chickens. (four / six)",
+                "There are ______ mangoes. (three / five)",
+                "There are ______ paw-paws. (two / five)"
+              ]
+            },
+            {
+              "id": "3C",
+              "instructions": "Trace the numbers. Say them in English.",
+              "type": "trace",
+              "items": [
+                "1 one",
+                "2 two",
+                "3 three",
+                "4 four",
+                "5 five"
+              ]
+            },
+            {
+              "id": "3D",
+              "instructions": "Join the number to the right group of dots.",
+              "type": "match",
+              "left": [
+                "two",
+                "four",
+                "five"
+              ],
+              "right": [
+                "● ● ● ●",
+                "● ●",
+                "● ● ● ● ●"
+              ]
+            }
+          ],
+          "challenge": "Count the number of chairs, doors and windows in your classroom. Say: \"There are three windows.\"",
+          "song": {
+            "title": "Song: Ten Little Fingers",
+            "lines": [
+              "One little, two little, three little fingers,",
+              "Four little, five little, six little fingers,",
+              "Seven little, eight little, nine little fingers,",
+              "Ten little fingers on my hands!"
+            ]
+          },
+          "story": {
+            "title": "Story: The Market Basket",
+            "lines": [
+              "Mother gives Bih a basket. \"Go to the market, please.\"",
+              "Bih buys one paw-paw. \"One paw-paw, please.\"",
+              "Bih buys two bananas. \"Two bananas, please.\"",
+              "Bih buys three mangoes. \"Three mangoes, please.\"",
+              "Bih buys four tomatoes. \"Four tomatoes, please.\"",
+              "Bih buys five fish. \"Five fish, please.\"",
+              "Ngo counts in the basket: \"One, two, three, four, five!\"",
+              "Mother smiles. \"Very good, Bih. You can count!\""
+            ],
+            "say": "One paw-paw, two bananas, three mangoes…"
+          },
+          "check": [
+            "I can count from 1 to 10 in English.",
+            "I can say \"How many?\"",
+            "I can count things in the classroom.",
+            "I can write the numbers 1 to 5."
+          ],
+          "homework": "Count ten things at home in English: plates, cups, chairs, stones. Say: \"There are four plates.\""
+        },
+        {
+          "n": 4,
+          "title": "Colours All Around",
+          "week": "Week 4",
+          "competence": "To name nine colours and to say the colour of an object.",
+          "image": "unit-04-colours.jpg",
+          "caption": "Red, orange, yellow, green, blue, purple, brown, black and white.",
+          "words": [
+            {
+              "en": "red",
+              "fr": "rouge"
+            },
+            {
+              "en": "orange",
+              "fr": "orange"
+            },
+            {
+              "en": "yellow",
+              "fr": "jaune"
+            },
+            {
+              "en": "green",
+              "fr": "vert"
+            },
+            {
+              "en": "blue",
+              "fr": "bleu"
+            },
+            {
+              "en": "purple",
+              "fr": "violet"
+            },
+            {
+              "en": "brown",
+              "fr": "marron"
+            },
+            {
+              "en": "black",
+              "fr": "noir"
+            },
+            {
+              "en": "white",
+              "fr": "blanc"
+            }
+          ],
+          "listen": {
+            "instructions": "Listen and find. Your teacher says a colour. Point to something in the room that colour.",
+            "lines": [
+              "This is red. Like a football.",
+              "This is green. Like a leaf of the plantain.",
+              "This is yellow. Like a paw-paw.",
+              "This is orange. Like an orange.",
+              "This is brown. Like the earth in the road.",
+              "This is blue. Like the sky at midday.",
+              "Red, yellow and green are our flag colours in Cameroon.",
+              "The star on our flag is yellow.",
+              "Black and white. Like the shirts of school."
+            ]
+          },
+          "talk": {
+            "instructions": "Look at your clothes. Tell your friend the colour. Ask about their clothes.",
+            "questions": [
+              "What colour is it?",
+              "It is ______.",
+              "What colour is your shirt?",
+              "My shirt is ______."
+            ]
+          },
+          "practice": [
+            {
+              "id": "4A",
+              "instructions": "Colour the ball red, the leaf green, the sun yellow. Say the sentence aloud.",
+              "type": "draw",
+              "caption": "Colour the pictures"
+            },
+            {
+              "id": "4B",
+              "instructions": "Match the word to the colour.",
+              "type": "match",
+              "left": [
+                "red",
+                "green",
+                "yellow",
+                "black"
+              ],
+              "right": [
+                "green",
+                "red",
+                "black",
+                "yellow"
+              ]
+            },
+            {
+              "id": "4C",
+              "instructions": "Fill in the colour words.",
+              "type": "gaps",
+              "lines": [
+                "The paw-paw is ______.",
+                "The leaf is ______.",
+                "The ball is ______.",
+                "The chalk is ______ ."
+              ],
+              "wordbank": [
+                "yellow",
+                "green",
+                "red",
+                "white"
+              ]
+            },
+            {
+              "id": "4D",
+              "instructions": "Tick the colours of the Cameroon flag. Then say: \"The flag is green, red and yellow.\"",
+              "type": "tick",
+              "options": [
+                "tick"
+              ],
+              "rows": [
+                "green",
+                "blue",
+                "red",
+                "yellow",
+                "purple"
+              ]
+            }
+          ],
+          "challenge": "Play \"Colour hunt\". Your teacher says a colour. In one minute, find and touch three things of that colour.",
+          "song": {
+            "title": "Song: Rainbow Song",
+            "lines": [
+              "Red and yellow and pink and green,",
+              "Purple and orange and blue;",
+              "I can sing a rainbow, sing a rainbow,",
+              "Sing a rainbow too."
+            ]
+          },
+          "story": {
+            "title": "Story: Ngo's New Dress",
+            "lines": [
+              "Grandmother brings cloth from the market.",
+              "It is green and red and yellow.",
+              "They are the colours of our flag.",
+              "Grandmother sews a dress for Ngo.",
+              "\"What colour is your dress?\" asks Bih.",
+              "\"It is green, red and yellow!\" says Ngo.",
+              "Ngo dances in the yard. The dress spins like a flower.",
+              "\"You are beautiful, Ngo,\" says Grandmother. Ngo is very happy."
+            ],
+            "say": "The dress is green, red and yellow."
+          },
+          "check": [
+            "I can name nine colours.",
+            "I can say the colour of something.",
+            "I know the colours of the Cameroon flag.",
+            "I can colour inside the lines."
+          ],
+          "homework": "Find five things at home with different colours. Say: \"The cup is white.\" Draw them in your exercise book and colour them."
+        }
+      ]
+    },
+    {
+      "n": 2,
+      "title": "My Village, My Town",
+      "weeks": "Weeks 5–8",
+      "image": "theme-village.jpg",
+      "blurb": "In the village and in the town. We go to the market, name animals, and learn to ask for things politely.",
+      "units": [
+        {
+          "n": 5,
+          "title": "My Home, My House",
+          "week": "Week 5",
+          "competence": "To name the rooms and things in a home and to say what happens in each place.",
+          "image": "unit-05-home-interior.jpg",
+          "caption": "This is my house. We sleep, cook and eat here.",
+          "words": [
+            {
+              "en": "house",
+              "fr": "la maison"
+            },
+            {
+              "en": "room",
+              "fr": "la chambre"
+            },
+            {
+              "en": "kitchen",
+              "fr": "la cuisine"
+            },
+            {
+              "en": "mat",
+              "fr": "la natte"
+            },
+            {
+              "en": "bed",
+              "fr": "le lit"
+            },
+            {
+              "en": "chair",
+              "fr": "la chaise"
+            },
+            {
+              "en": "pot",
+              "fr": "la marmite"
+            },
+            {
+              "en": "plate",
+              "fr": "l'assiette"
+            },
+            {
+              "en": "cup",
+              "fr": "la tasse"
+            },
+            {
+              "en": "water",
+              "fr": "l'eau"
+            },
+            {
+              "en": "broom",
+              "fr": "le balai"
+            },
+            {
+              "en": "mosquito net",
+              "fr": "la moustiquaire"
+            }
+          ],
+          "listen": {
+            "instructions": "Listen and point to the picture. Say each word after your teacher.",
+            "lines": [
+              "This is my house. It has a roof and a door.",
+              "This is the room. We sleep in the room. There is a mosquito net.",
+              "This is the kitchen. Mother cooks in the kitchen.",
+              "There is a pot on the fire. There is water in the jerrycan.",
+              "We eat on the mat. We put food on the plate.",
+              "There is a cup for water. There is a broom for the floor.",
+              "We keep the house clean. Every day."
+            ]
+          },
+          "talk": {
+            "instructions": "Draw your house with your finger in the air. Tell your friend: what is in it?",
+            "questions": [
+              "What is this?",
+              "It is a ______.",
+              "Where do you sleep?",
+              "I sleep in the ______.",
+              "Where do you eat?"
+            ]
+          },
+          "practice": [
+            {
+              "id": "5A",
+              "instructions": "Label the picture. Use the word bank.",
+              "type": "gaps",
+              "lines": [
+                "① ______",
+                "② ______",
+                "③ ______",
+                "④ ______",
+                "⑤ ______"
+              ],
+              "wordbank": [
+                "pot",
+                "bed",
+                "chair",
+                "cup",
+                "broom"
+              ]
+            },
+            {
+              "id": "5B",
+              "instructions": "Match the action to the place or thing.",
+              "type": "match",
+              "left": [
+                "sleep",
+                "cook",
+                "eat",
+                "drink"
+              ],
+              "right": [
+                "pot",
+                "plate",
+                "cup",
+                "bed"
+              ]
+            },
+            {
+              "id": "5C",
+              "instructions": "Complete the sentences.",
+              "type": "gap-sentence",
+              "lines": [
+                "Mother cooks in the ______.",
+                "I sleep on the ______.",
+                "We drink water from a ______."
+              ]
+            },
+            {
+              "id": "5D",
+              "instructions": "Tick what you can see in the picture.",
+              "type": "tick",
+              "options": [
+                "see",
+                "not see"
+              ],
+              "rows": [
+                "a mosquito net",
+                "a jerrycan",
+                "a goat inside the house",
+                "a broom",
+                "a plate"
+              ]
+            }
+          ],
+          "challenge": "In groups, tell the class one thing you do in your house every morning. Say: \"I sweep the floor.\"",
+          "song": {
+            "title": "Song: This Is My House",
+            "lines": [
+              "This is my house, this is my home,",
+              "Here I cook and here I sleep,",
+              "This is my house, this is my home,",
+              "Keep it clean and keep it neat!"
+            ]
+          },
+          "story": {
+            "title": "Story: Clean the House",
+            "lines": [
+              "It is Saturday. The sun is hot.",
+              "Mother says: \"Children, let us clean the house.\"",
+              "Bih sweeps the floor. The broom is tall.",
+              "Ngo washes the plates in a basin.",
+              "Father carries water in a jerrycan.",
+              "Grandmother puts the mats in the sun.",
+              "The house is clean and sweet.",
+              "Mother says: \"Thank you, my children. A clean house is a happy house.\""
+            ],
+            "say": "A clean house is a happy house."
+          },
+          "check": [
+            "I can name things in my house.",
+            "I can say where I sleep and eat.",
+            "I can say one way to keep my house clean.",
+            "I say my words clearly."
+          ],
+          "homework": "Draw your house in your exercise book. Label three things in English: door, plate, bed."
+        },
+        {
+          "n": 6,
+          "title": "At the Market",
+          "week": "Week 6",
+          "competence": "To ask for things politely at the market and to name the people and things we find there.",
+          "image": "theme-village.jpg",
+          "caption": "This is the market. We buy and sell food here.",
+          "words": [
+            {
+              "en": "market",
+              "fr": "le marché"
+            },
+            {
+              "en": "buy",
+              "fr": "acheter"
+            },
+            {
+              "en": "sell",
+              "fr": "vendre"
+            },
+            {
+              "en": "please",
+              "fr": "s'il te plaît"
+            },
+            {
+              "en": "thank you",
+              "fr": "merci"
+            },
+            {
+              "en": "tomato",
+              "fr": "la tomate"
+            },
+            {
+              "en": "plantain",
+              "fr": "le plantain"
+            },
+            {
+              "en": "fish",
+              "fr": "le poisson"
+            },
+            {
+              "en": "pepper",
+              "fr": "le piment"
+            },
+            {
+              "en": "money",
+              "fr": "l'argent"
+            }
+          ],
+          "listen": {
+            "instructions": "Listen to the market talk. Then repeat with your teacher.",
+            "lines": [
+              "This is the market. It is very busy.",
+              "The market woman sells tomatoes and plantains.",
+              "Bih has money. Ngo has a basket.",
+              "Bih says: \"Good morning, madam.\"",
+              "The woman says: \"Good morning, my child.\"",
+              "Bih says: \"Two tomatoes, please.\"",
+              "The woman says: \"Here you are.\"",
+              "Bih says: \"Thank you!\""
+            ]
+          },
+          "talk": {
+            "instructions": "One pupil is the market woman. One pupil is the buyer. Buy and sell. Be polite!",
+            "questions": [
+              "Good morning, madam.",
+              "What do you want?",
+              "______, please.",
+              "Here you are.",
+              "Thank you."
+            ]
+          },
+          "practice": [
+            {
+              "id": "6A",
+              "instructions": "Put the conversation in the right order. Write 1 to 4.",
+              "type": "order",
+              "lines": [
+                "______ \"Here you are.\"",
+                "______ \"Good morning, madam.\"",
+                "______ \"Thank you!\"",
+                "______ \"Two tomatoes, please.\""
+              ]
+            },
+            {
+              "id": "6B",
+              "instructions": "Match the word and the picture description.",
+              "type": "match",
+              "left": [
+                "market",
+                "money",
+                "pepper",
+                "fish"
+              ],
+              "right": [
+                "We swim in water. We are food.",
+                "We buy things with it.",
+                "It is hot and small and red.",
+                "Many people buy here."
+              ]
+            },
+            {
+              "id": "6C",
+              "instructions": "Complete with the polite words.",
+              "type": "gaps",
+              "lines": [
+                "A: Three mangoes, ______.",
+                "B: Here you are.",
+                "A: ______ you!"
+              ],
+              "wordbank": [
+                "please",
+                "Thank"
+              ]
+            },
+            {
+              "id": "6D",
+              "instructions": "Tick the things you can buy at the market.",
+              "type": "tick",
+              "options": [
+                "yes",
+                "no"
+              ],
+              "rows": [
+                "tomatoes",
+                "a classroom",
+                "fish",
+                "plantains",
+                "the sky"
+              ]
+            }
+          ],
+          "challenge": "Make a market corner in your classroom. Bring clean empty packets. Sell and buy in English, using please and thank you.",
+          "song": {
+            "title": "Chant: Market Chant",
+            "lines": [
+              "Tomato, tomato, two tomatoes please!",
+              "Plantain, plantain, one plantain please!",
+              "Thank you, madam, thank you, sir!",
+              "Money in the market, basket in my hand!"
+            ]
+          },
+          "story": {
+            "title": "Story: The Spilled Basket",
+            "lines": [
+              "Ngo goes to the market with Mother.",
+              "Ngo carries a basket of tomatoes.",
+              "A boy runs past. Bump! The basket falls.",
+              "Oh no! The tomatoes roll in the dust.",
+              "Ngo wants to cry. Her eyes are wet.",
+              "The market woman comes. She helps Ngo.",
+              "They pick up every tomato and clean them.",
+              "\"Thank you, madam,\" says Ngo. \"You are very kind.\""
+            ],
+            "say": "Thank you, madam. You are very kind."
+          },
+          "check": [
+            "I can name five things at the market.",
+            "I can ask for something with \"please\".",
+            "I can say \"thank you\".",
+            "I can buy and sell in a game."
+          ],
+          "homework": "At home, ask politely in English: \"Water, please.\" and say \"Thank you.\" Practise three times."
+        },
+        {
+          "n": 7,
+          "title": "In the Village, In the Town",
+          "week": "Week 7",
+          "competence": "To talk about where I live and to name things I see in the village and in the town.",
+          "image": "theme-village.jpg",
+          "caption": "Some of us live in a village. Some of us live in a town.",
+          "words": [
+            {
+              "en": "village",
+              "fr": "le village"
+            },
+            {
+              "en": "town",
+              "fr": "la ville"
+            },
+            {
+              "en": "road",
+              "fr": "la route"
+            },
+            {
+              "en": "tree",
+              "fr": "l'arbre"
+            },
+            {
+              "en": "river",
+              "fr": "la rivière"
+            },
+            {
+              "en": "school",
+              "fr": "l'école"
+            },
+            {
+              "en": "hospital",
+              "fr": "l'hôpital"
+            },
+            {
+              "en": "shop",
+              "fr": "la boutique"
+            },
+            {
+              "en": "field",
+              "fr": "le champ"
+            },
+            {
+              "en": "big",
+              "fr": "grand"
+            },
+            {
+              "en": "small",
+              "fr": "petit"
+            }
+          ],
+          "listen": {
+            "instructions": "Listen to Ngo and Bih. Then say where you live.",
+            "lines": [
+              "Ngo lives in a village. Her village is small.",
+              "There are many trees and a river.",
+              "There are farms and goats and hens.",
+              "Bih lives in a town. Her town is big.",
+              "There are many cars, shops and a hospital.",
+              "In the village and in the town, there is a school.",
+              "We all go to school. We all learn English."
+            ]
+          },
+          "talk": {
+            "instructions": "Tell your friend: \"I live in a village\" or \"I live in a town.\" Then say two things you see there.",
+            "questions": [
+              "Where do you live?",
+              "I live in a ______.",
+              "What do you see?",
+              "I see ______."
+            ]
+          },
+          "practice": [
+            {
+              "id": "7A",
+              "instructions": "Tick. Is it in a village, a town, or both?",
+              "type": "tick",
+              "options": [
+                "village",
+                "town",
+                "both"
+              ],
+              "rows": [
+                "a river",
+                "a hospital",
+                "a school",
+                "a big shop",
+                "a farm with goats"
+              ]
+            },
+            {
+              "id": "7B",
+              "instructions": "Match the opposites.",
+              "type": "match",
+              "left": [
+                "big",
+                "long",
+                "hot",
+                "day"
+              ],
+              "right": [
+                "night",
+                "small",
+                "cold",
+                "short"
+              ]
+            },
+            {
+              "id": "7C",
+              "instructions": "Complete the sentences.",
+              "type": "gap-sentence",
+              "lines": [
+                "My village is ______. (small / many)",
+                "There is a ______ near my house. (river / plate)",
+                "We go to ______ every day. (school / field)"
+              ]
+            },
+            {
+              "id": "7D",
+              "instructions": "Draw where you live. Draw two things you see there. Say: \"This is my ______.\"",
+              "type": "draw",
+              "caption": "Where I live"
+            }
+          ],
+          "challenge": "Work in pairs. One pupil comes from the village, one from the town. Say three things that are the same where you live.",
+          "song": {
+            "title": "Chant: My Home Place",
+            "lines": [
+              "Village, village, trees so tall,",
+              "Town, town, shops and all,",
+              "River, road and school and sun,",
+              "Cameroon is home for everyone!"
+            ]
+          },
+          "story": {
+            "title": "Story: Ngo Visits the Town",
+            "lines": [
+              "Ngo lives in a small village. She visits Bih in the town.",
+              "Ngo sees a big road. She sees many cars.",
+              "\"Oh! The cars are so fast!\" says Ngo.",
+              "Ngo sees a big shop. She sees a hospital.",
+              "\"In my village we have one small shop,\" says Ngo.",
+              "Bih says: \"In your village you have a big river and many trees.\"",
+              "\"Yes,\" says Ngo. \"And you have mangoes?\"",
+              "\"No,\" says Bih. \"Come and play. We can share.\""
+            ],
+            "say": "Where do you live? I live in a ______."
+          },
+          "check": [
+            "I can say where I live.",
+            "I can name five things in my village or town.",
+            "I can say \"big\" and \"small\".",
+            "I listen when my friend tells about their home."
+          ],
+          "homework": "Ask your mother or father: \"Where did you live when you were small?\" Then draw one thing they tell you about."
+        },
+        {
+          "n": 8,
+          "title": "Animals Around Us",
+          "week": "Week 8",
+          "competence": "To name animals near our homes and to say the sound each animal makes.",
+          "image": "unit-08-animals.jpg",
+          "caption": "We have animals at home and in the bush.",
+          "words": [
+            {
+              "en": "hen",
+              "fr": "la poule"
+            },
+            {
+              "en": "goat",
+              "fr": "la chèvre"
+            },
+            {
+              "en": "dog",
+              "fr": "le chien"
+            },
+            {
+              "en": "cat",
+              "fr": "le chat"
+            },
+            {
+              "en": "cow",
+              "fr": "la vache"
+            },
+            {
+              "en": "pig",
+              "fr": "le cochon"
+            },
+            {
+              "en": "bird",
+              "fr": "l'oiseau"
+            },
+            {
+              "en": "monkey",
+              "fr": "le singe"
+            },
+            {
+              "en": "elephant",
+              "fr": "l'éléphant"
+            },
+            {
+              "en": "big",
+              "fr": "grand"
+            },
+            {
+              "en": "small",
+              "fr": "petit"
+            },
+            {
+              "en": "chick",
+              "fr": "le poussin"
+            }
+          ],
+          "listen": {
+            "instructions": "Listen to the animals. Make the sound with your teacher.",
+            "lines": [
+              "This is a hen. The hen says \"kot, kot, kot\".",
+              "This is a goat. The goat says \"meh, meh\".",
+              "This is a dog. The dog says \"wouf, wouf\".",
+              "This is a cat. The cat says \"miaou\".",
+              "This is a cow. The cow is big. It says \"moo\".",
+              "This is a bird. The bird is small. It flies in the sky.",
+              "The monkey and the elephant live in the bush.",
+              "Which animal do you like?"
+            ]
+          },
+          "talk": {
+            "instructions": "Choose one animal. Say: \"I like the ______. It says ______.\" Your friend guesses the animal.",
+            "questions": [
+              "What is this?",
+              "It is a ______.",
+              "What does the hen say?",
+              "Do you like the ______?"
+            ]
+          },
+          "practice": [
+            {
+              "id": "8A",
+              "instructions": "Match the animal to its home or what it gives us.",
+              "type": "match",
+              "left": [
+                "hen",
+                "cow",
+                "dog",
+                "bird"
+              ],
+              "right": [
+                "It gives us milk.",
+                "It lives in a nest.",
+                "It gives us eggs.",
+                "It guards the house."
+              ]
+            },
+            {
+              "id": "8B",
+              "instructions": "Write the animal. Use the word bank.",
+              "type": "gaps",
+              "lines": [
+                "\"Moo\" = ______",
+                "\"Kot, kot\" = ______",
+                "\"Meh, meh\" = ______",
+                "\"Wouf, wouf\" = ______"
+              ],
+              "wordbank": [
+                "cow",
+                "hen",
+                "goat",
+                "dog"
+              ]
+            },
+            {
+              "id": "8C",
+              "instructions": "Tick big or small.",
+              "type": "tick",
+              "options": [
+                "big",
+                "small"
+              ],
+              "rows": [
+                "an elephant",
+                "a bird",
+                "a goat",
+                "a cat"
+              ]
+            },
+            {
+              "id": "8D",
+              "instructions": "Draw your favourite animal. Say: \"This is a ______.\"",
+              "type": "draw",
+              "caption": "My favourite animal"
+            }
+          ],
+          "challenge": "Play animal sounds. One pupil makes a sound. The others say the English name of the animal.",
+          "song": {
+            "title": "Song: Old MacDonald",
+            "lines": [
+              "Old MacDonald had a farm, E-I-E-I-O,",
+              "And on his farm he had a hen, E-I-E-I-O,",
+              "With a kot-kot here and a kot-kot there,",
+              "Here a kot, there a kot, everywhere a kot-kot!"
+            ]
+          },
+          "story": {
+            "title": "Story: The Clever Hen",
+            "lines": [
+              "A hen lives near the house. She has five chicks.",
+              "A big dog comes near. The chicks are afraid.",
+              "The hen opens her wings wide. \"Kot, kot, kot!\"",
+              "The chicks hide under her wings.",
+              "The dog looks and looks. He cannot see the chicks.",
+              "The dog goes away.",
+              "The hen is clever. She protects her chicks.",
+              "\"Kot, kot, kot!\" says the hen. The chicks are safe."
+            ],
+            "say": "The hen is clever. She protects her chicks."
+          },
+          "check": [
+            "I can name eight animals.",
+            "I can say the sound of a hen, a goat and a dog.",
+            "I can say \"big\" and \"small\".",
+            "I can say which animal I like."
+          ],
+          "homework": "Watch the animals near your home. Count the hens you see. Say in English: \"I see four hens.\""
+        }
+      ]
+    },
+    {
+      "n": 3,
+      "title": "My School",
+      "weeks": "Weeks 9–12",
+      "image": "theme-school.jpg",
+      "blurb": "In our classroom. We learn about jobs, we find out where people are, and we take care when we travel.",
+      "units": [
+        {
+          "n": 9,
+          "title": "People and Jobs",
+          "week": "Week 9",
+          "competence": "To name people's jobs and to say what a person does.",
+          "image": "unit-09-jobs-cameroon.jpg",
+          "caption": "Who helps us? The nurse, the teacher, the carpenter.",
+          "words": [
+            {
+              "en": "teacher",
+              "fr": "l'enseignant(e)"
+            },
+            {
+              "en": "nurse",
+              "fr": "l'infirmier(ère)"
+            },
+            {
+              "en": "farmer",
+              "fr": "l'agriculteur(trice)"
+            },
+            {
+              "en": "carpenter",
+              "fr": "le charpentier"
+            },
+            {
+              "en": "driver",
+              "fr": "le chauffeur"
+            },
+            {
+              "en": "market woman",
+              "fr": "la vendeuse"
+            },
+            {
+              "en": "doctor",
+              "fr": "le médecin"
+            },
+            {
+              "en": "work",
+              "fr": "travailler"
+            },
+            {
+              "en": "help",
+              "fr": "aider"
+            }
+          ],
+          "listen": {
+            "instructions": "Listen. Then point to each person in the picture.",
+            "lines": [
+              "This is a teacher. The teacher teaches us to read.",
+              "This is a nurse. The nurse helps us at the hospital.",
+              "This is a farmer. The farmer grows maize and cassava.",
+              "This is a carpenter. The carpenter makes tables and chairs.",
+              "This is a driver. The driver drives the bus to Douala.",
+              "This is a market woman. She sells tomatoes and plantains.",
+              "They all work. They all help us. Say thank you often."
+            ]
+          },
+          "talk": {
+            "instructions": "Act a job. Do not speak! Your friends guess in English: \"You are a ______.\"",
+            "questions": [
+              "What is this person doing?",
+              "This person is a ______.",
+              "Who helps you at school?",
+              "What work do you want to do?"
+            ]
+          },
+          "practice": [
+            {
+              "id": "9A",
+              "instructions": "Match the person to what they do.",
+              "type": "match",
+              "left": [
+                "teacher",
+                "nurse",
+                "farmer",
+                "carpenter"
+              ],
+              "right": [
+                "makes a table",
+                "teaches reading",
+                "grows maize",
+                "helps the sick"
+              ]
+            },
+            {
+              "id": "9B",
+              "instructions": "Complete the sentences.",
+              "type": "gaps",
+              "lines": [
+                "The ______ drives the bus.",
+                "The ______ sells tomatoes.",
+                "The ______ helps me when I am sick.",
+                "The ______ teaches me English."
+              ],
+              "wordbank": [
+                "driver",
+                "market woman",
+                "nurse",
+                "teacher"
+              ]
+            },
+            {
+              "id": "9C",
+              "instructions": "Tick the people who work in a hospital.",
+              "type": "tick",
+              "options": [
+                "yes",
+                "no"
+              ],
+              "rows": [
+                "nurse",
+                "doctor",
+                "carpenter"
+              ]
+            },
+            {
+              "id": "9D",
+              "instructions": "Draw the work you want to do when you are big. Say: \"I want to be a ______.\"",
+              "type": "draw",
+              "caption": "My work when I am big"
+            }
+          ],
+          "challenge": "Invite a nurse or a farmer to talk to your class. Prepare two questions in English: \"What is your work?\" \"Do you like your work?\"",
+          "song": {
+            "title": "Chant: The Helper Chant",
+            "lines": [
+              "The farmer grows, the carpenter builds,",
+              "The teacher teaches, the nurse gives pills;",
+              "The driver drives, the seller sells,",
+              "We thank them all, our helpers!"
+            ]
+          },
+          "story": {
+            "title": "Story: Nurse Mary Visits",
+            "lines": [
+              "Nurse Mary comes to visit the class.",
+              "She wears a white uniform. She carries a small bag.",
+              "\"Do you wash your hands?\" she asks.",
+              "\"Yes!\" shout the pupils.",
+              "\"When do you wash your hands?\"",
+              "Bih says: \"Before we eat.\"",
+              "Ngo says: \"After the toilet.\"",
+              "\"Very good,\" says Nurse Mary. \"Clean hands keep us well.\"",
+              "All the class wash their hands together."
+            ],
+            "say": "Clean hands keep us well."
+          },
+          "check": [
+            "I can name six jobs.",
+            "I can say what a person does.",
+            "I can ask \"What is your work?\"",
+            "I can say \"thank you\" to people who help us."
+          ],
+          "homework": "Ask two adults at home about their work. Draw one of them working and say: \"This is a ______.\""
+        },
+        {
+          "n": 10,
+          "title": "Up, Down, Here, There",
+          "week": "Week 10",
+          "competence": "To say where a thing or a person is.",
+          "image": "unit-10-travel-cameroon.jpg",
+          "caption": "The bus is on the road. The mother is in the taxi park.",
+          "words": [
+            {
+              "en": "in",
+              "fr": "dans"
+            },
+            {
+              "en": "on",
+              "fr": "sur"
+            },
+            {
+              "en": "under",
+              "fr": "sous"
+            },
+            {
+              "en": "next to",
+              "fr": "à côté de"
+            },
+            {
+              "en": "here",
+              "fr": "ici"
+            },
+            {
+              "en": "there",
+              "fr": "là-bas"
+            },
+            {
+              "en": "where",
+              "fr": "où"
+            },
+            {
+              "en": "bus",
+              "fr": "le bus"
+            },
+            {
+              "en": "taxi",
+              "fr": "le taxi"
+            },
+            {
+              "en": "road",
+              "fr": "la route"
+            },
+            {
+              "en": "bag",
+              "fr": "le sac"
+            }
+          ],
+          "listen": {
+            "instructions": "Listen and put your hand where the teacher says.",
+            "lines": [
+              "Where is the book? The book is on the table.",
+              "Where is the bag? The bag is under the chair.",
+              "Where is the teacher? The teacher is next to the door.",
+              "Where is the ball? The ball is in the basket.",
+              "Here is a pencil. There is a window.",
+              "Where is the bus? The bus is on the road."
+            ]
+          },
+          "talk": {
+            "instructions": "Hide a small stone in the classroom. Your friend asks: \"Where is the stone?\" Answer: \"It is on the chair.\"",
+            "questions": [
+              "Where is the ______?",
+              "It is in / on / under the ______.",
+              "Where are you?",
+              "I am here, next to ______."
+            ]
+          },
+          "practice": [
+            {
+              "id": "10A",
+              "instructions": "Look at the picture. Complete the sentences with in, on, under or next to.",
+              "type": "gaps",
+              "lines": [
+                "The bag is ______ the chair.",
+                "The taxi is ______ the road.",
+                "The mother is ______ the bus stop.",
+                "The boy is ______ the basket."
+              ],
+              "wordbank": [
+                "under",
+                "on",
+                "next to",
+                "in"
+              ]
+            },
+            {
+              "id": "10B",
+              "instructions": "Draw. The cat is under the table. The cup is on the table. The ball is next to the bag.",
+              "type": "draw",
+              "caption": "Where are the things?"
+            },
+            {
+              "id": "10C",
+              "instructions": "Match the question to the answer.",
+              "type": "match",
+              "left": [
+                "Where is the cup?",
+                "Where is the bus?",
+                "Where is your hand?"
+              ],
+              "right": [
+                "On the road.",
+                "Here, up.",
+                "Under the table."
+              ]
+            },
+            {
+              "id": "10D",
+              "instructions": "Tick the correct sentence.",
+              "type": "tick",
+              "options": [
+                "yes",
+                "no"
+              ],
+              "rows": [
+                "The bag is under the chair.",
+                "The bag under is chair.",
+                "The hen is on the mat."
+              ]
+            }
+          ],
+          "challenge": "Put five things in different places in the classroom. Say where each one is. A friend finds them.",
+          "song": {
+            "title": "Song: Where Is It?",
+            "lines": [
+              "Where is the ball? Where is the ball?",
+              "On the chair, under the table, next to the door!",
+              "Here it is! There it is!",
+              "Now let's count: one, two, three, four!"
+            ]
+          },
+          "story": {
+            "title": "Story: The Missing Shoe",
+            "lines": [
+              "It is morning. Bih cannot find her shoe.",
+              "\"Mother, where is my shoe?\" she asks.",
+              "\"Look under the bed,\" says Mother.",
+              "Bih looks under the bed. No shoe.",
+              "\"Look on the chair,\" says Ngo.",
+              "Bih looks on the chair. No shoe.",
+              "\"Look in the bag!\" says Grandmother.",
+              "Bih opens the bag. The shoe is in the bag!",
+              "\"Thank you, Grandmother!\" says Bih. Now she runs to school."
+            ],
+            "say": "Where is my shoe? It is in the bag."
+          },
+          "check": [
+            "I can say in, on, under, next to.",
+            "I can ask \"Where is it?\"",
+            "I can say where things are in my classroom.",
+            "I help my friend to find things."
+          ],
+          "homework": "Put three things in different places at home. Ask your brother or sister: \"Where is the ______?\" and answer in English."
+        },
+        {
+          "n": 11,
+          "title": "Food and Water",
+          "week": "Week 11",
+          "competence": "To name common foods and to say what we must do to stay healthy.",
+          "image": "unit-11-food-cameroon.jpg",
+          "caption": "We eat rice, beans, plantains and fruit. We drink clean water.",
+          "words": [
+            {
+              "en": "rice",
+              "fr": "le riz"
+            },
+            {
+              "en": "beans",
+              "fr": "les haricots"
+            },
+            {
+              "en": "plantain",
+              "fr": "le plantain"
+            },
+            {
+              "en": "ndolé",
+              "fr": "le ndolé"
+            },
+            {
+              "en": "koki",
+              "fr": "le koki"
+            },
+            {
+              "en": "fruit",
+              "fr": "les fruits"
+            },
+            {
+              "en": "water",
+              "fr": "l'eau"
+            },
+            {
+              "en": "clean",
+              "fr": "propre"
+            },
+            {
+              "en": "wash",
+              "fr": "laver"
+            },
+            {
+              "en": "soap",
+              "fr": "le savon"
+            }
+          ],
+          "listen": {
+            "instructions": "Listen. Then say the sentences with your teacher.",
+            "lines": [
+              "We eat rice and beans. This food is good for us.",
+              "We eat plantains, ndolé and koki. They are Cameroonian food.",
+              "We eat fruit: mango, paw-paw, banana and orange.",
+              "We drink water every day. Clean water is good.",
+              "We wash our hands with soap before we eat.",
+              "We wash fruit before we eat it.",
+              "We cook meat and fish very well. Then we are strong and well."
+            ]
+          },
+          "talk": {
+            "instructions": "Say what you ate this morning. Say what you like. Then ask your friend.",
+            "questions": [
+              "What did you eat?",
+              "I ate ______.",
+              "Do you like ______?",
+              "Yes, I like it. / No, thank you.",
+              "I am thirsty. Water, please."
+            ]
+          },
+          "practice": [
+            {
+              "id": "11A",
+              "instructions": "Match the food to the colour.",
+              "type": "match",
+              "left": [
+                "mango",
+                "ndolé",
+                "rice",
+                "beans"
+              ],
+              "right": [
+                "green",
+                "white",
+                "yellow",
+                "brown"
+              ]
+            },
+            {
+              "id": "11B",
+              "instructions": "Put a ✔ for good and a ✘ for not good.",
+              "type": "tick",
+              "options": [
+                "✔ good",
+                "✘ not good"
+              ],
+              "rows": [
+                "Wash hands before eating.",
+                "Drink dirty water.",
+                "Wash the mango before eating.",
+                "Eat fruit every day."
+              ]
+            },
+            {
+              "id": "11C",
+              "instructions": "Complete the sentences.",
+              "type": "gaps",
+              "lines": [
+                "I eat ______ for lunch.",
+                "I drink ______ every day.",
+                "Before I eat I wash my ______ with ______."
+              ],
+              "wordbank": [
+                "rice",
+                "water",
+                "hands",
+                "soap"
+              ]
+            },
+            {
+              "id": "11D",
+              "instructions": "Draw your favourite food. Say: \"I like ______. It is good for me.\"",
+              "type": "draw",
+              "caption": "My favourite food"
+            }
+          ],
+          "challenge": "Work in groups. Make a healthy plate. Draw rice, beans, plantain and fruit. Then tell the class: \"This is good food.\"",
+          "song": {
+            "title": "Song: Wash Your Hands",
+            "lines": [
+              "Wash, wash, wash your hands,",
+              "Wash them with soap and water!",
+              "Before you eat, after the toilet,",
+              "Wash, wash, wash your hands!"
+            ]
+          },
+          "story": {
+            "title": "Story: The Mango Tree",
+            "lines": [
+              "There is a mango tree near the school.",
+              "The mangoes are yellow and sweet. The children love them.",
+              "Ngo picks one big mango. She starts to eat.",
+              "\"Stop!\" says Bih. \"Did you wash it?\"",
+              "\"No,\" says Ngo. \"But it is from the tree!\"",
+              "\"Our teacher says wash it first. There is dust and flies on it.\"",
+              "Ngo washes the mango in clean water.",
+              "Then she eats it. It is very sweet and she is safe.",
+              "\"Thank you, Bih,\" says Ngo."
+            ],
+            "say": "Wash it first, then eat."
+          },
+          "check": [
+            "I can name six foods.",
+            "I can say what I like to eat.",
+            "I know to wash my hands before I eat.",
+            "I know to wash fruit in clean water."
+          ],
+          "homework": "Help to wash fruit or vegetables at home. Say in English: \"I wash the mango. It is clean.\""
+        },
+        {
+          "n": 12,
+          "title": "My Body — Keep It Safe",
+          "week": "Week 12",
+          "competence": "To name the parts of my body and to say how I keep my body safe and clean.",
+          "image": "unit-12-body.jpg",
+          "caption": "This is my body. I keep it clean and safe.",
+          "words": [
+            {
+              "en": "head",
+              "fr": "la tête"
+            },
+            {
+              "en": "eye",
+              "fr": "l'œil"
+            },
+            {
+              "en": "ear",
+              "fr": "l'oreille"
+            },
+            {
+              "en": "mouth",
+              "fr": "la bouche"
+            },
+            {
+              "en": "nose",
+              "fr": "le nez"
+            },
+            {
+              "en": "hand",
+              "fr": "la main"
+            },
+            {
+              "en": "foot",
+              "fr": "le pied"
+            },
+            {
+              "en": "stomach",
+              "fr": "le ventre"
+            },
+            {
+              "en": "tooth",
+              "fr": "la dent"
+            },
+            {
+              "en": "clean",
+              "fr": "propre"
+            },
+            {
+              "en": "safe",
+              "fr": "en sécurité"
+            }
+          ],
+          "listen": {
+            "instructions": "Listen and touch the part of your body with your hand.",
+            "lines": [
+              "This is my head. I wash my head.",
+              "These are my eyes. I use my eyes to see.",
+              "These are my ears. I use my ears to listen.",
+              "This is my nose. I smell food with my nose.",
+              "This is my mouth. I brush my teeth every morning.",
+              "These are my hands. I wash my hands with soap.",
+              "These are my feet. I wear shoes to protect my feet.",
+              "I keep my body clean. I keep my body safe."
+            ]
+          },
+          "talk": {
+            "instructions": "Play \"Simon says\". Your teacher says: \"Simon says touch your nose.\" Do it. If the teacher does not say \"Simon says\", do not move!",
+            "questions": [
+              "What is this?",
+              "This is my ______.",
+              "What do you do with your ears?",
+              "I listen with my ears."
+            ]
+          },
+          "practice": [
+            {
+              "id": "12A",
+              "instructions": "Match the body part to its work.",
+              "type": "match",
+              "left": [
+                "eyes",
+                "ears",
+                "nose",
+                "teeth"
+              ],
+              "right": [
+                "to bite and eat",
+                "to hear",
+                "to see",
+                "to smell"
+              ]
+            },
+            {
+              "id": "12B",
+              "instructions": "Label the body. Use the word bank.",
+              "type": "gaps",
+              "lines": [
+                "① ______",
+                "② ______",
+                "③ ______",
+                "④ ______",
+                "⑤ ______"
+              ],
+              "wordbank": [
+                "head",
+                "hand",
+                "foot",
+                "eye",
+                "ear"
+              ]
+            },
+            {
+              "id": "12C",
+              "instructions": "Tick what keeps you safe and clean.",
+              "type": "tick",
+              "options": [
+                "✔ yes",
+                "✘ no"
+              ],
+              "rows": [
+                "Wash your hands with soap.",
+                "Walk on the road where cars go fast.",
+                "Wash your body every day.",
+                "Put your hand on a hot pot."
+              ]
+            },
+            {
+              "id": "12D",
+              "instructions": "Draw a face. Draw the eyes, the nose and the mouth. Say what each part is for.",
+              "type": "draw",
+              "caption": "My face"
+            }
+          ],
+          "challenge": "Make a health poster for the class. Draw a hand with soap. Write or copy: \"Wash your hands!\"",
+          "song": {
+            "title": "Song: Head, Shoulders, Knees and Toes",
+            "lines": [
+              "Head, shoulders, knees and toes, knees and toes,",
+              "Head, shoulders, knees and toes, knees and toes,",
+              "And eyes and ears and mouth and nose,",
+              "Head, shoulders, knees and toes, knees and toes!"
+            ]
+          },
+          "story": {
+            "title": "Story: The Broken Tap",
+            "lines": [
+              "The tap at school is broken. There is no water.",
+              "The children cannot wash their hands.",
+              "\"What can we do?\" asks Ngo.",
+              "Bih has an idea. \"Let us bring water from home.\"",
+              "The children bring water in small jerrycans.",
+              "They put soap next to the basin.",
+              "Now everybody can wash their hands.",
+              "The teacher says: \"Well done, children. You keep us safe.\""
+            ],
+            "say": "Wash your hands. Keep your body clean and safe."
+          },
+          "check": [
+            "I can name nine parts of my body.",
+            "I can say what my eyes and ears do.",
+            "I can say how I keep my body clean.",
+            "I can play \"Simon says\" in English."
+          ],
+          "homework": "Show your family the song \"Head, Shoulders, Knees and Toes\". Sing it in English and do the actions."
+        }
+      ]
+    }
+  ],
+  "appendix": {
+    "pictureDictionary": [
+      {
+        "group": "People",
+        "words": [
+          "mother",
+          "father",
+          "grandmother",
+          "brother",
+          "sister",
+          "baby",
+          "teacher",
+          "nurse",
+          "farmer",
+          "driver"
+        ]
+      },
+      {
+        "group": "Things at home",
+        "words": [
+          "house",
+          "room",
+          "kitchen",
+          "bed",
+          "mat",
+          "chair",
+          "pot",
+          "plate",
+          "cup",
+          "broom",
+          "water",
+          "mosquito net"
+        ]
+      },
+      {
+        "group": "Market",
+        "words": [
+          "market",
+          "money",
+          "tomato",
+          "plantain",
+          "fish",
+          "pepper",
+          "basket",
+          "shop"
+        ]
+      },
+      {
+        "group": "Animals",
+        "words": [
+          "hen",
+          "chick",
+          "goat",
+          "dog",
+          "cat",
+          "cow",
+          "pig",
+          "bird",
+          "monkey",
+          "elephant"
+        ]
+      },
+      {
+        "group": "Colours",
+        "words": [
+          "red",
+          "orange",
+          "yellow",
+          "green",
+          "blue",
+          "purple",
+          "brown",
+          "black",
+          "white"
+        ]
+      },
+      {
+        "group": "Numbers",
+        "words": [
+          "one",
+          "two",
+          "three",
+          "four",
+          "five",
+          "six",
+          "seven",
+          "eight",
+          "nine",
+          "ten"
+        ]
+      },
+      {
+        "group": "Body",
+        "words": [
+          "head",
+          "eye",
+          "ear",
+          "nose",
+          "mouth",
+          "hand",
+          "foot",
+          "stomach",
+          "tooth"
+        ]
+      }
+    ],
+    "usefulSentences": [
+      [
+        "Good morning, teacher.",
+        "Bonjour, maîtresse / maître."
+      ],
+      [
+        "My name is ______.",
+        "Je m'appelle ______."
+      ],
+      [
+        "How are you? — I am fine, thank you.",
+        "Comment vas-tu ? — Je vais bien, merci."
+      ],
+      [
+        "May I go out, please?",
+        "Puis-je sortir, s'il vous plaît ?"
+      ],
+      [
+        "Water, please.",
+        "De l'eau, s'il vous plaît."
+      ],
+      [
+        "What is this? — It is a ______.",
+        "Qu'est-ce que c'est ? — C'est un(e) ______."
+      ],
+      [
+        "Where is the ______? — It is on the table.",
+        "Où est le ______ ? — Il est sur la table."
+      ],
+      [
+        "I am sorry.",
+        "Je suis désolé(e)."
+      ],
+      [
+        "Thank you very much.",
+        "Merci beaucoup."
+      ],
+      [
+        "Can I play with you?",
+        "Puis-je jouer avec vous ?"
+      ]
+    ],
+    "certificate": "This pupil can speak English in Class 1. Teacher: ______________  Date: ____________"
+  },
+  "licence": "Written for École Azobe (Cameroon). Free to photocopy for the school's pupils; not for sale."
+}

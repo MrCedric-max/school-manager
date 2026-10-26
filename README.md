@@ -32,6 +32,25 @@ Worksheet ticks and quiz scores are saved in the browser (localStorage).
 - `NEW-REPOSITORY.md` — why this project was split out of `school-manager`
 - `azobe-school-manager/` — **excluded from this repository** (see `.gitignore`); the earlier École Azobe app remains in `MrCedric-max/school-manager`
 
+## Class 1 Pupil's Book
+
+`books/class-1/` holds a book written for this school: **My English Book — Pupil's Book,
+Class 1** (A4, print-ready DOCX). The Drive `books pro` folder only has EFEDI schemes from
+Class 2 up, so this one is original material, set in Cameroon and following the Class 2
+scheme's shape.
+
+- `books/class-1/My-English-Book-Class-1-Pupils-Book.docx` — the book (3 themes, 12 units,
+  117 words, 12 songs, 12 stories, picture dictionary, progress record, certificate)
+- `books/class-1/content.json` — all the text, editable
+- `books/class-1/illustrations/` — print-resolution art + the prompts used to make it
+- `books/class-1/README.md` — what is inside, how to rebuild, known gaps
+- `scripts/build_class1_docx.py`, `scripts/validate_class1_content.py`
+
+```bash
+pip install python-docx
+python3 scripts/validate_class1_content.py && python3 scripts/build_class1_docx.py
+```
+
 ## Note on scope
 
 The previous version of this project used the whole Drive (84 files). At the owner's
