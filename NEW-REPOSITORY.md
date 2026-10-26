@@ -1,46 +1,42 @@
-# Moving Books Pro to its own repository
+# Books Pro — its own repository
 
-**Intended new repository:** `MrCedric-max/books-pro` (private suggested) — does not exist yet.
+**New repository (created by the owner):** https://github.com/MrCedric-max/Books-pro
 
 ## Status (2026-10-26)
 
-Creating the repo from this Arena session was attempted with
-`gh repo create MrCedric-max/books-pro --private` and GitHub refused it:
+- ✅ The owner created the `Books-pro` repository on GitHub.
+- ❌ This Arena session still cannot write to it. Its GitHub token is scoped to
+  `MrCedric-max/school-manager` only: `gh repo view MrCedric-max/Books-pro` cannot
+  resolve it, and `git ls-remote https://github.com/MrCedric-max/Books-pro.git`
+  returns `403 — Write access to repository not granted`.
+- Therefore the project cannot be pushed to `Books-pro` from this session. Use
+  Route A or B below — both are already prepared and tested.
 
-> GraphQL: Resource not accessible by integration (createRepository)
+## Route A — new Arena session (easiest)
 
-This session's GitHub token is scoped to `MrCedric-max/school-manager` only, and the
-session itself can only push to its own branch. So the repo must be created once
-by the account owner, then the project (already packaged) is moved across.
+Start a new Arena session linked to **Books-pro** and say:
 
-## Step 1 — create the empty repo (30 seconds, owner only)
+> Copy the Books Pro project from MrCedric-max/school-manager (root of branch
+> arena/605bce77-school-manager) into this repo, excluding azobe-school-manager/.
 
-1. Go to https://github.com/new
-2. Owner: `MrCedric-max` · Repository name: `books-pro`
-3. Choose **Private** (recommended — school/book material)
-4. Do **NOT** add a README, .gitignore or licence (the export brings its own)
-5. Click **Create repository**
+That session's token will be scoped to Books-pro, so it can push there.
 
-## Step 2 — move the project (pick one)
+## Route B — locally
 
-### Route A — new Arena session (easiest)
-Start a new Arena session linked to `books-pro` and say:
-"Copy the Books Pro project from MrCedric-max/school-manager (root of branch
-arena/605bce77-school-manager) into this repo, excluding azobe-school-manager/."
-
-### Route B — locally
 ```bash
 # from a clone of school-manager, on branch arena/605bce77-school-manager:
-bash scripts/export-to-new-repo.sh /tmp/books-pro
-cd /tmp/books-pro
-git remote add origin https://github.com/MrCedric-max/books-pro.git
+bash scripts/export-to-new-repo.sh /tmp/Books-pro
+cd /tmp/Books-pro
+git remote add origin https://github.com/MrCedric-max/Books-pro.git
 git push -u origin main
 ```
+
 The export script copies only the Books Pro project (root `index.html`, `assets/`,
-`data/`, `scripts/`, README, this file), initialises git, and makes a first commit.
-It deliberately excludes `azobe-school-manager/` and this repo's `.git`.
+`data/`, `scripts/`, README and this file), initialises git, and makes a first
+commit. It deliberately excludes `azobe-school-manager/` and this repo's `.git`.
 
 ## After the move
-- Optionally enable GitHub Pages on the new repo (Settings → Pages → main branch).
-- If books are added to the Drive folder, update `data/books-pro.json` and re-run
-  `python3 scripts/build_books_data.py`.
+
+- Optionally enable GitHub Pages on Books-pro (Settings → Pages → main branch).
+- If books are added to the Drive `books pro` folder, update `data/books-pro.json`
+  and re-run `python3 scripts/build_books_data.py`.

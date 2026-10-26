@@ -28,7 +28,7 @@ Worksheet ticks and quiz scores are saved in the browser (localStorage).
 - `index.html`, `assets/` — the app (`assets/books-data.js` is generated, do not edit by hand)
 - `data/books-pro.json` — the 8-book catalogue (Drive ids, links, descriptions)
 - `scripts/build_books_data.py` — regenerates `assets/books-data.js` from the catalogue + transcribed contents (TEST MASTER structure/quizzes, Class 6 weeks, from the preserved copy in `azobe-school-manager/assets/school-data.js`)
-- `NEW-REPOSITORY.md` — how this moves to its own repository (**books-pro**)
+- `NEW-REPOSITORY.md` — how this project is linked to its own repository (**MrCedric-max/Books-pro**)
 - `azobe-school-manager/` — the earlier École Azobe school-manager app (whole-Drive scope), preserved as requested; open `azobe-school-manager/index.html`
 
 ## Note on scope

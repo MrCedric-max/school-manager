@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Export ONLY the Books Pro project (root level) into a fresh git repo folder.
-# Usage: bash scripts/export-to-new-repo.sh /path/to/new/books-pro
+# Usage: bash scripts/export-to-new-repo.sh /path/to/new/Books-pro
 set -euo pipefail
 DEST="${1:?Usage: bash scripts/export-to-new-repo.sh /path/to/destination}"
 SRC="$(cd "$(dirname "$0")/.." && pwd)"
@@ -18,4 +18,4 @@ cd "$DEST"
 git add -A
 git -c user.name="Books Pro" -c user.email="books-pro@localhost" commit -qm "Books Pro — English learning & curriculum app (from Drive folder 'books pro')" || true
 echo "Exported Books Pro to $DEST"
-echo "Next: git -C $DEST remote add origin https://github.com/MrCedric-max/books-pro.git && git -C $DEST push -u origin main"
+echo "Next: git -C $DEST remote add origin https://github.com/MrCedric-max/Books-pro.git && git -C $DEST push -u origin main"
