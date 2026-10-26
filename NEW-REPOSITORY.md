@@ -1,37 +1,46 @@
 # Moving Books Pro to its own repository
 
-**Intended new repository:** `books-pro` (under the same GitHub account, i.e. `MrCedric-max/books-pro`) — rename freely.
+**Intended new repository:** `MrCedric-max/books-pro` (private suggested) — does not exist yet.
 
-## Why a manual step is needed
+## Status (2026-10-26)
 
-This project was built in an Arena session that is permanently bound to the
-`MrCedric-max/school-manager` repository and its session branch. That session can
-only commit/push there, so it cannot create or push to the new repository for you.
-One of these two routes will do it:
+Creating the repo from this Arena session was attempted with
+`gh repo create MrCedric-max/books-pro --private` and GitHub refused it:
 
-## Route A — new Arena session (easiest)
+> GraphQL: Resource not accessible by integration (createRepository)
 
-1. On GitHub, create an empty repository named **books-pro** (no README, no .gitignore).
-2. Start a new Arena session linked to `books-pro` and say:
-   "Copy the Books Pro project from MrCedric-max/school-manager (root of branch
-   arena/605bce77-school-manager) into this repo, excluding azobe-school-manager/."
+This session's GitHub token is scoped to `MrCedric-max/school-manager` only, and the
+session itself can only push to its own branch. So the repo must be created once
+by the account owner, then the project (already packaged) is moved across.
 
-## Route B — do it locally (5 minutes)
+## Step 1 — create the empty repo (30 seconds, owner only)
 
+1. Go to https://github.com/new
+2. Owner: `MrCedric-max` · Repository name: `books-pro`
+3. Choose **Private** (recommended — school/book material)
+4. Do **NOT** add a README, .gitignore or licence (the export brings its own)
+5. Click **Create repository**
+
+## Step 2 — move the project (pick one)
+
+### Route A — new Arena session (easiest)
+Start a new Arena session linked to `books-pro` and say:
+"Copy the Books Pro project from MrCedric-max/school-manager (root of branch
+arena/605bce77-school-manager) into this repo, excluding azobe-school-manager/."
+
+### Route B — locally
 ```bash
-# from a clone of this repo, on the session branch:
+# from a clone of school-manager, on branch arena/605bce77-school-manager:
 bash scripts/export-to-new-repo.sh /tmp/books-pro
 cd /tmp/books-pro
 git remote add origin https://github.com/MrCedric-max/books-pro.git
 git push -u origin main
 ```
-
 The export script copies only the Books Pro project (root `index.html`, `assets/`,
-`data/`, `scripts/`, this file and the README), initialises git, and makes a first
-commit. It deliberately excludes `azobe-school-manager/` (the preserved Azobe app)
-and this repo's `.git`.
+`data/`, `scripts/`, README, this file), initialises git, and makes a first commit.
+It deliberately excludes `azobe-school-manager/` and this repo's `.git`.
 
 ## After the move
-
-- Enable GitHub Pages on the new repo (Settings → Pages → main branch) to publish the app.
-- Update the Drive folder id / book catalogue in `data/books-pro.json` if books are added.
+- Optionally enable GitHub Pages on the new repo (Settings → Pages → main branch).
+- If books are added to the Drive folder, update `data/books-pro.json` and re-run
+  `python3 scripts/build_books_data.py`.
